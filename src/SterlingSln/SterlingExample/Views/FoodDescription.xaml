@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="SterlingExample.Views.FoodDescription"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:ViewModel="clr-namespace:SterlingExample.ViewModel" xmlns:Controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Data" xmlns:Charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit" xmlns:Converter="clr-namespace:SterlingExample.Converter" mc:Ignorable="d"
+    >
+    <UserControl.Resources>
+        <Converter:BooleanVisibilityConverter x:Key="BoolViz"/>
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Visibility="{Binding IsNotEmpty,Converter={StaticResource BoolViz}}">
+        <Grid.DataContext>
+            <ViewModel:FoodDescriptionViewModel/>
+        </Grid.DataContext>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="250"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Charting:Chart Height="245" Width="270" Grid.Row="2" LegendTitle="Calories" Title="Calorie Breakdown">
+            <Charting:Chart.Series>
+                <Charting:ColumnSeries ItemsSource="{Binding ProCarbFats}" IndependentValueBinding="{Binding DataName}"
+                                    DependentValueBinding="{Binding Value}"/>
+            </Charting:Chart.Series>
+        </Charting:Chart>
+        <TextBlock Text="{Binding CurrentFoodDescription.Description}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Center">            
+            <TextBlock Text=" ("/>
+            <TextBlock Text="{Binding CurrentFoodDescription.Abbreviated}"/>
+            <TextBlock Text=")"/>
+        </StackPanel>
+        <Controls:DataGrid AutoGenerateColumns="True" ItemsSource="{Binding Nutrients}" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="5" Grid.Row="3"/>        
+    </Grid>
+</UserControl>

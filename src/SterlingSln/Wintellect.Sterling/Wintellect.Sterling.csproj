@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}</ProjectGuid>
+    <ProjectTypeGuids>{A1591282-1198-4647-A2B1-27E5FF5F6F3B};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Wintellect.Sterling</RootNamespace>
+    <AssemblyName>Wintellect.Sterling</AssemblyName>
+    <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
+    <SilverlightApplication>false</SilverlightApplication>
+    <ValidateXaml>true</ValidateXaml>
+    <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <!-- This property group is only here to support building this project using the 
+       MSBuild 3.5 toolset. In order to work correctly with this older toolset, it needs 
+       to set the TargetFrameworkVersion to v3.5 -->
+  <PropertyGroup Condition="'$(MSBuildToolsVersion)' == '3.5'">
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Bin\Release</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="System.Windows" />
+    <Reference Include="system" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Windows.Browser" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Database\BaseDatabaseInstance.cs" />
+    <Compile Include="Database\Extensions.cs" />
+    <Compile Include="Database\ITableDefinition.cs" />
+    <Compile Include="Database\LogManager.cs" />
+    <Compile Include="Database\TableDefinition.cs" />
+    <Compile Include="Events\SterlingOperationArgs.cs" />
+    <Compile Include="Exceptions\Exceptions.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Exceptions.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Exceptions\SterlingActivationException.cs" />
+    <Compile Include="Exceptions\SterlingDatabaseNotFoundException.cs" />
+    <Compile Include="Exceptions\SterlingDuplicateDatabaseException.cs" />
+    <Compile Include="Exceptions\SterlingDuplicateIndexException.cs" />
+    <Compile Include="Exceptions\SterlingDuplicateTypeException.cs" />
+    <Compile Include="Exceptions\SterlingIndexNotFoundException.cs" />
+    <Compile Include="Exceptions\SterlingIsolatedStorageException.cs" />
+    <Compile Include="Exceptions\SterlingLoggerNotFoundException.cs" />
+    <Compile Include="Exceptions\SterlingNoTableDefinitionsException.cs" />
+    <Compile Include="Exceptions\SterlingNotReadyException.cs" />
+    <Compile Include="Exceptions\SterlingNullException.cs" />
+    <Compile Include="Exceptions\SterlingSerializerException.cs" />
+    <Compile Include="Exceptions\SterlingTableNotFoundException.cs" />
+    <Compile Include="Indexes\IIndexCollection.cs" />
+    <Compile Include="Indexes\IndexCollection.cs" />
+    <Compile Include="Indexes\IndexCollection2.cs" />
+    <Compile Include="Indexes\TableIndex.cs" />
+    <Compile Include="Indexes\TableIndex2.cs" />
+    <Compile Include="IsolatedStorage\IsoStorageHelper.cs" />
+    <Compile Include="IsolatedStorage\PathProvider.cs" />
+    <Compile Include="ISterlingDatabase.cs" />
+    <Compile Include="Database\SterlingDatabase.cs" />
+    <Compile Include="ISterlingDatabaseInstance.cs" />
+    <Compile Include="ISterlingLock.cs" />
+    <Compile Include="Keys\IKeyCollection.cs" />
+    <Compile Include="Keys\KeyCollection.cs" />
+    <Compile Include="Keys\TableKey.cs" />
+    <Compile Include="Serialization\AggregateSerializer.cs" />
+    <Compile Include="Serialization\BaseSerializer.cs" />
+    <Compile Include="Serialization\DefaultSerializer.cs" />
+    <Compile Include="Serialization\ExtendedSerializer.cs" />
+    <Compile Include="Serialization\ISterlingSerializer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serialization\SerializationCache.cs" />
+    <Compile Include="Serialization\SerializationHelper.cs" />
+    <Compile Include="SterlingDefaultLogger.cs" />
+    <Compile Include="SterlingEngine.cs" />
+    <Compile Include="SterlingFactory.cs" />
+    <Compile Include="SterlingLogLevel.cs" />
+    <Compile Include="Events\SterlingOperation.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Exceptions\Exceptions.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Exceptions.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{A1591282-1198-4647-A2B1-27E5FF5F6F3B}">
+        <SilverlightProjectProperties />
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
