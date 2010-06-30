@@ -26,9 +26,12 @@ namespace Wintellect.Sterling.Serialization
                                                     (bw, obj) => bw.Write(((DateTime) obj).Ticks),
                                                     br => new DateTime(br.ReadInt64())));
 
+#if WINPHONE7
+#else
             _serializers.Add(typeof(Guid), new Tuple<Action<BinaryWriter, object>, Func<BinaryReader, object>>(
                 (bw, obj) => bw.Write(obj.ToString()),
                 br => Guid.Parse(br.ReadString())));
+#endif
 
             _serializers.Add(typeof(Uri), new Tuple<Action<BinaryWriter, object>, Func<BinaryReader, object>>(
                 (bw, obj) => bw.Write(((Uri)obj).AbsoluteUri),

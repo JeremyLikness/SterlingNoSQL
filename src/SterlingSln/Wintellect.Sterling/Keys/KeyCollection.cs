@@ -60,7 +60,11 @@ namespace Wintellect.Sterling.Keys
         /// <summary>
         ///     Query the keys
         /// </summary>
+#if WINPHONE7
+        public IEnumerable<TableKey<T, TKey>> Query { get { return _keyList; } }
+#else
         public IQueryable<TableKey<T, TKey>> Query { get { return _keyList.AsQueryable(); } }
+#endif
 
         private void _DeserializeKeys()
         {

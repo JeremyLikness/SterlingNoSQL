@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.20506</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7842BE18-DAE7-408A-8863-7C0DE2FFB9D8}</ProjectGuid>
+    <ProjectTypeGuids>{C089C8C0-30E0-4E22-80C0-CE093F111A43};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Wintellect.Sterling</RootNamespace>
+    <AssemblyName>Wintellect.Sterling.WindowsPhone</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
+    <TargetFrameworkProfile>WindowsPhone</TargetFrameworkProfile>
+    <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
+    <SilverlightApplication>false</SilverlightApplication>
+    <ValidateXaml>true</ValidateXaml>
+    <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Bin\Release</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT WINPHONE7</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="System.Windows" />
+    <Reference Include="system" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Net" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Wintellect.Sterling\Database\BaseDatabaseInstance.cs">
+      <Link>Database\BaseDatabaseInstance.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Database\Extensions.cs">
+      <Link>Database\Extensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Database\ITableDefinition.cs">
+      <Link>Database\ITableDefinition.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Database\LogManager.cs">
+      <Link>Database\LogManager.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Database\SterlingDatabase.cs">
+      <Link>Database\SterlingDatabase.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Database\TableDefinition.cs">
+      <Link>Database\TableDefinition.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Events\SterlingOperation.cs">
+      <Link>Events\SterlingOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Events\SterlingOperationArgs.cs">
+      <Link>Events\SterlingOperationArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\Exceptions.Designer.cs">
+      <Link>Exceptions\Exceptions.Designer.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingActivationException.cs">
+      <Link>Exceptions\SterlingActivationException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingDatabaseNotFoundException.cs">
+      <Link>Exceptions\SterlingDatabaseNotFoundException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingDuplicateDatabaseException.cs">
+      <Link>Exceptions\SterlingDuplicateDatabaseException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingDuplicateIndexException.cs">
+      <Link>Exceptions\SterlingDuplicateIndexException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingDuplicateTypeException.cs">
+      <Link>Exceptions\SterlingDuplicateTypeException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingIndexNotFoundException.cs">
+      <Link>Exceptions\SterlingIndexNotFoundException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingIsolatedStorageException.cs">
+      <Link>Exceptions\SterlingIsolatedStorageException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingLoggerNotFoundException.cs">
+      <Link>Exceptions\SterlingLoggerNotFoundException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingNoTableDefinitionsException.cs">
+      <Link>Exceptions\SterlingNoTableDefinitionsException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingNotReadyException.cs">
+      <Link>Exceptions\SterlingNotReadyException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingNullException.cs">
+      <Link>Exceptions\SterlingNullException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingSerializerException.cs">
+      <Link>Exceptions\SterlingSerializerException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingTableNotFoundException.cs">
+      <Link>Exceptions\SterlingTableNotFoundException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Indexes\IIndexCollection.cs">
+      <Link>Indexes\IIndexCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Indexes\IndexCollection.cs">
+      <Link>Indexes\IndexCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Indexes\IndexCollection2.cs">
+      <Link>Indexes\IndexCollection2.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Indexes\TableIndex.cs">
+      <Link>Indexes\TableIndex.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Indexes\TableIndex2.cs">
+      <Link>Indexes\TableIndex2.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\IsolatedStorage\IsoStorageHelper.cs">
+      <Link>IsolatedStorage\IsoStorageHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\IsolatedStorage\PathProvider.cs">
+      <Link>IsolatedStorage\PathProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\ISterlingDatabase.cs">
+      <Link>ISterlingDatabase.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\ISterlingDatabaseInstance.cs">
+      <Link>ISterlingDatabaseInstance.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\ISterlingLock.cs">
+      <Link>ISterlingLock.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Keys\IKeyCollection.cs">
+      <Link>Keys\IKeyCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Keys\KeyCollection.cs">
+      <Link>Keys\KeyCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Keys\TableKey.cs">
+      <Link>Keys\TableKey.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Serialization\AggregateSerializer.cs">
+      <Link>Serialization\AggregateSerializer.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Serialization\BaseSerializer.cs">
+      <Link>Serialization\BaseSerializer.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Serialization\DefaultSerializer.cs">
+      <Link>Serialization\DefaultSerializer.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Serialization\ExtendedSerializer.cs">
+      <Link>Serialization\ExtendedSerializer.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Serialization\ISterlingSerializer.cs">
+      <Link>Serialization\ISterlingSerializer.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Serialization\SerializationCache.cs">
+      <Link>Serialization\SerializationCache.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Serialization\SerializationHelper.cs">
+      <Link>Serialization\SerializationHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\SterlingDefaultLogger.cs">
+      <Link>SterlingDefaultLogger.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\SterlingEngine.cs">
+      <Link>SterlingEngine.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\SterlingFactory.cs">
+      <Link>SterlingFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\SterlingLogLevel.cs">
+      <Link>SterlingLogLevel.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SL4Stub\IStructuralComparable.cs" />
+    <Compile Include="SL4Stub\IStructuralEquatable.cs" />
+    <Compile Include="SL4Stub\Lazy.cs" />
+    <Compile Include="SL4Stub\Tuple.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\Wintellect.Sterling\Exceptions\Exceptions.resx">
+      <Link>Exceptions\Exceptions.resx</Link>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />
+  <ProjectExtensions />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

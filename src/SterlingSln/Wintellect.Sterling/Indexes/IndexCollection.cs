@@ -115,7 +115,11 @@ namespace Wintellect.Sterling.Indexes
         /// <summary>
         ///     Query the indexes
         /// </summary>
+#if WINPHONE7
+        public IEnumerable<TableIndex<T, TIndex, TKey>> Query { get { return _indexList; } }
+#else
         public IQueryable<TableIndex<T, TIndex, TKey>> Query { get { return _indexList.AsQueryable(); } }
+#endif
 
         /// <summary>
         ///     Deserialize the indexes
