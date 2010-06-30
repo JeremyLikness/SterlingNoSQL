@@ -28,14 +28,12 @@ namespace SterlingExample.WindowsPhone.Database
         public ISterlingDatabaseInstance Database { get; private set; }
 
         private SterlingEngine _engine;
-        private SterlingDefaultLogger _logger; 
-
+        
         public void StartService(ApplicationServiceContext context)
         {
             
             Current = this;
             _engine = new SterlingEngine();
-            _logger = new SterlingDefaultLogger(SterlingLogLevel.Verbose);
         }
 
         public void StopService()
@@ -56,7 +54,6 @@ namespace SterlingExample.WindowsPhone.Database
 
         public void Exiting()
         {
-            _logger.Detach();
             _engine.Dispose();
         }
 
