@@ -1,0 +1,47 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{86611684-2AAD-42B0-ADBE-CD92F14B6989}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling", "..\SterlingSln\Wintellect.Sterling\Wintellect.Sterling.csproj", "{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.WindowsPhone", "..\SterlingSln\Wintellect.Sterling.WindowsPhone\Wintellect.Sterling.WindowsPhone.csproj", "{7842BE18-DAE7-408A-8863-7C0DE2FFB9D8}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 4
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs04.codeplex.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = ..\\SterlingSln\\Wintellect.Sterling\\Wintellect.Sterling.csproj
+		SccProjectName1 = ../SterlingSln/Wintellect.Sterling
+		SccLocalPath1 = ..\\SterlingSln\\Wintellect.Sterling
+		SccProjectUniqueName2 = ..\\SterlingSln\\Wintellect.Sterling.WindowsPhone\\Wintellect.Sterling.WindowsPhone.csproj
+		SccProjectName2 = ../SterlingSln/Wintellect.Sterling.WindowsPhone
+		SccLocalPath2 = ..\\SterlingSln\\Wintellect.Sterling.WindowsPhone
+		SccProjectUniqueName3 = Setup\\Setup.vdproj
+		SccProjectName3 = Setup
+		SccLocalPath3 = Setup
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{86611684-2AAD-42B0-ADBE-CD92F14B6989}.Debug|Any CPU.ActiveCfg = Debug
+		{86611684-2AAD-42B0-ADBE-CD92F14B6989}.Debug|Any CPU.Build.0 = Debug
+		{86611684-2AAD-42B0-ADBE-CD92F14B6989}.Release|Any CPU.ActiveCfg = Release
+		{86611684-2AAD-42B0-ADBE-CD92F14B6989}.Release|Any CPU.Build.0 = Release
+		{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7842BE18-DAE7-408A-8863-7C0DE2FFB9D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7842BE18-DAE7-408A-8863-7C0DE2FFB9D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7842BE18-DAE7-408A-8863-7C0DE2FFB9D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7842BE18-DAE7-408A-8863-7C0DE2FFB9D8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
