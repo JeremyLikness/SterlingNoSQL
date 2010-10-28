@@ -97,7 +97,7 @@ namespace Wintellect.Sterling.IsolatedStorage
         /// <param name="path">the path</param>
         public void EnsureDirectory(string path)
         {
-            if (!path.EndsWith("/"))
+            if (path.EndsWith("/"))
             {
                 path = path.Substring(0, path.Length - 1);
             }
