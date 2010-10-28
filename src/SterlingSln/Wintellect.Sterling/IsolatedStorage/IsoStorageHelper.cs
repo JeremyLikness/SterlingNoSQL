@@ -99,7 +99,7 @@ namespace Wintellect.Sterling.IsolatedStorage
         {
             if (!path.EndsWith("/"))
             {
-                path = path + "/";
+                path = path.Substring(0, path.Length - 1);
             }
 
             try
