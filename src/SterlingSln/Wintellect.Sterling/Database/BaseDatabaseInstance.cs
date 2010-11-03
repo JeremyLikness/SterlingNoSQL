@@ -570,11 +570,13 @@ namespace Wintellect.Sterling.Database
             if (handler == null) return;
 
             Action raise = () => handler(this, new SterlingOperationArgs(operation, targetType, key));
-
-            if (!Deployment.Current.CheckAccess()) return;
-
+            
             var dispatcher = Deployment.Current.Dispatcher;
             if (dispatcher.CheckAccess())
+            {
+                raise();
+            }
+            else
             {
                 dispatcher.BeginInvoke(raise);
             }

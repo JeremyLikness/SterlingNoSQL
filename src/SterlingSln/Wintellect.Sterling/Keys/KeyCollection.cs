@@ -83,6 +83,10 @@ namespace Wintellect.Sterling.Keys
                         {
                             var key = _serializer.Deserialize<TKey>(br);
                             var idx = br.ReadInt32();
+                            if (idx >= NextKey)
+                            {
+                                NextKey = idx + 1;
+                            }
                             _keyMap.Add(key, idx);
                             _keyList.Add(new TableKey<T, TKey>(key, _resolver));
                         }

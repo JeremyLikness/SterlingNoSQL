@@ -58,21 +58,22 @@ namespace Wintellect.Sterling.Database
         /// <param name="exception">The exception</param>
         public void Log(SterlingLogLevel level, string message, Exception exception)
         {
-            if (!Deployment.Current.CheckAccess()) return;
-
             var dispatcher = Deployment.Current.Dispatcher;
-
-            if (!dispatcher.CheckAccess())
-            {
-                return;
-            }
-
+            
             lock(Lock)
             {
                 foreach (var key in _loggers.Keys)
                 {
                     var key1 = key;
-                    dispatcher.BeginInvoke(()=>_loggers[key1](level, message, exception));
+                    Action action = () => _loggers[key1](level, message, exception);
+                    if (dispatcher.CheckAccess())
+                    {
+                        action();
+                    }
+                    else
+                    {
+                        dispatcher.BeginInvoke(action);
+                    }
                 }
             }
         }
