@@ -23,20 +23,18 @@ namespace Wintellect.Sterling.Serialization
         {
             // wire up the serialization pairs 
             _serializers.Add(typeof (DateTime), new Tuple<Action<BinaryWriter, object>, Func<BinaryReader, object>>(
-                                                    (bw, obj) => bw.Write(((DateTime) obj).Ticks),
-                                                    br => new DateTime(br.ReadInt64())));
+                                                    (bw, obj) => bw.Write(((DateTime)obj).ToFileTimeUtc()),
+                                                    br => DateTime.FromFileTimeUtc(br.ReadInt64())));
 
-#if WINPHONE7
-#else
+
             _serializers.Add(typeof(Guid), new Tuple<Action<BinaryWriter, object>, Func<BinaryReader, object>>(
-                (bw, obj) => bw.Write(obj.ToString()),
-                br => Guid.Parse(br.ReadString())));
-#endif
+                (bw, obj) => bw.Write(((Guid)obj).ToByteArray()),
+                br => new Guid(br.ReadBytes(16))));
 
             _serializers.Add(typeof(Uri), new Tuple<Action<BinaryWriter, object>, Func<BinaryReader, object>>(
                 (bw, obj) => bw.Write(((Uri)obj).AbsoluteUri),
                 br => new Uri(br.ReadString())));          
-        }
+        }      
 
         /// <summary>
         ///     Return true if this serializer can handle the object
