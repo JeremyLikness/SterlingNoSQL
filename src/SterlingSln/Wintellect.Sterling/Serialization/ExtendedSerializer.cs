@@ -13,7 +13,7 @@ namespace Wintellect.Sterling.Serialization
         /// <summary>
         ///     Dictionary of serializers
         /// </summary>
-        private readonly Dictionary<Type, Tuple<Action<BinaryWriter,object>,Func<BinaryReader,object>>> _serializers
+        private readonly Dictionary<Type, Tuple<Action<BinaryWriter, object>, Func<BinaryReader, object>>> _serializers
             = new Dictionary<Type, Tuple<Action<BinaryWriter, object>, Func<BinaryReader, object>>>();
 
         /// <summary>
@@ -23,18 +23,52 @@ namespace Wintellect.Sterling.Serialization
         {
             // wire up the serialization pairs 
             _serializers.Add(typeof (DateTime), new Tuple<Action<BinaryWriter, object>, Func<BinaryReader, object>>(
-                                                    (bw, obj) => bw.Write(((DateTime)obj).ToFileTimeUtc()),
-                                                    br => DateTime.FromFileTimeUtc(br.ReadInt64())));
+                                                    (bw, obj) => bw.Write(((DateTime) obj).ToFileTimeUtc()),
+                                                    br => DateTime.FromFileTimeUtc(br.ReadInt64()).ToLocalTime()));
 
 
-            _serializers.Add(typeof(Guid), new Tuple<Action<BinaryWriter, object>, Func<BinaryReader, object>>(
-                (bw, obj) => bw.Write(((Guid)obj).ToByteArray()),
-                br => new Guid(br.ReadBytes(16))));
+            _serializers.Add(typeof (Guid), new Tuple<Action<BinaryWriter, object>, Func<BinaryReader, object>>(
+                                                (bw, obj) => bw.Write(((Guid) obj).ToByteArray()),
+                                                br => new Guid(br.ReadBytes(16))));
 
-            _serializers.Add(typeof(Uri), new Tuple<Action<BinaryWriter, object>, Func<BinaryReader, object>>(
-                (bw, obj) => bw.Write(((Uri)obj).AbsoluteUri),
-                br => new Uri(br.ReadString())));          
-        }      
+            _serializers.Add(typeof (Uri), new Tuple<Action<BinaryWriter, object>, Func<BinaryReader, object>>(
+                                               (bw, obj) => bw.Write(((Uri) obj).AbsoluteUri),
+                                               br => new Uri(br.ReadString())));
+
+            _serializers.Add(typeof (decimal), new Tuple<Action<BinaryWriter, object>, Func<BinaryReader, object>>(
+                                                   (bw, obj) =>
+                                                       {
+                                                           var bits = decimal.GetBits((decimal) obj);
+                                                           bw.Write(bits[0]);
+                                                           bw.Write(bits[1]);
+                                                           bw.Write(bits[2]);
+                                                           bw.Write(bits[3]);
+                                                       },
+                                                   br =>
+                                                       {
+                                                           var bits = new int[4];
+                                                           bits[0] = br.ReadInt32();
+                                                           bits[1] = br.ReadInt32();
+                                                           bits[2] = br.ReadInt32();
+                                                           bits[3] = br.ReadInt32();
+                                                           return new decimal(bits);
+                                                       })
+                );
+
+            _serializers.Add(typeof (TimeSpan), new Tuple<Action<BinaryWriter, object>, Func<BinaryReader, object>>(
+                                                    (bw, obj) => bw.Write(((TimeSpan) obj).Ticks),
+                                                    br => new TimeSpan(br.ReadInt64())));
+
+            _serializers.Add(typeof (DateTimeOffset),
+                             new Tuple<Action<BinaryWriter, object>, Func<BinaryReader, object>>(
+                                 (bw, obj) =>
+                                     {
+                                         var dto = (DateTimeOffset) obj;
+                                         bw.Write(dto.Ticks);
+                                         bw.Write(dto.Offset.Ticks);
+                                     },
+                                 br => new DateTimeOffset(br.ReadInt64(), new TimeSpan(br.ReadInt64()))));
+        }
 
         /// <summary>
         ///     Return true if this serializer can handle the object
@@ -43,7 +77,7 @@ namespace Wintellect.Sterling.Serialization
         /// <returns>True if it can be serialized</returns>
         public override bool CanSerialize(Type type)
         {
-            return _serializers.ContainsKey(type);            
+            return _serializers.ContainsKey(type);
         }
 
         /// <summary>
@@ -73,6 +107,6 @@ namespace Wintellect.Sterling.Serialization
                 throw new SterlingSerializerException(this, type);
             }
             return _serializers[type].Item2(reader);
-        }   
+        }
     }
 }

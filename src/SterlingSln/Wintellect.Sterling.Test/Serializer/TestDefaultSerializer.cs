@@ -1,9 +1,7 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using Microsoft.Silverlight.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Wintellect.Sterling.Exceptions;
 using Wintellect.Sterling.Serialization;
 
 namespace Wintellect.Sterling.Test.Serializer
@@ -24,8 +22,7 @@ namespace Wintellect.Sterling.Test.Serializer
         const int FIVE = 5;
         const double PI = 3.14;
         const string TEST_STRING = "This string";
-        DateTime _date = DateTime.Now; 
-
+        
         [TestInitialize]
         public void Init()
         {
@@ -41,35 +38,8 @@ namespace Wintellect.Sterling.Test.Serializer
             Assert.IsTrue(_target.CanSerialize<int>(), "Failed to recognize integer.");
             Assert.IsTrue(_target.CanSerialize<double>(), "Failed to recognize double.");
             Assert.IsTrue(_target.CanSerialize<string>(), "Failed to recognize string (generic).");
-            Assert.IsTrue(_target.CanSerialize(typeof(string)), "Failed to recognize string.");           
-            Assert.IsFalse(_target.CanSerialize(_date.GetType()), "Accepted data time.");
-        }
-
-        /// <summary>
-        ///     Check it throws an exception when trying to serialize the wrong thing
-        /// </summary>
-        [TestMethod]
-        public void TestSerializerException()
-        {
-            var exception = false;
-
-            using (var mem = new MemoryStream())
-            {
-                using (var bw = new BinaryWriter(mem))
-                {
-                    try
-                    {
-                        _target.Serialize(_date, bw);
-                    }
-                    catch (SterlingSerializerException)
-                    {
-                        exception = true;
-                    }
-
-                    Assert.IsTrue(exception, "Sterling did not throw an exception when attemping to serialize the date.");
-                }
-            }
-        }
+            Assert.IsTrue(_target.CanSerialize(typeof(string)), "Failed to recognize string.");                       
+        }        
 
         /// <summary>
         ///     Test the serialization and deserialization
