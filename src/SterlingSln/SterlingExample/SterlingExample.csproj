@@ -78,10 +78,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Windows.Browser" />
     <Reference Include="System.Xml.Linq, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-    <Reference Include="Wintellect.Sterling, Version=0.9.3999.28536, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Wintellect.Sterling\Bin\Debug\Wintellect.Sterling.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
@@ -168,7 +164,12 @@
     <Content Include="RDA\NUT_DATA.txt" />
     <Content Include="RDA\WEIGHT.txt" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Wintellect.Sterling\Wintellect.Sterling.csproj">
+      <Project>{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}</Project>
+      <Name>Wintellect.Sterling</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
