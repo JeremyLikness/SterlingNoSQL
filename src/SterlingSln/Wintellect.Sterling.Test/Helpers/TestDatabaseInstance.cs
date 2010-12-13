@@ -25,13 +25,17 @@ namespace Wintellect.Sterling.Test.Helpers
             return new List<ITableDefinition>
                        {
                            CreateTableDefinition<TestModel, int>(testModel => testModel.Key)
-                                .WithIndex<TestModel,string,int>(DATAINDEX,t=>t.Data)
-                                .WithIndex<TestModel,DateTime,string,int>("IndexDateData",t=>Tuple.Create(t.Date,t.Data)),
+                               .WithIndex<TestModel, string, int>(DATAINDEX, t => t.Data)
+                               .WithIndex<TestModel, DateTime, string, int>("IndexDateData",
+                                                                            t => Tuple.Create(t.Date, t.Data)),
                            CreateTableDefinition<TestForeignModel, Guid>(t => t.Key),
                            CreateTableDefinition<TestAggregateModel, string>(t => t.Key),
                            CreateTableDefinition<TestListModel, int>(t => t.ID),
-                           CreateTableDefinition<TestClassWithStruct, int>(t => t.ID)
+                           CreateTableDefinition<TestClassWithStruct, int>(t => t.ID),
+                           CreateTableDefinition<TestCompositeClass, string>(k=>string.Format("{0}-{1}-{2}-{3}",
+                               k.Key1, k.Key2, k.Key3, k.Key4)
+                              )
                        };
         }
-    }
+    }    
 }

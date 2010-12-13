@@ -92,8 +92,12 @@
     <Compile Include="Helpers\DupDatabaseInstance.cs" />
     <Compile Include="Helpers\TestAggregateModel.cs" />
     <Compile Include="Helpers\TestClassWithStruct.cs" />
+    <Compile Include="Helpers\TestCompositeClass.cs" />
+    <Compile Include="Helpers\TestCompositeKeyClass.cs" />
+    <Compile Include="Helpers\TestCompositeSerializer.cs" />
     <Compile Include="Helpers\TestDatabaseInstance.cs" />
     <Compile Include="Database\TestTableDefinition.cs" />
+    <Compile Include="Helpers\TestDatabaseInstanceComposite.cs" />
     <Compile Include="Helpers\TestDatabaseInterfaceInstance.cs" />
     <Compile Include="Helpers\TestForeignModel.cs" />
     <Compile Include="Helpers\TestListModel.cs" />
@@ -101,6 +105,8 @@
     <Compile Include="Helpers\TestSerializer.cs" />
     <Compile Include="Indexes\TestSingleIndex.cs" />
     <Compile Include="IsolatedStorage\TestIsoHelper.cs" />
+    <Compile Include="Keys\TestCompositeKey.cs" />
+    <Compile Include="Keys\TestCompositeKeyWithKeyClass.cs" />
     <Compile Include="Keys\TestKeyCollection.cs" />
     <Compile Include="Keys\TestTableKey.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
