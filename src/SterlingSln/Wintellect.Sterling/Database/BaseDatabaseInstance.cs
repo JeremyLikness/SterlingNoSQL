@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using Wintellect.Sterling.Events;
@@ -45,6 +46,8 @@ namespace Wintellect.Sterling.Database
         {
             _locks.Clear();
         }
+
+        private readonly IsoStorageHelper _iso = new IsoStorageHelper();
 
         /// <summary>
         ///     The base database instance
@@ -115,21 +118,18 @@ namespace Wintellect.Sterling.Database
         /// </summary>
         internal void PublishTables()
         {
-            using (var iso = new IsoStorageHelper())
-            {
-                iso.EnsureDirectory(_pathProvider.GetDatabasePath(Name));
+            _iso.EnsureDirectory(_pathProvider.GetDatabasePath(Name));
 
-                lock (((ICollection) _tableDefinitions).SyncRoot)
+            lock (((ICollection) _tableDefinitions).SyncRoot)
+            {
+                foreach (var table in _RegisterTables())
                 {
-                    foreach (var table in _RegisterTables())
+                    _iso.EnsureDirectory(_pathProvider.GetTablePath(Name, table.TableType));
+                    if (_tableDefinitions.ContainsKey(table.TableType))
                     {
-                        iso.EnsureDirectory(_pathProvider.GetTablePath(Name, table.TableType));
-                        if (_tableDefinitions.ContainsKey(table.TableType))
-                        {
-                            throw new SterlingDuplicateTypeException(table.TableType, Name);
-                        }
-                        _tableDefinitions.Add(table.TableType, table);
+                        throw new SterlingDuplicateTypeException(table.TableType, Name);
                     }
+                    _tableDefinitions.Add(table.TableType, table);
                 }
             }
         }
@@ -269,7 +269,8 @@ namespace Wintellect.Sterling.Database
         public IEnumerable<TableIndex<T, Tuple<TIndex1, TIndex2>, TKey>> Query<T, TIndex1, TIndex2, TKey>(string indexName)
             where T : class, new()
 #else
-        public IQueryable<TableIndex<T, Tuple<TIndex1, TIndex2>, TKey>> Query<T, TIndex1, TIndex2, TKey>(string indexName)
+        public IQueryable<TableIndex<T, Tuple<TIndex1, TIndex2>, TKey>> Query<T, TIndex1, TIndex2, TKey>(
+            string indexName)
             where T : class, new()
 #endif
         {
@@ -315,17 +316,27 @@ namespace Wintellect.Sterling.Database
 
             var key = _tableDefinitions[type].FetchKeyFromInstance(instance);
             var keyIndex = _tableDefinitions[type].Keys.AddKey(key);
+            
+            _iso.EnsureDirectory(_pathProvider.GetDatabasePath(Name));
+            _iso.EnsureDirectory(_pathProvider.GetTablePath(Name, type));
 
-            using (var iso = new IsoStorageHelper())
+            using (var memStream = new MemoryStream())
             {
-                iso.EnsureDirectory(_pathProvider.GetDatabasePath(Name));
-                iso.EnsureDirectory(_pathProvider.GetTablePath(Name, type));
-                using (var bw = iso.GetWriter(_pathProvider.GetInstancePath(Name, type, keyIndex)))
+                using (var bw = new BinaryWriter(memStream))
                 {
                     var serializationHelper = new SerializationHelper(this, Serializer, SterlingFactory.GetLogger());
-                    serializationHelper.Save(type, instance, bw);
-                }
-            }
+                    serializationHelper.Save(type, instance, bw);          
+          
+                    bw.Flush();
+                    
+                    memStream.Seek(0, SeekOrigin.Begin);
+
+                    using (var isoWriter = _iso.GetWriter(_pathProvider.GetInstancePath(Name, type, keyIndex)))
+                    {
+                        isoWriter.Write(memStream.ToArray());
+                    }
+                }                                                                          
+            }            
 
             // update the indexes
             foreach (var index in _tableDefinitions[type].Indexes.Values)
@@ -464,27 +475,25 @@ namespace Wintellect.Sterling.Database
                 throw new SterlingTableNotFoundException(type, Name);
             }
 
-            using (var iso = new IsoStorageHelper())
+
+            var keyIndex = _tableDefinitions[type].Keys.GetIndexForKey(key);
+
+            // key not found
+            if (keyIndex < 0)
             {
-                var keyIndex = _tableDefinitions[type].Keys.GetIndexForKey(key);
-
-                // key not found
-                if (keyIndex < 0)
-                {
-                    return null;
-                }
-
-                object obj;
-
-                using (var br = iso.GetReader(_pathProvider.GetInstancePath(Name, type, keyIndex)))
-                {
-                    var serializationHelper = new SerializationHelper(this, Serializer, SterlingFactory.GetLogger());
-                    obj = serializationHelper.Load(type, br);
-                }
-
-                _RaiseOperation(SterlingOperation.Load, type, key);
-                return obj;
+                return null;
             }
+
+            object obj;
+
+            using (var br = _iso.GetReader(_pathProvider.GetInstancePath(Name, type, keyIndex)))
+            {
+                var serializationHelper = new SerializationHelper(this, Serializer, SterlingFactory.GetLogger());
+                obj = serializationHelper.Load(type, br);
+            }
+
+            _RaiseOperation(SterlingOperation.Load, type, key);
+            return obj;
         }
 
         /// <summary>
@@ -511,13 +520,12 @@ namespace Wintellect.Sterling.Database
 
             var keyEntry = _tableDefinitions[type].Keys.GetIndexForKey(key);
 
-            using (var iso = new IsoStorageHelper())
-            {
-                iso.Delete(_pathProvider.GetInstancePath(Name, type, keyEntry));
-            }
+
+            _iso.Delete(_pathProvider.GetInstancePath(Name, type, keyEntry));
+
 
             _tableDefinitions[type].Keys.RemoveKey(key);
-            foreach(var index in _tableDefinitions[type].Indexes.Values)
+            foreach (var index in _tableDefinitions[type].Indexes.Values)
             {
                 index.RemoveIndex(key);
             }
@@ -531,10 +539,8 @@ namespace Wintellect.Sterling.Database
         /// <param name="type">The type</param>
         public void Truncate(Type type)
         {
-            using (var iso = new IsoStorageHelper())
-            {
-                iso.Purge(_pathProvider.GetTablePath(Name, type));
-            }
+            _iso.Purge(_pathProvider.GetTablePath(Name, type));
+
 
             _RaiseOperation(SterlingOperation.Truncate, type, null);
         }
@@ -544,10 +550,7 @@ namespace Wintellect.Sterling.Database
         /// </summary>
         public void Purge()
         {
-            using (var iso = new IsoStorageHelper())
-            {
-                iso.Purge(_pathProvider.GetDatabasePath(Name));
-            }
+            _iso.Purge(_pathProvider.GetDatabasePath(Name));
 
             _pathProvider.Purge(Name);
 
@@ -570,7 +573,7 @@ namespace Wintellect.Sterling.Database
             if (handler == null) return;
 
             Action raise = () => handler(this, new SterlingOperationArgs(operation, targetType, key));
-            
+
             var dispatcher = Deployment.Current.Dispatcher;
             if (dispatcher.CheckAccess())
             {

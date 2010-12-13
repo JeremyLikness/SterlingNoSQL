@@ -17,7 +17,7 @@ namespace Wintellect.Sterling.Test.Database
         private ISterlingDatabaseInstance _databaseInstance;
         private List<TestModel> _modelList;
 
-        private const int MODELS = 50; 
+        private const int MODELS = 100; 
 
         [TestInitialize]
         public void TestInit()

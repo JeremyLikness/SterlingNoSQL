@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Linq;
+using System.Windows;
 using Wintellect.Sterling.Exceptions;
 
 namespace Wintellect.Sterling.IsolatedStorage
@@ -11,31 +12,25 @@ namespace Wintellect.Sterling.IsolatedStorage
     ///     This class is used to assist with manager the isolated storage references, allowing
     ///     for nested requests to use the same isolated storage reference
     /// </summary>
-    internal class IsoStorageHelper : IDisposable, ISterlingLock  
+    internal class IsoStorageHelper : IDisposable 
     {
+        private static readonly List<string> _paths = new List<string>();
+        private static readonly List<string> _files = new List<string>();
+
         /// <summary>
         ///     The isolated storage file reference
         /// </summary>
         private static IsolatedStorageFile _iso;
-
-        /// <summary>
-        ///     Reference count of requestors 
-        /// </summary>
-        private static int _refCount; 
-
+        
         /// <summary>
         ///     Constructor - determine whether or not to spin up the iso instance
         /// </summary>
         public IsoStorageHelper()
         {
-            lock(Lock)
-            {
-                if (_refCount == 0)
-                {
-                    _iso = IsolatedStorageFile.GetUserStoreForApplication();
-                }
-                _refCount++;
-            }
+            if (_iso != null) return;
+
+            _iso = IsolatedStorageFile.GetUserStoreForApplication();
+            Application.Current.Exit += (o, e) => _iso.Dispose();
         }
 
         /// <summary>
@@ -77,12 +72,16 @@ namespace Wintellect.Sterling.IsolatedStorage
         /// </summary>
         /// <param name="path">The path</param>
         public void Delete(string path)
-        {
+        {            
             try
             {
                 if (_iso.FileExists(path))
                 {
                     _iso.DeleteFile(path);
+                    if (_files.Contains(path))
+                    {
+                        _paths.Remove(path);
+                    }
                 }
             }
             catch(Exception ex)
@@ -96,7 +95,7 @@ namespace Wintellect.Sterling.IsolatedStorage
         /// </summary>
         /// <param name="path">the path</param>
         public void EnsureDirectory(string path)
-        {
+        {            
             if (path.EndsWith("/"))
             {
                 path = path.Substring(0, path.Length - 1);
@@ -104,9 +103,13 @@ namespace Wintellect.Sterling.IsolatedStorage
 
             try
             {
-                if (!_iso.DirectoryExists(path))
+                if (!_paths.Contains(path))
                 {
-                    _iso.CreateDirectory(path);
+                    if (!_iso.DirectoryExists(path))
+                    {
+                        _iso.CreateDirectory(path);
+                    }
+                    _paths.Add(path);
                 }
             }
             catch(Exception ex)
@@ -124,7 +127,15 @@ namespace Wintellect.Sterling.IsolatedStorage
         {
             try
             {
-                return _iso.FileExists(path);
+                if (_files.Contains(path))
+                    return true; 
+
+                if (_iso.FileExists(path))
+                {
+                    _files.Add(path);
+                    return true;
+                }
+                return false;
             }
             catch (Exception ex)
             {
@@ -138,6 +149,9 @@ namespace Wintellect.Sterling.IsolatedStorage
         /// <param name="path">The path</param>
         public void Purge(string path)
         {
+            _paths.Clear();
+            _files.Clear();
+
             if (!path.EndsWith("/"))
             {
                 path = path + "/";
@@ -180,14 +194,7 @@ namespace Wintellect.Sterling.IsolatedStorage
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
-        {
-            lock(Lock)
-            {
-                if (--_refCount != 0) return;
-
-                _iso.Dispose();
-                _iso = null;
-            }
+        {            
         }
 
         // Method to retrieve all directories, recursively, within a store.
@@ -228,13 +235,6 @@ namespace Wintellect.Sterling.IsolatedStorage
             var pattern = dir + "*";
 
             return _iso.GetFileNames(pattern).Select(file => string.Format("{0}{1}", dir, file)).ToList(); 
-        } 
-
-        private static readonly object _lock = new object();
-
-        public object Lock
-        {
-            get { return _lock; }
-        }
+        }         
     }
 }
