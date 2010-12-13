@@ -62,7 +62,7 @@ namespace Wintellect.Sterling.Serialization
             {
                 listType = (from @interface in type.GetInterfaces()
                             where @interface.IsGenericType
-                            where @interface.GetGenericTypeDefinition() == typeof (ICollection<>)
+                            where @interface.GetGenericTypeDefinition() == typeof (IList<>)
                             select @interface.GetGenericArguments()[0]).FirstOrDefault();
             }
 
@@ -244,13 +244,16 @@ namespace Wintellect.Sterling.Serialization
         /// <param name="p">The type of the property</param>
         private void _SerializeProperty(Type type, object propertyValue, BinaryWriter bw, Type p)
         {
-            // sorry, we don't support nulls here
             if (propertyValue == null)
             {
-                var exception = new SterlingNullException(p.FullName, type);
-                _logManager.Log(SterlingLogLevel.Error, exception.Message, exception);
-                throw exception;
+                bw.Write(NULL);
+                _logManager.Log(SterlingLogLevel.Verbose,
+                            string.Format("Sterling is saving property of type {0} with value NULL for parent {1}",
+                                          p.FullName, type.FullName), null);
+                return;
             }
+
+            bw.Write(NOTNULL);
 
             _logManager.Log(SterlingLogLevel.Verbose,
                             string.Format("Sterling is saving property of type {0} with value {1} for parent {2}",
@@ -374,6 +377,18 @@ namespace Wintellect.Sterling.Serialization
         /// <returns>The de-serialized property</returns>
         private object _DeserializeProperty(Type type, BinaryReader br, Type p)
         {
+            var isNull = _serializer.Deserialize(NULL.GetType(), br);
+
+            if (isNull.Equals(NULL))
+            {
+                _logManager.Log(SterlingLogLevel.Verbose,
+                            string.Format(
+                                "Sterling de-serialized property of type {0} with value NULL for parent {1}",
+                                p.FullName, type.FullName), null);
+            
+                return null;
+            }
+
             var propertyValue = _serializer.Deserialize(p, br);
             _logManager.Log(SterlingLogLevel.Verbose,
                             string.Format(
