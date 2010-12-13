@@ -12,8 +12,8 @@ namespace Wintellect.Sterling.IsolatedStorage
     /// </summary>
     internal class PathProvider
     {
-        private readonly LogManager _logManager; 
-        
+        private readonly LogManager _logManager;
+
         internal const string BASE = "Sterling/";
         internal const string DB = "{0}db.dat";
         internal const string TABLE = "{0}tables.dat";
@@ -32,12 +32,18 @@ namespace Wintellect.Sterling.IsolatedStorage
         /// <summary>
         ///     Master index of databases
         /// </summary>
-        private readonly Dictionary<string,int> _databaseMaster = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> _databaseMaster = new Dictionary<string, int>();
 
         /// <summary>
         ///     Master index of tables 
         /// </summary>
-        private readonly Dictionary<int,Dictionary<Type,int>> _tableMaster = new Dictionary<int,Dictionary<Type,int>>();              
+        private readonly Dictionary<int, Dictionary<Type, int>> _tableMaster =
+            new Dictionary<int, Dictionary<Type, int>>();
+
+        /// <summary>
+        ///     Isolated storage
+        /// </summary>
+        private static readonly IsoStorageHelper _iso = new IsoStorageHelper();
 
         /// <summary>
         ///     Constructor
@@ -46,11 +52,8 @@ namespace Wintellect.Sterling.IsolatedStorage
         {
             _logManager = logManager;
 
-            using (var helper = new IsoStorageHelper())
-            {
-                helper.EnsureDirectory(BASE);                
-            }
-            
+            _iso.EnsureDirectory(BASE);
+
             _InitializeDatabases();
         }
 
@@ -62,11 +65,11 @@ namespace Wintellect.Sterling.IsolatedStorage
         {
             if (_databaseMaster.ContainsKey(databaseName))
             {
-                lock(((ICollection)_databaseMaster).SyncRoot)
+                lock (((ICollection) _databaseMaster).SyncRoot)
                 {
                     var idx = _databaseMaster[databaseName];
                     _databaseMaster.Remove(databaseName);
-                    lock(((ICollection)_tableMaster).SyncRoot)
+                    lock (((ICollection) _tableMaster).SyncRoot)
                     {
                         if (_tableMaster.ContainsKey(idx))
                         {
@@ -75,9 +78,9 @@ namespace Wintellect.Sterling.IsolatedStorage
                     }
                 }
             }
-            _SerializeDatabases();            
+            _SerializeDatabases();
         }
-        
+
         /// <summary>
         ///     Get the path for a database
         /// </summary>
@@ -90,23 +93,24 @@ namespace Wintellect.Sterling.IsolatedStorage
                 throw new ArgumentNullException("databaseName");
             }
 
-            _logManager.Log(SterlingLogLevel.Verbose, string.Format("Path Provider: Database Path Request: {0}", databaseName), null);
+            _logManager.Log(SterlingLogLevel.Verbose,
+                            string.Format("Path Provider: Database Path Request: {0}", databaseName), null);
 
-            lock(((ICollection)_databaseMaster).SyncRoot)
+            lock (((ICollection) _databaseMaster).SyncRoot)
             {
                 if (!_databaseMaster.ContainsKey(databaseName))
                 {
                     _databaseMaster.Add(databaseName, NextDb++);
                     _SerializeDatabases();
-                    _tableMaster.Add(_databaseMaster[databaseName], new Dictionary<Type, int>());                    
+                    _tableMaster.Add(_databaseMaster[databaseName], new Dictionary<Type, int>());
                 }
             }
 
             var path = string.Format("{0}{1}/", BASE, _databaseMaster[databaseName]);
 
             _logManager.Log(SterlingLogLevel.Verbose, string.Format("Resolved database path from {0} to {1}",
-                databaseName, path), null);
-            return path; 
+                                                                    databaseName, path), null);
+            return path;
         }
 
         /// <summary>
@@ -115,8 +119,8 @@ namespace Wintellect.Sterling.IsolatedStorage
         /// <typeparam name="T">Type of the table</typeparam>
         /// <param name="databaseName">The name of the database</param>
         /// <returns>The table path</returns>
-        public string GetTablePath<T>(string databaseName) where T: class, new()
-        {            
+        public string GetTablePath<T>(string databaseName) where T : class, new()
+        {
             return GetTablePath(databaseName, typeof (T));
         }
 
@@ -138,11 +142,12 @@ namespace Wintellect.Sterling.IsolatedStorage
                 throw new SterlingDatabaseNotFoundException(databaseName);
             }
 
-            _logManager.Log(SterlingLogLevel.Verbose, string.Format("Path Provider: Table Path Request: {0}", tableType.FullName), null);
+            _logManager.Log(SterlingLogLevel.Verbose,
+                            string.Format("Path Provider: Table Path Request: {0}", tableType.FullName), null);
 
             var tableRef = _tableMaster[_databaseMaster[databaseName]];
 
-            lock(((ICollection)tableRef).SyncRoot)
+            lock (((ICollection) tableRef).SyncRoot)
             {
                 if (tableRef.Count == 0)
                 {
@@ -160,7 +165,7 @@ namespace Wintellect.Sterling.IsolatedStorage
 
             var path = string.Format("{0}{1}/", GetDatabasePath(databaseName), tableRef[tableType]);
             _logManager.Log(SterlingLogLevel.Verbose, string.Format("Resolved table path from {0} to {1}",
-               tableType.FullName, path), null);
+                                                                    tableType.FullName, path), null);
             return path;
         }
 
@@ -182,7 +187,7 @@ namespace Wintellect.Sterling.IsolatedStorage
         /// <typeparam name="T"></typeparam>
         /// <param name="databaseName"></param>
         /// <returns></returns>
-        public string GetKeysPath<T>(string databaseName) where T: class, new()
+        public string GetKeysPath<T>(string databaseName) where T : class, new()
         {
             return GetKeysPath(databaseName, typeof (T));
         }
@@ -198,12 +203,12 @@ namespace Wintellect.Sterling.IsolatedStorage
             if (string.IsNullOrEmpty(databaseName))
             {
                 throw new ArgumentNullException("databaseName");
-            }            
+            }
 
             var path = string.Format(KEY, GetTablePath(databaseName, tableType));
 
             _logManager.Log(SterlingLogLevel.Verbose, string.Format("Resolved key path for table {0} from to {1}",
-               tableType.FullName, path), null);
+                                                                    tableType.FullName, path), null);
 
             return path;
         }
@@ -212,24 +217,25 @@ namespace Wintellect.Sterling.IsolatedStorage
         {
             var databaseIndex = _databaseMaster[databaseName];
 
-            using (var iso = new IsoStorageHelper())
+
+            _iso.EnsureDirectory(GetDatabasePath(databaseName));
+            var path = string.Format(TABLE, GetDatabasePath(databaseName));
+            using (var bw = _iso.GetWriter(path))
             {
-                iso.EnsureDirectory(GetDatabasePath(databaseName));
-                var path = string.Format(TABLE, GetDatabasePath(databaseName));
-                using (var bw = iso.GetWriter(path))
+                var tableRef = _tableMaster[databaseIndex];
+                bw.Write(tableRef.Count);
+                var stringBuilder = new StringBuilder();
+                foreach (var key in tableRef.Keys)
                 {
-                    var tableRef = _tableMaster[databaseIndex];
-                    bw.Write(tableRef.Count);
-                    var stringBuilder = new StringBuilder();
-                    foreach(var key in tableRef.Keys)
-                    {
-                        bw.Write(key.AssemblyQualifiedName);
-                        bw.Write(tableRef[key]);
-                        stringBuilder.AppendFormat(" {0}={1} ", tableRef[key], key.AssemblyQualifiedName);
-                    }
-                    _logManager.Log(SterlingLogLevel.Information,string.Format("Sterling serialized {0} table definitions to path {1} for database {2}:{3}{4}",
-                        _tableMaster[databaseIndex].Count, path, databaseName, Environment.NewLine, stringBuilder), null);
+                    bw.Write(key.AssemblyQualifiedName);
+                    bw.Write(tableRef[key]);
+                    stringBuilder.AppendFormat(" {0}={1} ", tableRef[key], key.AssemblyQualifiedName);
                 }
+                _logManager.Log(SterlingLogLevel.Information,
+                                string.Format(
+                                    "Sterling serialized {0} table definitions to path {1} for database {2}:{3}{4}",
+                                    _tableMaster[databaseIndex].Count, path, databaseName, Environment.NewLine,
+                                    stringBuilder), null);
             }
         }
 
@@ -238,22 +244,21 @@ namespace Wintellect.Sterling.IsolatedStorage
         /// </summary>
         private void _SerializeDatabases()
         {
-            using (var iso = new IsoStorageHelper())
+            _iso.EnsureDirectory(BASE);
+            using (var bw = _iso.GetWriter(string.Format(DB, BASE)))
             {
-                iso.EnsureDirectory(PathProvider.BASE);
-                using (var bw = iso.GetWriter(string.Format(DB,BASE)))
+                bw.Write(NextDb);
+                bw.Write(NextTable);
+                bw.Write(_databaseMaster.Count);
+                foreach (var key in _databaseMaster.Keys)
                 {
-                    bw.Write(NextDb);
-                    bw.Write(NextTable);
-                    bw.Write(_databaseMaster.Count);
-                    foreach(var key in _databaseMaster.Keys)
-                    {
-                        bw.Write(key);
-                        bw.Write(_databaseMaster[key]);
-                    }
-                    _logManager.Log(SterlingLogLevel.Information, string.Format("Sterling serialized the master database nextDb={0} nextTable={1} databases={2}",
-                        NextDb, NextTable, _databaseMaster.Count), null);
+                    bw.Write(key);
+                    bw.Write(_databaseMaster[key]);
                 }
+                _logManager.Log(SterlingLogLevel.Information,
+                                string.Format(
+                                    "Sterling serialized the master database nextDb={0} nextTable={1} databases={2}",
+                                    NextDb, NextTable, _databaseMaster.Count), null);
             }
         }
 
@@ -266,30 +271,30 @@ namespace Wintellect.Sterling.IsolatedStorage
 
             _logManager.Log(SterlingLogLevel.Verbose, string.Format("Initialize databases from path: {0}", path), null);
 
-            using (var iso = new IsoStorageHelper())
+
+            if (!_iso.FileExists(path)) return;
+
+            _databaseMaster.Clear();
+            _tableMaster.Clear();
+
+            using (var br = _iso.GetReader(path))
             {
-                if (!iso.FileExists(path)) return;
-
-                _databaseMaster.Clear();
-                _tableMaster.Clear();
-
-                using (var br = iso.GetReader(path))
+                NextDb = br.ReadInt32();
+                NextTable = br.ReadInt32();
+                var count = br.ReadInt32();
+                var stringBuilder = new StringBuilder();
+                for (var i = 0; i < count; i++)
                 {
-                    NextDb = br.ReadInt32();
-                    NextTable = br.ReadInt32();
-                    var count = br.ReadInt32();
-                    var stringBuilder = new StringBuilder();
-                    for (var i = 0; i < count; i++)
-                    {
-                        var dbName = br.ReadString();
-                        var dbIndex = br.ReadInt32();
-                        stringBuilder.AppendFormat(" {0}={1} ", dbIndex, dbName);
-                        _databaseMaster.Add(dbName, dbIndex);
-                        _tableMaster.Add(dbIndex, new Dictionary<Type,int>());
-                    }
-                    _logManager.Log(SterlingLogLevel.Information, string.Format("Sterling de-serialized the master database nextDb={0} nextTable={1} databases={2}:{3}{4}",
-                      NextDb, NextTable, _databaseMaster.Count, Environment.NewLine, stringBuilder), null);
+                    var dbName = br.ReadString();
+                    var dbIndex = br.ReadInt32();
+                    stringBuilder.AppendFormat(" {0}={1} ", dbIndex, dbName);
+                    _databaseMaster.Add(dbName, dbIndex);
+                    _tableMaster.Add(dbIndex, new Dictionary<Type, int>());
                 }
+                _logManager.Log(SterlingLogLevel.Information,
+                                string.Format(
+                                    "Sterling de-serialized the master database nextDb={0} nextTable={1} databases={2}:{3}{4}",
+                                    NextDb, NextTable, _databaseMaster.Count, Environment.NewLine, stringBuilder), null);
             }
         }
 
@@ -300,26 +305,23 @@ namespace Wintellect.Sterling.IsolatedStorage
         {
             _logManager.Log(SterlingLogLevel.Verbose, string.Format("Initialize tables from path: {0}", path), null);
 
-            using (var iso = new IsoStorageHelper())
+            if (!_iso.FileExists(path)) return;
+
+            using (var br = _iso.GetReader(path))
             {
-                if (!iso.FileExists(path)) return;
-                
-                using (var br = iso.GetReader(path))
+                var count = br.ReadInt32();
+                var stringBuilder = new StringBuilder();
+                for (var i = 0; i < count; i++)
                 {
-                    var count = br.ReadInt32();
-                    var stringBuilder = new StringBuilder();
-                    for (var i = 0; i < count; i++)
-                    {
-                        var typeName = br.ReadString();
-                        var tableIndex = br.ReadInt32();
-                        stringBuilder.AppendFormat(" {0}={1} ", tableIndex, typeName);
-                        dictionaryRef.Add(Type.GetType(typeName), tableIndex);
-                    }
-                    _logManager.Log(SterlingLogLevel.Information, string.Format("Sterling de-serialized {0} table definitions from path {1}:{2}{3}",
-                       count, path, Environment.NewLine, stringBuilder), null);
+                    var typeName = br.ReadString();
+                    var tableIndex = br.ReadInt32();
+                    stringBuilder.AppendFormat(" {0}={1} ", tableIndex, typeName);
+                    dictionaryRef.Add(Type.GetType(typeName), tableIndex);
                 }
+                _logManager.Log(SterlingLogLevel.Information,
+                                string.Format("Sterling de-serialized {0} table definitions from path {1}:{2}{3}",
+                                              count, path, Environment.NewLine, stringBuilder), null);
             }
         }
-
     }
 }
