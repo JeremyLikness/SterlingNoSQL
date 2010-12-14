@@ -83,6 +83,7 @@
     <Compile Include="Database\TestDelete.cs" />
     <Compile Include="Database\TestIndexQuery.cs" />
     <Compile Include="Database\TestLists.cs" />
+    <Compile Include="Database\TestNullable.cs" />
     <Compile Include="Database\TestPathProvider.cs" />
     <Compile Include="Database\TestQuery.cs" />
     <Compile Include="Database\TestRegistration.cs" />

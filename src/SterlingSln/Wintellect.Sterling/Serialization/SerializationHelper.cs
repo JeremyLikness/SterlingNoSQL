@@ -99,8 +99,15 @@ namespace Wintellect.Sterling.Serialization
 
                 foreach (var p in properties)
                 {
+                    var propType = p.PropertyType;
+
+                    if (propType.IsGenericType && propType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
+                    {
+                        propType = Nullable.GetUnderlyingType(propType);
+                    }
+
                     // this is registered "keyed" type, so we serialize the foreign key
-                    if (_database.IsRegistered(p.PropertyType))
+                    if (_database.IsRegistered(propType))
                     {
                         var p1 = p;
                         _propertyCache[type].Add(
@@ -112,12 +119,12 @@ namespace Wintellect.Sterling.Serialization
                                 parent => p1.GetGetMethod().Invoke(parent, new object[] {})));
                     }
                         // this is a property
-                    else if (_serializer.CanSerialize(p.PropertyType))
+                    else if (_serializer.CanSerialize(propType))
                     {
                         var p1 = p;
                         _propertyCache[type].Add(
                             new SerializationCache(
-                                p.PropertyType,
+                                propType,
                                 null,
                                 PropertyType.Property,
                                 (parent, property) => p1.GetSetMethod().Invoke(parent, new[] {property}),
@@ -126,14 +133,14 @@ namespace Wintellect.Sterling.Serialization
                     else
                     {
                         // check if we can handle this as a list
-                        var listType = _IsGenericList(p.PropertyType);
+                        var listType = _IsGenericList(propType);
                         if (listType != null &&
                             (_database.IsRegistered(listType) || _serializer.CanSerialize(listType)))
                         {
                             var p1 = p;
                             _propertyCache[type].Add(
                                 new SerializationCache(
-                                    p.PropertyType,
+                                    propType,
                                     listType, PropertyType.List,
                                     (parent, property) => p1.GetSetMethod().Invoke(parent, new[] {property}),
                                     parent => p1.GetGetMethod().Invoke(parent, new object[] {})));
