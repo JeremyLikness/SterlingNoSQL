@@ -95,6 +95,9 @@
     <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingDuplicateTypeException.cs">
       <Link>Exceptions\SterlingDuplicateTypeException.cs</Link>
     </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingException.cs">
+      <Link>Exceptions\SterlingException.cs</Link>
+    </Compile>
     <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingIndexNotFoundException.cs">
       <Link>Exceptions\SterlingIndexNotFoundException.cs</Link>
     </Compile>
