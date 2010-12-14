@@ -104,9 +104,15 @@ namespace Wintellect.Sterling.Serialization
         /// <param name="writer">The writer</param>
         public override void Serialize(object target, BinaryWriter writer)
         {
-            if (CanSerialize(target.GetType()))
+            var type = target.GetType();
+            if (type.IsEnum)
             {
-                _serializerCache[target.GetType()].Item1(target, writer);
+                type = Enum.GetUnderlyingType(type);
+            }
+
+            if (CanSerialize(type))
+            {
+                _serializerCache[type].Item1(target, writer);
             }
             else
             {
@@ -122,9 +128,15 @@ namespace Wintellect.Sterling.Serialization
         /// <returns>The deserialized object</returns>
         public override object Deserialize(Type type, BinaryReader reader)
         {
-            if (CanSerialize(type))
+            var targetType = type;
+
+            if (targetType.IsEnum)
             {
-                return _serializerCache[type].Item2(reader);
+                targetType = Enum.GetUnderlyingType(targetType);
+            }
+            if (CanSerialize(targetType))
+            {
+                return _serializerCache[targetType].Item2(reader);
             }
             
             throw new SterlingSerializerException(this,type);            

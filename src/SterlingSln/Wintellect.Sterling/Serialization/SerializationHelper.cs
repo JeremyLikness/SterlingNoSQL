@@ -105,6 +105,10 @@ namespace Wintellect.Sterling.Serialization
                     {
                         propType = Nullable.GetUnderlyingType(propType);
                     }
+                    else if (propType.IsEnum)
+                    {
+                        propType = Enum.GetUnderlyingType(propType);
+                    }
 
                     // this is registered "keyed" type, so we serialize the foreign key
                     if (_database.IsRegistered(propType))
@@ -122,13 +126,23 @@ namespace Wintellect.Sterling.Serialization
                     else if (_serializer.CanSerialize(propType))
                     {
                         var p1 = p;
+
+                        Func<object, object> getter = parent => p1.GetGetMethod().Invoke(parent, new object[] {});
+
+                        // cast to underlying type
+                        if (p.PropertyType.IsEnum)
+                        {                            
+                            getter = parent => Convert.ChangeType(p1.GetGetMethod().Invoke(parent, new object[] {}),
+                                                                  propType, null);
+                        }
+                        
                         _propertyCache[type].Add(
                             new SerializationCache(
                                 propType,
                                 null,
                                 PropertyType.Property,
                                 (parent, property) => p1.GetSetMethod().Invoke(parent, new[] {property}),
-                                parent => p1.GetGetMethod().Invoke(parent, new object[] {})));
+                                getter));
                     }
                     else
                     {
