@@ -75,6 +75,7 @@
     <Compile Include="Exceptions\SterlingDuplicateDatabaseException.cs" />
     <Compile Include="Exceptions\SterlingDuplicateIndexException.cs" />
     <Compile Include="Exceptions\SterlingDuplicateTypeException.cs" />
+    <Compile Include="Exceptions\SterlingException.cs" />
     <Compile Include="Exceptions\SterlingIndexNotFoundException.cs" />
     <Compile Include="Exceptions\SterlingIsolatedStorageException.cs" />
     <Compile Include="Exceptions\SterlingLoggerNotFoundException.cs" />

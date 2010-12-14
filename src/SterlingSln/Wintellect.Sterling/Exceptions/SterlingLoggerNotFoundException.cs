@@ -2,7 +2,7 @@
 
 namespace Wintellect.Sterling.Exceptions
 {
-    public class SterlingLoggerNotFoundException : Exception 
+    public class SterlingLoggerNotFoundException : SterlingException 
     {
         public SterlingLoggerNotFoundException(Guid guid) : base(string.Format(Exceptions.SterlingLoggerNotFoundException, guid))
         {

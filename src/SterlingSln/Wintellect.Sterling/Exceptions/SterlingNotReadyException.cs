@@ -2,7 +2,7 @@
 
 namespace Wintellect.Sterling.Exceptions
 {
-    public class SterlingNotReadyException : Exception
+    public class SterlingNotReadyException : SterlingException
     {
         public SterlingNotReadyException() : base(Exceptions.SterlingNotReadyException)
         {

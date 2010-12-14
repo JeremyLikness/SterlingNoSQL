@@ -2,7 +2,7 @@
 
 namespace Wintellect.Sterling.Exceptions
 {
-    public class SterlingNoTableDefinitionsException : Exception 
+    public class SterlingNoTableDefinitionsException : SterlingException 
     {
         public SterlingNoTableDefinitionsException() : base(Exceptions.SterlingNoTableDefinitionsException)
         {

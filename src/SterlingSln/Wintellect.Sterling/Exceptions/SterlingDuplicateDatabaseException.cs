@@ -2,7 +2,7 @@
 
 namespace Wintellect.Sterling.Exceptions
 {
-    public class SterlingDuplicateDatabaseException : Exception
+    public class SterlingDuplicateDatabaseException : SterlingException
     {
         public SterlingDuplicateDatabaseException(ISterlingDatabaseInstance instance) : base(
             string.Format(Exceptions.SterlingDuplicateDatabaseException, instance.GetType().FullName))

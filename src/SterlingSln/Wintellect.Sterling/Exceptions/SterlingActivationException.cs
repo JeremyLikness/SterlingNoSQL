@@ -2,7 +2,7 @@
 
 namespace Wintellect.Sterling.Exceptions
 {
-    public class SterlingActivationException : Exception 
+    public class SterlingActivationException : SterlingException 
     {
         public SterlingActivationException(string operation) : base(string.Format(Exceptions.SterlingActivationException, operation))
         {
