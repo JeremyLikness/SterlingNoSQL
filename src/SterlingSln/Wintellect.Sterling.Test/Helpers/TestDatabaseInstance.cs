@@ -30,8 +30,13 @@ namespace Wintellect.Sterling.Test.Helpers
                                                                             t => Tuple.Create(t.Date, t.Data)),
                            CreateTableDefinition<TestForeignModel, Guid>(t => t.Key),
                            CreateTableDefinition<TestAggregateModel, string>(t => t.Key),
+                           CreateTableDefinition<TestAggregateListModel, int>(t => t.ID), 
                            CreateTableDefinition<TestListModel, int>(t => t.ID),
+                           CreateTableDefinition<TestDerivedClassAModel, Guid>(t => t.Key),
+                           CreateTableDefinition<TestDerivedClassBModel, Guid>(t => t.Key),
+                           CreateTableDefinition<TestClassWithArray, int>(t => t.ID),
                            CreateTableDefinition<TestClassWithStruct, int>(t => t.ID),
+                           CreateTableDefinition<TestClassWithDictionary, int>(t => t.ID),
                            CreateTableDefinition<TestCompositeClass, string>(k=>string.Format("{0}-{1}-{2}-{3}",
                                k.Key1, k.Key2, k.Key3, k.Key4)
                               )

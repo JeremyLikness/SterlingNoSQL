@@ -74,6 +74,7 @@ namespace Wintellect.Sterling.Test.Database
             var actual = _databaseInstance.Load<TestAggregateModel>(expected.Key);
             var actualTestModel = _databaseInstance.Load<TestModel>(expected.TestModelInstance.Key);
             var actualForeignModel = _databaseInstance.Load<TestForeignModel>(expected.TestForeignInstance.Key);
+            var actualDerivedModel = _databaseInstance.Load<TestDerivedClassAModel>(expected.TestBaseClassInstance.Key);
 
             Assert.AreEqual(expected.Key, actual.Key, "Load with foreign key failed: key mismatch.");
             Assert.AreEqual(expected.TestForeignInstance.Key, actual.TestForeignInstance.Key, "Load failed: foreign key mismatch.");
@@ -84,6 +85,10 @@ namespace Wintellect.Sterling.Test.Database
             Assert.AreEqual(expected.TestForeignInstance.Data, actualForeignModel.Data, "Load failed: foreign data mismatch on direct load.");
             Assert.AreEqual(expected.TestModelInstance.Key, actualTestModel.Key, "Load failed: test model key mismatch on direct load.");
             Assert.AreEqual(expected.TestModelInstance.Data, actualTestModel.Data, "Load failed: test model data mismatch on direct load.");
+
+            Assert.AreEqual(expected.TestBaseClassInstance.Key, actual.TestBaseClassInstance.Key, "Load failed: base class key mismatch.");
+            Assert.AreEqual(expected.TestBaseClassInstance.BaseProperty, actual.TestBaseClassInstance.BaseProperty, "Load failed: base class data mismatch.");
+            Assert.AreEqual(expected.TestBaseClassInstance.GetType(), actual.TestBaseClassInstance.GetType(), "Load failed: base class type mismatch.");
         }
 
         [TestMethod]

@@ -79,8 +79,11 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Database\TestActivation.cs" />
+    <Compile Include="Database\TestAggregateList.cs" />
+    <Compile Include="Database\TestArrays.cs" />
     <Compile Include="Database\TestAsync.cs" />
     <Compile Include="Database\TestDelete.cs" />
+    <Compile Include="Database\TestDictionary.cs" />
     <Compile Include="Database\TestEnum.cs" />
     <Compile Include="Database\TestIndexQuery.cs" />
     <Compile Include="Database\TestLists.cs" />
@@ -92,7 +95,11 @@
     <Compile Include="Database\TestSerializers.cs" />
     <Compile Include="Helpers\BadDatabaseInstance.cs" />
     <Compile Include="Helpers\DupDatabaseInstance.cs" />
+    <Compile Include="Helpers\TestAggregateListModel.cs" />
     <Compile Include="Helpers\TestAggregateModel.cs" />
+    <Compile Include="Helpers\TestBaseClassModel.cs" />
+    <Compile Include="Helpers\TestClassWithArray.cs" />
+    <Compile Include="Helpers\TestClassWithDictionary.cs" />
     <Compile Include="Helpers\TestClassWithStruct.cs" />
     <Compile Include="Helpers\TestCompositeClass.cs" />
     <Compile Include="Helpers\TestCompositeKeyClass.cs" />
@@ -101,6 +108,8 @@
     <Compile Include="Database\TestTableDefinition.cs" />
     <Compile Include="Helpers\TestDatabaseInstanceComposite.cs" />
     <Compile Include="Helpers\TestDatabaseInterfaceInstance.cs" />
+    <Compile Include="Helpers\TestDerivedClassAModel.cs" />
+    <Compile Include="Helpers\TestDerivedClassBModel.cs" />
     <Compile Include="Helpers\TestForeignModel.cs" />
     <Compile Include="Helpers\TestListModel.cs" />
     <Compile Include="Helpers\TestModel.cs" />

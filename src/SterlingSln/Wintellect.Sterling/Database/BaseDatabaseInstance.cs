@@ -470,30 +470,59 @@ namespace Wintellect.Sterling.Database
         /// <returns>The instance</returns>
         public object Load(Type type, object key)
         {
-            if (!_tableDefinitions.ContainsKey(type))
+            Type newType = type;
+            bool assignable = false;
+            int keyIndex = -1;
+
+            using (var iso = new IsoStorageHelper())
             {
-                throw new SterlingTableNotFoundException(type, Name);
+                if (!_tableDefinitions.ContainsKey(type))
+                {
+                    // check if type is a base type
+                    foreach (Type t in _tableDefinitions.Keys)
+                    {
+                        if (type.IsAssignableFrom(t))
+                        {
+                            assignable = true;
+                            keyIndex = _tableDefinitions[t].Keys.GetIndexForKey(key);
+
+                            if (keyIndex >= 0)
+                            {
+                                newType = t;
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    keyIndex = _tableDefinitions[newType].Keys.GetIndexForKey(key);
+                }
+
+                if (!assignable)
+                {
+                    if (!_tableDefinitions.ContainsKey(type))
+                    {
+                        throw new SterlingTableNotFoundException(type, Name);
+                    }
+                }
+
+                if (keyIndex < 0)
+                {
+                    return null;
+                }
+
+                object obj;
+
+                using (var br = iso.GetReader(_pathProvider.GetInstancePath(Name, newType, keyIndex)))
+                {
+                    var serializationHelper = new SerializationHelper(this, Serializer, SterlingFactory.GetLogger());
+                    obj = serializationHelper.Load(newType, br);
+                }
+
+                _RaiseOperation(SterlingOperation.Load, newType, key);
+                return obj;
             }
-
-
-            var keyIndex = _tableDefinitions[type].Keys.GetIndexForKey(key);
-
-            // key not found
-            if (keyIndex < 0)
-            {
-                return null;
-            }
-
-            object obj;
-
-            using (var br = _iso.GetReader(_pathProvider.GetInstancePath(Name, type, keyIndex)))
-            {
-                var serializationHelper = new SerializationHelper(this, Serializer, SterlingFactory.GetLogger());
-                obj = serializationHelper.Load(type, br);
-            }
-
-            _RaiseOperation(SterlingOperation.Load, type, key);
-            return obj;
         }
 
         /// <summary>

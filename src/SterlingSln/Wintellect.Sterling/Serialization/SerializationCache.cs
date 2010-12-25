@@ -9,22 +9,35 @@ namespace Wintellect.Sterling.Serialization
     {
         Class,
         Property,
-        List
+        Array,
+        List,
+        Dictionary
     }
-    
+
     /// <summary>
     ///     Cache for serialization of properties
     /// </summary>
     internal class SerializationCache
     {
         public SerializationCache(Type propertyType, Type listType, PropertyType serializationType,
-            Action<object,object> setter, Func<object, object> getter)
+            Action<object, object> setter, Func<object, object> getter)
         {
             PropType = propertyType;
             ListType = listType;
             SerializationType = serializationType;
             SetMethod = setter;
             GetMethod = getter;
+        }
+
+        public SerializationCache(Type propertyType, Type keyType, Type valueType,
+            Action<object, object> setter, Func<object, object> getter)
+        {
+            PropType = propertyType;
+            DictionaryKeyType = keyType;
+            DictionaryValueType = valueType;
+            SetMethod = setter;
+            GetMethod = getter;
+            SerializationType = PropertyType.Dictionary;
         }
 
         /// <summary>
@@ -36,6 +49,16 @@ namespace Wintellect.Sterling.Serialization
         ///     For IList, the type of the individual elements
         /// </summary>
         public Type ListType { get; private set; }
+
+        /// <summary>
+        ///     Property type
+        /// </summary>
+        public Type DictionaryKeyType { get; private set; }
+
+        /// <summary>
+        ///     Property type
+        /// </summary>
+        public Type DictionaryValueType { get; private set; }
 
         /// <summary>
         ///     The method for serialization

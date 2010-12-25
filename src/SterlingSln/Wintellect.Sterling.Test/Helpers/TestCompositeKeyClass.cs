@@ -6,7 +6,6 @@ namespace Wintellect.Sterling.Test.Helpers
     {
         public TestCompositeKeyClass()
         {
-            
         }
 
         public TestCompositeKeyClass(int key1, string key2, Guid key3, DateTime key4)

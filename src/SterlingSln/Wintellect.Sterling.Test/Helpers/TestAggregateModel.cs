@@ -7,8 +7,8 @@ namespace Wintellect.Sterling.Test.Helpers
         public string Key { get; set; }
 
         public TestModel TestModelInstance { get; set; }
-
         public TestForeignModel TestForeignInstance { get; set; }
+        public TestBaseClassModel TestBaseClassInstance { get; set; }
 
         public static TestAggregateModel MakeAggregateModel()
         {
@@ -16,7 +16,8 @@ namespace Wintellect.Sterling.Test.Helpers
                        {
                            Key = Guid.NewGuid().ToString(),
                            TestModelInstance = TestModel.MakeTestModel(),
-                           TestForeignInstance = TestForeignModel.MakeForeignModel()
+                           TestForeignInstance = TestForeignModel.MakeForeignModel(),
+                           TestBaseClassInstance = new TestDerivedClassAModel()
                        };
         }
     }
