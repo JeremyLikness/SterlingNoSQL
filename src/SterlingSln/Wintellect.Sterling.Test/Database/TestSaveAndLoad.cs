@@ -61,7 +61,9 @@ namespace Wintellect.Sterling.Test.Database
             Assert.IsNotNull(actual, "Load failed.");
 
             Assert.AreEqual(expected.Key, actual.Key, "Load failed: key mismatch.");
-            Assert.AreEqual(expected.Data, actual.Data, "Load failed: data mismatch.");           
+            Assert.AreEqual(expected.Data, actual.Data, "Load failed: data mismatch.");
+            Assert.IsNotNull(actual.SubClass, "Load failed: sub class is null.");           
+            Assert.AreEqual(expected.SubClass.NestedText, actual.SubClass.NestedText, "Load failed: sub class text mismtach.");
         }
 
         [TestMethod]
