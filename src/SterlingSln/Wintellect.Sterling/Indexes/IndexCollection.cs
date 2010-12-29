@@ -255,10 +255,10 @@ namespace Wintellect.Sterling.Indexes
             
             lock(((ICollection)_indexList).SyncRoot)
             {
-                if (_indexList.Contains(index))
-                {
-                    _indexList.Remove(index);
-                }
+                if (!_indexList.Contains(index)) return;
+
+                _indexList.Remove(index);
+                IsDirty = true;
             }
         }
 
