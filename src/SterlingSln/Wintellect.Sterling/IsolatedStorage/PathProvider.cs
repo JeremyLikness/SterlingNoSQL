@@ -16,6 +16,7 @@ namespace Wintellect.Sterling.IsolatedStorage
 
         internal const string BASE = "Sterling/";
         internal const string DB = "{0}db.dat";
+        internal const string TYPE = "{0}types.dat";
         internal const string TABLE = "{0}tables.dat";
         internal const string KEY = "{0}keys.dat";
 
@@ -33,6 +34,11 @@ namespace Wintellect.Sterling.IsolatedStorage
         ///     Master index of databases
         /// </summary>
         private readonly Dictionary<string, int> _databaseMaster = new Dictionary<string, int>();
+
+        /// <summary>
+        ///     Master list of types
+        /// </summary>
+        private readonly List<string> _typeMaster = new List<string>();
 
         /// <summary>
         ///     Master index of tables 
@@ -79,6 +85,48 @@ namespace Wintellect.Sterling.IsolatedStorage
                 }
             }
             _SerializeDatabases();
+        }
+
+        public int GetTypeIndex(string typeName)
+        {
+            if (_typeMaster.Count < 1)
+            {
+                _InitializeTypes();
+            }
+
+            if (string.IsNullOrEmpty(typeName))
+            {
+                throw new ArgumentNullException("typeName");
+            }
+
+            if (!_typeMaster.Contains(typeName))
+            {
+                lock(((ICollection)_typeMaster).SyncRoot)
+                {
+                    if (!_typeMaster.Contains(typeName))
+                    {
+                        _typeMaster.Add(typeName);
+                        _SerializeTypes();
+                    }
+                }
+            }
+
+            return _typeMaster.IndexOf(typeName);
+        }
+
+        public string GetTypeAtIndex(int typeIndex)
+        {
+            if (_typeMaster.Count < 1)
+            {
+                _InitializeTypes();
+            }
+
+            if ((_typeMaster.Count - 1) < typeIndex)
+            {
+                throw new IndexOutOfRangeException("typeIndex");
+            }
+
+            return _typeMaster[typeIndex];
         }
 
         /// <summary>
@@ -259,6 +307,23 @@ namespace Wintellect.Sterling.IsolatedStorage
                                 string.Format(
                                     "Sterling serialized the master database nextDb={0} nextTable={1} databases={2}",
                                     NextDb, NextTable, _databaseMaster.Count), null);
+            }            
+        }
+
+        private void _SerializeTypes()
+        {
+            _iso.EnsureDirectory(BASE);
+            using (var bw = _iso.GetWriter(string.Format(TYPE, BASE)))
+            {
+                bw.Write(_typeMaster.Count);
+                foreach(var type in _typeMaster)
+                {
+                    bw.Write(type);
+                }
+                _logManager.Log(SterlingLogLevel.Information,
+                                string.Format(
+                                    "Sterling serialized the master type list types={0}",
+                                    _typeMaster.Count), null);
             }
         }
 
@@ -295,6 +360,35 @@ namespace Wintellect.Sterling.IsolatedStorage
                                 string.Format(
                                     "Sterling de-serialized the master database nextDb={0} nextTable={1} databases={2}:{3}{4}",
                                     NextDb, NextTable, _databaseMaster.Count, Environment.NewLine, stringBuilder), null);
+            }
+        }
+
+        /// <summary>
+        ///     Initializes the database mappings 
+        /// </summary>
+        private void _InitializeTypes()
+        {
+            var path = string.Format(TYPE, BASE);
+            _logManager.Log(SterlingLogLevel.Verbose, string.Format("Initialize types from path: {0}", path), null);
+            if (!_iso.FileExists(path)) return;
+
+            lock (((ICollection)_typeMaster).SyncRoot)
+            {
+
+                _typeMaster.Clear();
+
+                using (var br = _iso.GetReader(path))
+                {
+                    var count = br.ReadInt32();
+                    for (var i = 0; i < count; i++)
+                    {
+                        _typeMaster.Add(br.ReadString());
+                    }
+                    _logManager.Log(SterlingLogLevel.Information,
+                                    string.Format(
+                                        "Sterling de-serialized the type database types={0}",
+                                        count), null);
+                }
             }
         }
 

@@ -324,7 +324,8 @@ namespace Wintellect.Sterling.Database
             {
                 using (var bw = new BinaryWriter(memStream))
                 {
-                    var serializationHelper = new SerializationHelper(this, Serializer, SterlingFactory.GetLogger());
+                    var serializationHelper = new SerializationHelper(this, Serializer, SterlingFactory.GetLogger(), s => _pathProvider.GetTypeIndex(s),
+                        i => _pathProvider.GetTypeAtIndex(i));
                     serializationHelper.Save(type, instance, bw);          
           
                     bw.Flush();
@@ -516,7 +517,8 @@ namespace Wintellect.Sterling.Database
 
                 using (var br = iso.GetReader(_pathProvider.GetInstancePath(Name, newType, keyIndex)))
                 {
-                    var serializationHelper = new SerializationHelper(this, Serializer, SterlingFactory.GetLogger());
+                    var serializationHelper = new SerializationHelper(this, Serializer, SterlingFactory.GetLogger(), s=>_pathProvider.GetTypeIndex(s),
+                        i=>_pathProvider.GetTypeAtIndex(i));
                     obj = serializationHelper.Load(newType, br);
                 }
 

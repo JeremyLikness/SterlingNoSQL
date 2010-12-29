@@ -5,7 +5,6 @@ using System.Linq;
 using Wintellect.Sterling.Database;
 using Wintellect.Sterling.Exceptions;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Wintellect.Sterling.Serialization
 {
@@ -39,6 +38,8 @@ namespace Wintellect.Sterling.Serialization
         private readonly ISterlingDatabaseInstance _database;
         private readonly ISterlingSerializer _serializer;
         private readonly LogManager _logManager;
+        private readonly Func<string, int> _typeResolver = s => 1;
+        private readonly Func<int, string> _typeIndexer = i => string.Empty;
 
         /// <summary>
         ///     Checks to see if it is a generic list, and, if it is, returns the type of the list
@@ -57,14 +58,12 @@ namespace Wintellect.Sterling.Serialization
                 return _listTypes[type];
             }
 
-            Type listType = null;
-
-            listType = (from @interface in type.GetInterfaces()
-                        where @interface.IsGenericType
-                        && (@interface.GetGenericTypeDefinition() == typeof(ICollection<>)
-                        || @interface.GetGenericTypeDefinition() == typeof(IList<>)
-                        || @interface.GetGenericTypeDefinition() == typeof(IList))
-                        select @interface.GetGenericArguments()[0]).FirstOrDefault();
+            Type listType = (from @interface in type.GetInterfaces()
+                             where @interface.IsGenericType
+                                   && (@interface.GetGenericTypeDefinition() == typeof(ICollection<>)
+                                       || @interface.GetGenericTypeDefinition() == typeof(IList<>)
+                                       || @interface.GetGenericTypeDefinition() == typeof(IList))
+                             select @interface.GetGenericArguments()[0]).FirstOrDefault();
 
             if (listType == null)
             {
@@ -82,7 +81,7 @@ namespace Wintellect.Sterling.Serialization
             return listType;
         }
 
-        private bool _IsArray(Type type)
+        private static bool _IsArray(Type type)
         {
             return type.IsArray;
         }
@@ -133,10 +132,10 @@ namespace Wintellect.Sterling.Serialization
         ///     Cache the properties for a type so we don't reflect every time
         /// </summary>
         /// <param name="type">The type to manage</param>
+        /// <param name="instance"></param>
         private void _CacheProperties(Type type, object instance)
         {
             Type valueType = null;
-            Type listType, dictKeyType, dictValueType;
 
             lock (((ICollection)_propertyCache).SyncRoot)
             {
@@ -178,7 +177,7 @@ namespace Wintellect.Sterling.Serialization
                     if (_database.IsRegistered(propType) || (value != null && _database.IsRegistered(valueType)))
                     {
                         var p1 = p;
-                        var v = valueType != null ? valueType : propType;
+                        var v = valueType ?? propType;
                         _propertyCache[type].Add(
                             new SerializationCache(
                             //p.PropertyType,
@@ -221,44 +220,48 @@ namespace Wintellect.Sterling.Serialization
                                 (parent, property) => p1.GetSetMethod().Invoke(parent, new[] { property }),
                                 parent => p1.GetGetMethod().Invoke(parent, new object[] { })));
                     }
-                    else if (_IsGenericDictionary(p.PropertyType, out dictKeyType, out dictValueType))
+                    else
                     {
-                        var p1 = p;
-                        _propertyCache[type].Add(
-                            new SerializationCache(
-                                p.PropertyType,
-                                dictKeyType,
-                                dictValueType,
-                                (parent, property) => p1.GetSetMethod().Invoke(parent, new[] { property }),
-                                parent => p1.GetGetMethod().Invoke(parent, new object[] { })));
-                    }
-                    else if ((listType = _IsGenericList(propType)) != null)
-                    {
-                        // check if we can handle this as a list
-                        bool cansave = true;
-
-                        // try to get the type of each object of the list
-                        var v = p.GetGetMethod().Invoke(instance, new object[] { });
-                        IEnumerable ie = v as IEnumerable;
-
-                        foreach (object o in ie)
-                        {
-                            if (!_database.IsRegistered(o.GetType()))
-                            {
-                                cansave = false;
-                                break;
-                            }
-                        }
-
-                        if (cansave || _database.IsRegistered(listType) || _serializer.CanSerialize(listType))
+                        Type dictKeyType;
+                        Type dictValueType;
+                        if (_IsGenericDictionary(p.PropertyType, out dictKeyType, out dictValueType))
                         {
                             var p1 = p;
                             _propertyCache[type].Add(
                                 new SerializationCache(
                                     p.PropertyType,
-                                    listType, PropertyType.List,
+                                    dictKeyType,
+                                    dictValueType,
                                     (parent, property) => p1.GetSetMethod().Invoke(parent, new[] { property }),
                                     parent => p1.GetGetMethod().Invoke(parent, new object[] { })));
+                        }
+                        else
+                        {
+                            Type listType;
+                            if ((listType = _IsGenericList(propType)) != null)
+                            {
+                                // check if we can handle this as a list
+
+                                // try to get the type of each object of the list
+                                var v = p.GetGetMethod().Invoke(instance, new object[] { });
+                                var ie = v as IEnumerable;
+
+                                if (ie != null)
+                                {
+                                    var cansave = ie.Cast<object>().All(o => _database.IsRegistered(o.GetType()));
+
+                                    if (cansave || _database.IsRegistered(listType) || _serializer.CanSerialize(listType))
+                                    {
+                                        var p1 = p;
+                                        _propertyCache[type].Add(
+                                            new SerializationCache(
+                                                p.PropertyType,
+                                                listType, PropertyType.List,
+                                                (parent, property) => p1.GetSetMethod().Invoke(parent, new[] { property }),
+                                                parent => p1.GetGetMethod().Invoke(parent, new object[] { })));
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -271,12 +274,16 @@ namespace Wintellect.Sterling.Serialization
         /// <param name="database">Database this is a helper for</param>
         /// <param name="serializer">The serializer</param>
         /// <param name="logManager">The logger</param>
+        /// <param name="typeResolver"></param>
+        /// <param name="typeIndexer"></param>
         public SerializationHelper(ISterlingDatabaseInstance database, ISterlingSerializer serializer,
-                                   LogManager logManager)
+                                   LogManager logManager, Func<string,int> typeResolver, Func<int,string> typeIndexer)
         {
             _database = database;
             _serializer = serializer;
             _logManager = logManager;
+            _typeResolver = typeResolver;
+            _typeIndexer = typeIndexer;
         }
 
         /// <summary>
@@ -463,7 +470,7 @@ namespace Wintellect.Sterling.Serialization
             if (foreignTable == null) return;
 
             // aggiungo il tipo dell'oggetto da serializzare            
-            bw.Write(foreignTable.GetType().AssemblyQualifiedName);
+            bw.Write(_typeResolver(foreignTable.GetType().AssemblyQualifiedName));
 
             // if not null, serialize the key value to look up when we load back
             var foreignKey = _database.GetKey(foreignTable);
@@ -587,12 +594,12 @@ namespace Wintellect.Sterling.Serialization
         private void _DeserializeDictionary(Type parentType, Type keyType, Type valueType,
             IDictionary instance, BinaryReader br, Type p)
         {
-            Type listKeyType, listValueType;
             var idx = br.ReadInt32();
-            object key, value;
 
             for (var i = 0; i < idx; i++)
             {
+                Type listKeyType;
+                object key;
                 if ((listKeyType = _IsGenericList(keyType)) == null)
                 {
                     key = _database.IsRegistered(keyType) || !_serializer.CanSerialize(keyType)
@@ -601,10 +608,12 @@ namespace Wintellect.Sterling.Serialization
                 }
                 else
                 {
-                    key = (IList)Activator.CreateInstance(keyType);
+                    key = Activator.CreateInstance(keyType);
                     _DeserializeList(parentType, listKeyType, (IList)key, br, p);
                 }
 
+                Type listValueType;
+                object value;
                 if ((listValueType = _IsGenericList(valueType)) == null)
                 {
                     value = _database.IsRegistered(valueType) || !_serializer.CanSerialize(valueType)
@@ -613,7 +622,7 @@ namespace Wintellect.Sterling.Serialization
                 }
                 else
                 {
-                    value = (IList)Activator.CreateInstance(valueType);
+                    value = Activator.CreateInstance(valueType);
                     _DeserializeList(parentType, listValueType, (IList)value, br, p);
                 }
 
@@ -692,8 +701,8 @@ namespace Wintellect.Sterling.Serialization
                 return null;
             }
 
-            string typeName = br.ReadString();
-            targetType = Type.GetType(typeName);
+            var typeIndex = br.ReadInt32();
+            targetType = Type.GetType(_typeIndexer(typeIndex));
 
             var keyType = _database.GetKeyType(targetType);
             return _database.Load(targetType, _serializer.Deserialize(keyType, br));
