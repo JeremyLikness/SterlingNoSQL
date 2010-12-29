@@ -54,7 +54,7 @@ namespace Wintellect.Sterling.Test.Serializer
             double targetPi;
             string targetTestString;
             char[] targetCharArray;
-            byte[] targetByteArray;
+            byte[] targetByteArray;            
 
             using (var mem = new MemoryStream())
             {
