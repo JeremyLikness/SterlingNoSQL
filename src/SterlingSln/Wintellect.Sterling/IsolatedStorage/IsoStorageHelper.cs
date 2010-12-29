@@ -174,7 +174,7 @@ namespace Wintellect.Sterling.IsolatedStorage
                     {
                         _iso.DeleteFile(file);
                     }
-                    _iso.DeleteDirectory(dir);
+                    _iso.DeleteDirectory(dir.Substring(0, dir.Length - 1));
                 }
                 
                 foreach (var file in _GetAllFiles(path).Where(file => _iso.FileExists(file)))
