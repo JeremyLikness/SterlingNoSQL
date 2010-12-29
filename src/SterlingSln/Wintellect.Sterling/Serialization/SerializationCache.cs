@@ -11,7 +11,8 @@ namespace Wintellect.Sterling.Serialization
         Property,
         Array,
         List,
-        Dictionary
+        Dictionary,
+        ComplexType
     }
 
     /// <summary>

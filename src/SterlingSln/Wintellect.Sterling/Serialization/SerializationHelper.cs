@@ -164,7 +164,7 @@ namespace Wintellect.Sterling.Serialization
                         propType = Enum.GetUnderlyingType(propType);
                     }
 
-                    object value = p.GetGetMethod().Invoke(instance, new object[] { });
+                    var value = p.GetGetMethod().Invoke(instance, new object[] { });
 
                     // Try to get the value's type. PropertyType could be abstract
 
@@ -186,9 +186,11 @@ namespace Wintellect.Sterling.Serialization
                                 PropertyType.Class,
                                 (parent, property) => p1.GetSetMethod().Invoke(parent, new[] { property }),
                                 parent => p1.GetGetMethod().Invoke(parent, new object[] { })));
+                        continue;
                     }
+                    
                     // this is a property
-                    else if (_serializer.CanSerialize(propType))
+                    if (_serializer.CanSerialize(propType))
                     {
                         var p1 = p;
 
@@ -208,8 +210,10 @@ namespace Wintellect.Sterling.Serialization
                                 PropertyType.Property,
                                 (parent, property) => p1.GetSetMethod().Invoke(parent, new[] { property }),
                                 getter));
+                        continue;
                     }
-                    else if (_IsArray(p.PropertyType))
+                    
+                    if (_IsArray(p.PropertyType))
                     {
                         var p1 = p;
                         _propertyCache[type].Add(
@@ -219,51 +223,59 @@ namespace Wintellect.Sterling.Serialization
                                 PropertyType.Array,
                                 (parent, property) => p1.GetSetMethod().Invoke(parent, new[] { property }),
                                 parent => p1.GetGetMethod().Invoke(parent, new object[] { })));
+                        continue;
                     }
-                    else
+                    
+                    Type dictKeyType;
+                    Type dictValueType;
+                    if (_IsGenericDictionary(p.PropertyType, out dictKeyType, out dictValueType))
                     {
-                        Type dictKeyType;
-                        Type dictValueType;
-                        if (_IsGenericDictionary(p.PropertyType, out dictKeyType, out dictValueType))
+                        var p1 = p;
+                        _propertyCache[type].Add(
+                            new SerializationCache(
+                                p.PropertyType,
+                                dictKeyType,
+                                dictValueType,
+                                (parent, property) => p1.GetSetMethod().Invoke(parent, new[] { property }),
+                                parent => p1.GetGetMethod().Invoke(parent, new object[] { })));
+                        continue;
+                    }
+                    
+                    Type listType;
+                    if ((listType = _IsGenericList(propType)) != null)
+                    {
+                        // check if we can handle this as a list
+
+                        // try to get the type of each object of the list
+                        var v = p.GetGetMethod().Invoke(instance, new object[] { });
+                        var ie = v as IEnumerable;
+
+                        if (ie != null)
                         {
-                            var p1 = p;
-                            _propertyCache[type].Add(
-                                new SerializationCache(
-                                    p.PropertyType,
-                                    dictKeyType,
-                                    dictValueType,
-                                    (parent, property) => p1.GetSetMethod().Invoke(parent, new[] { property }),
-                                    parent => p1.GetGetMethod().Invoke(parent, new object[] { })));
-                        }
-                        else
-                        {
-                            Type listType;
-                            if ((listType = _IsGenericList(propType)) != null)
+                            var cansave = ie.Cast<object>().All(o => _database.IsRegistered(o.GetType()));
+
+                            if (cansave || _database.IsRegistered(listType) || _serializer.CanSerialize(listType))
                             {
-                                // check if we can handle this as a list
-
-                                // try to get the type of each object of the list
-                                var v = p.GetGetMethod().Invoke(instance, new object[] { });
-                                var ie = v as IEnumerable;
-
-                                if (ie != null)
-                                {
-                                    var cansave = ie.Cast<object>().All(o => _database.IsRegistered(o.GetType()));
-
-                                    if (cansave || _database.IsRegistered(listType) || _serializer.CanSerialize(listType))
-                                    {
-                                        var p1 = p;
-                                        _propertyCache[type].Add(
-                                            new SerializationCache(
-                                                p.PropertyType,
-                                                listType, PropertyType.List,
-                                                (parent, property) => p1.GetSetMethod().Invoke(parent, new[] { property }),
-                                                parent => p1.GetGetMethod().Invoke(parent, new object[] { })));
-                                    }
-                                }
+                                var p1 = p;
+                                _propertyCache[type].Add(
+                                    new SerializationCache(
+                                        p.PropertyType,
+                                        listType, PropertyType.List,
+                                        (parent, property) => p1.GetSetMethod().Invoke(parent, new[] { property }),
+                                        parent => p1.GetGetMethod().Invoke(parent, new object[] { })));
                             }
+                            continue;
                         }
                     }
+
+                    // nothing else, so we'll call it complex and recurse
+                    var pLocal = p;
+                    _propertyCache[type].Add(
+                                    new SerializationCache(
+                                        p.PropertyType,
+                                        listType, PropertyType.ComplexType,
+                                        (parent, property) => pLocal.GetSetMethod().Invoke(parent, new[] { property }),
+                                        parent => pLocal.GetGetMethod().Invoke(parent, new object[] { })));
                 }
             }
         }
@@ -331,6 +343,13 @@ namespace Wintellect.Sterling.Serialization
                 else if (p.SerializationType.Equals(PropertyType.Dictionary))
                 {
                     _SerializeDictionary(p.DictionaryKeyType, p.DictionaryValueType, (IDictionary)p.GetMethod(instance), bw);
+                }
+                else if (p.SerializationType.Equals(PropertyType.ComplexType))
+                {
+                    var propertyValue = p.GetMethod(instance);
+                    var propertyType = propertyValue == null ? p.PropType : propertyValue.GetType();
+                    bw.Write(_typeResolver(propertyType.AssemblyQualifiedName));
+                    Save(propertyType, propertyValue, bw);
                 }
             }
         }
@@ -554,6 +573,12 @@ namespace Wintellect.Sterling.Serialization
                     p.SetMethod(instance, dict);
                     _DeserializeDictionary(type, p.DictionaryKeyType, p.DictionaryValueType, dict, br, p.PropType);
                 }
+                else if (p.SerializationType.Equals(PropertyType.ComplexType))
+                {
+                    var propertyTypeIndex = br.ReadInt32();
+                    var propertyType = Type.GetType(_typeIndexer(propertyTypeIndex));
+                    p.SetMethod(instance, Load(propertyType, br));
+                }                
             }
 
             return instance;
