@@ -182,7 +182,7 @@ namespace Wintellect.Sterling.IsolatedStorage
                     _iso.DeleteFile(file);
                 }
 
-                _iso.DeleteDirectory(path);
+                _iso.DeleteDirectory(path.Substring(0, path.Length-1));
             }
             catch(Exception ex)
             {
