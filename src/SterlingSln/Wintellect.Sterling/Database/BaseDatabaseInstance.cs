@@ -409,8 +409,11 @@ namespace Wintellect.Sterling.Database
 
                                      Save(item.GetType(), item);
 
-                                     var pct = index++*100/list.Count;
-                                     bw.ReportProgress(pct);
+                                     if (bw.WorkerReportsProgress)
+                                     {
+                                         var pct = index++*100/list.Count;
+                                         bw.ReportProgress(pct);
+                                     }
                                  }
                              };
 

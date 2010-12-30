@@ -17,6 +17,10 @@ namespace Wintellect.Sterling.Test.Keys
         [TestInitialize]
         public void TestInit()
         {
+            using (var iso = new IsoStorageHelper())
+            {
+                iso.Purge(PathProvider.BASE);
+            }
             _engine = new SterlingEngine();
             _engine.SterlingDatabase.RegisterSerializer<TestCompositeSerializer>();
             _engine.Activate();

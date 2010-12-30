@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Silverlight.Testing;
@@ -17,7 +18,7 @@ namespace Wintellect.Sterling.Test.Database
         private ISterlingDatabaseInstance _databaseInstance;
         private List<TestModel> _modelList;
 
-        private const int MODELS = 100; 
+        private const int MODELS = 1000; 
 
         [TestInitialize]
         public void TestInit()
@@ -70,10 +71,37 @@ namespace Wintellect.Sterling.Test.Database
                                                                                    "Asynchronous save was canceled.");
                                                                     Assert.IsNull(e.Error,
                                                                                   "Asynchronous save failed with error.");
-                                                                    EnqueueTestComplete();
+                                                                    EnqueueTestComplete();                                                                    
                                                                 };
                                    bw.RunWorkerAsync();
                                };
+            TestPanel.Children.Add(grid);
+        }
+
+        [Asynchronous]
+        [TestMethod]
+        public void TestSaveNoProgress()
+        {
+            var grid = new Grid();
+            var textBlock = new TextBlock();
+            textBlock.SetValue(FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Center);
+            textBlock.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
+            var progress = new ProgressBar { IsIndeterminate = true };
+            grid.Children.Add(progress);
+            grid.Children.Add(textBlock);
+            grid.Loaded += (sender, args) =>
+            {
+                var bw = _databaseInstance.SaveAsync((IList)_modelList);
+                bw.RunWorkerCompleted += (o, e) =>
+                {
+                    Assert.IsFalse(e.Cancelled,
+                                   "Asynchronous save was canceled.");
+                    Assert.IsNull(e.Error,
+                                  "Asynchronous save failed with error.");
+                    EnqueueTestComplete();                    
+                };
+                bw.RunWorkerAsync();
+            };
             TestPanel.Children.Add(grid);
         }
 
@@ -109,7 +137,7 @@ namespace Wintellect.Sterling.Test.Database
                                                                 "Asynchronous save was not canceled.");
                                                  Assert.IsNull(e.Error,
                                                                "Asynchronous save failed with error.");
-                                                 EnqueueTestComplete();
+                                                 EnqueueTestComplete();                                                 
                                              };
                 bw.RunWorkerAsync();
             };
