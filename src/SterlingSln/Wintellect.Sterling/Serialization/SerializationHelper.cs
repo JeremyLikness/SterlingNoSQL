@@ -177,7 +177,7 @@ namespace Wintellect.Sterling.Serialization
                     if (_database.IsRegistered(propType) || (value != null && _database.IsRegistered(valueType)))
                     {
                         var p1 = p;
-                        var v = valueType ?? propType;
+                        var v = _database.IsRegistered(propType) ? propType : valueType;
                         _propertyCache[type].Add(
                             new SerializationCache(
                             //p.PropertyType,
@@ -248,6 +248,7 @@ namespace Wintellect.Sterling.Serialization
 
                         // try to get the type of each object of the list
                         var v = p.GetGetMethod().Invoke(instance, new object[] { });
+                        
                         var ie = v as IEnumerable;
 
                         if (ie != null)
