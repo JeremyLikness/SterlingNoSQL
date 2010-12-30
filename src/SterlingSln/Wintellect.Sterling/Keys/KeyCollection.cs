@@ -167,6 +167,15 @@ namespace Wintellect.Sterling.Keys
         }
 
         /// <summary>
+        ///     Truncate the collection
+        /// </summary>
+        public void Truncate()
+        {
+            IsDirty = false;
+            Refresh();
+        }
+
+        /// <summary>
         ///     Add a key to the list
         /// </summary>
         /// <param name="key">The key</param>

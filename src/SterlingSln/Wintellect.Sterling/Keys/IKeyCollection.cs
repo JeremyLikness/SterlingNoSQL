@@ -23,6 +23,11 @@
         void Refresh();
 
         /// <summary>
+        ///     Truncate the collection
+        /// </summary>
+        void Truncate();
+
+        /// <summary>
         ///     Add a key to the list
         /// </summary>
         /// <param name="key">The key</param>

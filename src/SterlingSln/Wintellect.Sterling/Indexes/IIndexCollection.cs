@@ -13,7 +13,12 @@
         /// <summary>
         ///     Refresh the list
         /// </summary>
-        void Refresh();        
+        void Refresh();
+
+        /// <summary>
+        ///     Truncate index
+        /// </summary>
+        void Truncate();
 
         /// <summary>
         ///     Add an index to the list

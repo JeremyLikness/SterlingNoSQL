@@ -95,6 +95,7 @@
     <Compile Include="Database\TestRegistration.cs" />
     <Compile Include="Database\TestSaveAndLoad.cs" />
     <Compile Include="Database\TestSerializers.cs" />
+    <Compile Include="Database\TestTruncate.cs" />
     <Compile Include="Helpers\BadDatabaseInstance.cs" />
     <Compile Include="Helpers\DupDatabaseInstance.cs" />
     <Compile Include="Helpers\TestAggregateListModel.cs" />

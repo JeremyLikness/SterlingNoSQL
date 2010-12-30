@@ -203,7 +203,16 @@ namespace Wintellect.Sterling.Indexes
                 _DeserializeIndexes();
                 IsDirty = false;
             }
-        }       
+        }
+
+        /// <summary>
+        ///     Truncate index
+        /// </summary>
+        public void Truncate()
+        {
+            IsDirty = false;
+            Refresh();
+        }
 
         /// <summary>
         ///     Add an index to the list

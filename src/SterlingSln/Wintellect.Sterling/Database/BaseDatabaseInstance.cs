@@ -575,7 +575,12 @@ namespace Wintellect.Sterling.Database
         {
             _iso.Purge(_pathProvider.GetTablePath(Name, type));
 
-
+            _tableDefinitions[type].Keys.Truncate();
+            foreach (var index in _tableDefinitions[type].Indexes.Values)
+            {
+                index.Truncate();
+            }
+            
             _RaiseOperation(SterlingOperation.Truncate, type, null);
         }
 
@@ -587,6 +592,16 @@ namespace Wintellect.Sterling.Database
             _iso.Purge(_pathProvider.GetDatabasePath(Name));
 
             _pathProvider.Purge(Name);
+
+            // clear key lists from memory
+            foreach(var table in _tableDefinitions.Keys)
+            {
+                _tableDefinitions[table].Keys.Truncate();
+                foreach (var index in _tableDefinitions[table].Indexes.Values)
+                {
+                    index.Truncate();
+                }
+            }
 
             _RaiseOperation(SterlingOperation.Purge, GetType(), Name);
         }
