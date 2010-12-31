@@ -82,7 +82,11 @@ namespace Wintellect.Sterling.Test.Helpers
         /// <typeparam name="T">The type to query</typeparam>
         /// <typeparam name="TKey">The type of the key</typeparam>
         /// <returns>The list of keys to query</returns>
+#if WINDOWS_PHONE
+        public IEnumerable<TableKey<T, TKey>> Query<T, TKey>() where T: class, new()
+#else
         public IQueryable<TableKey<T, TKey>> Query<T, TKey>() where T : class, new()
+#endif
         {
             throw new NotImplementedException();
         }
@@ -95,7 +99,11 @@ namespace Wintellect.Sterling.Test.Helpers
         /// <typeparam name="TKey">The type of the key</typeparam>
         /// <param name="indexName">The name of the index</param>
         /// <returns>The list of indexes to query</returns>
+#if WINDOWS_PHONE
+        public IEnumerable<TableIndex<T, TIndex, TKey>> Query<T, TIndex, TKey>(string indexName) where T : class, new()
+#else
         public IQueryable<TableIndex<T, TIndex, TKey>> Query<T, TIndex, TKey>(string indexName) where T : class, new()
+#endif
         {
             throw new NotImplementedException();
         }
@@ -108,8 +116,12 @@ namespace Wintellect.Sterling.Test.Helpers
         /// <typeparam name="TIndex2">The type of the index</typeparam>
         /// <typeparam name="TKey">The type of the key</typeparam>
         /// <param name="indexName">The name of the index</param>
-        /// <returns>The list of indexes to query</returns>        
+        /// <returns>The list of indexes to query</returns>  
+#if WINDOWS_PHONE
+        public IEnumerable<TableIndex<T, Tuple<TIndex1, TIndex2>, TKey>> Query<T, TIndex1, TIndex2, TKey>(string indexName) where T : class, new()
+#else
         public IQueryable<TableIndex<T, Tuple<TIndex1, TIndex2>, TKey>> Query<T, TIndex1, TIndex2, TKey>(string indexName) where T : class, new()
+#endif
         {
             throw new NotImplementedException();
         }

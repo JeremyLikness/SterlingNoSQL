@@ -5,9 +5,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsPhoneSterling", "Win
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.WindowsPhone", "Wintellect.Sterling.WindowsPhone\Wintellect.Sterling.WindowsPhone.csproj", "{7842BE18-DAE7-408A-8863-7C0DE2FFB9D8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.WindowsPhone.Test", "Wintellect.Sterling.WindowsPhone.Test\Wintellect.Sterling.WindowsPhone.Test.csproj", "{D6DBEA81-0DF4-4B60-8D5E-3212AB9F0B5B}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 3
+		SccNumberOfProjects = 4
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -17,6 +19,9 @@ Global
 		SccProjectUniqueName2 = Wintellect.Sterling.WindowsPhone\\Wintellect.Sterling.WindowsPhone.csproj
 		SccProjectName2 = Wintellect.Sterling.WindowsPhone
 		SccLocalPath2 = Wintellect.Sterling.WindowsPhone
+		SccProjectUniqueName3 = Wintellect.Sterling.WindowsPhone.Test\\Wintellect.Sterling.WindowsPhone.Test.csproj
+		SccProjectName3 = Wintellect.Sterling.WindowsPhone.Test
+		SccLocalPath3 = Wintellect.Sterling.WindowsPhone.Test
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +38,12 @@ Global
 		{7842BE18-DAE7-408A-8863-7C0DE2FFB9D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7842BE18-DAE7-408A-8863-7C0DE2FFB9D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7842BE18-DAE7-408A-8863-7C0DE2FFB9D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6DBEA81-0DF4-4B60-8D5E-3212AB9F0B5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6DBEA81-0DF4-4B60-8D5E-3212AB9F0B5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6DBEA81-0DF4-4B60-8D5E-3212AB9F0B5B}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{D6DBEA81-0DF4-4B60-8D5E-3212AB9F0B5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6DBEA81-0DF4-4B60-8D5E-3212AB9F0B5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6DBEA81-0DF4-4B60-8D5E-3212AB9F0B5B}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
