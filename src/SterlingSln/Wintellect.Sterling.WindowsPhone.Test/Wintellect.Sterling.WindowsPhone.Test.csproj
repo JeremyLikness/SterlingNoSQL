@@ -102,6 +102,9 @@
     <Compile Include="..\Wintellect.Sterling.Test\Database\TestPathProvider.cs">
       <Link>Database\TestPathProvider.cs</Link>
     </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test\Database\TestPurge.cs">
+      <Link>Database\TestPurge.cs</Link>
+    </Compile>
     <Compile Include="..\Wintellect.Sterling.Test\Database\TestQuery.cs">
       <Link>Database\TestQuery.cs</Link>
     </Compile>
