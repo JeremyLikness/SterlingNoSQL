@@ -16,6 +16,16 @@ namespace Wintellect.Sterling.Test.Helpers
             get { return "TestDatabase"; }
         }
 
+        public static string GetCompositeKey(TestCompositeClass testClass)
+        {
+            if (testClass == null)
+                return string.Empty;
+
+            return string.Format("{0}-{1}-{2}-{3}", testClass.Key1, testClass.Key2, testClass.Key3,
+                                 testClass.Key4);
+        }
+
+
         /// <summary>
         ///     Method called from the constructor to register tables
         /// </summary>
@@ -37,9 +47,8 @@ namespace Wintellect.Sterling.Test.Helpers
                            CreateTableDefinition<TestClassWithArray, int>(t => t.ID),
                            CreateTableDefinition<TestClassWithStruct, int>(t => t.ID),
                            CreateTableDefinition<TestClassWithDictionary, int>(t => t.ID),
-                           CreateTableDefinition<TestCompositeClass, string>(k=>string.Format("{0}-{1}-{2}-{3}",
-                               k.Key1, k.Key2, k.Key3, k.Key4)
-                              )
+                           CreateTableDefinition<TestCompositeClass, string>(GetCompositeKey)
+                              
                        };
         }
     }    

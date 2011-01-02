@@ -590,8 +590,7 @@ namespace Wintellect.Sterling.Database
         public void Purge()
         {
             _iso.Purge(_pathProvider.GetDatabasePath(Name));
-
-            _pathProvider.Purge(Name);
+           
 
             // clear key lists from memory
             foreach(var table in _tableDefinitions.Keys)
@@ -601,7 +600,7 @@ namespace Wintellect.Sterling.Database
                 {
                     index.Truncate();
                 }
-            }
+            }                        
 
             _RaiseOperation(SterlingOperation.Purge, GetType(), Name);
         }

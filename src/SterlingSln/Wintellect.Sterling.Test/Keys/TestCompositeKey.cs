@@ -17,9 +17,13 @@ namespace Wintellect.Sterling.Test.Keys
         [TestInitialize]
         public void TestInit()
         {
+            using (var iso = new IsoStorageHelper())
+            {
+                iso.Purge(PathProvider.BASE);
+            }
             _engine = new SterlingEngine();
             _engine.Activate();
-            _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestDatabaseInstance>();
+            _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestDatabaseInstance>();            
         }
 
         [TestCleanup]
@@ -32,20 +36,19 @@ namespace Wintellect.Sterling.Test.Keys
                 iso.Purge(PathProvider.BASE);
             }
         }
-
-        private static string GetKey(TestCompositeClass testClass)
-        {
-            return string.Format("{0}-{1}-{2}-{3}", testClass.Key1, testClass.Key2, testClass.Key3,
-                                 testClass.Key4);
-        }
+       
 
         [TestMethod]
         public void TestSave()
         {
+            const int LISTSIZE = 20;
+
             var random = new Random();
+            
             // test saving and reloading
-            var list = new List<TestCompositeClass>();
-            for (var x = 0; x < 100; x++)
+            var list = new TestCompositeClass[LISTSIZE];
+
+            for (var x = 0; x < LISTSIZE; x++)
             {
                 var testClass = new TestCompositeClass
                                     {
@@ -55,15 +58,16 @@ namespace Wintellect.Sterling.Test.Keys
                                         Key4 = DateTime.Now.AddMinutes(-1*random.Next(100)),
                                         Data = Guid.NewGuid().ToString()
                                     };
-                list.Add(testClass);
+                list[x] = testClass;
                 _databaseInstance.Save(testClass);
             }
 
-            for (var x = 0; x < 100; x++)
+            for (var x = 0; x < LISTSIZE; x++)
             {
-                var actual = _databaseInstance.Load<TestCompositeClass>(GetKey(list[x]));
+                var compositeKey = TestDatabaseInstance.GetCompositeKey(list[x]);
+                var actual = _databaseInstance.Load<TestCompositeClass>(compositeKey);
                 Assert.IsNotNull(actual, "Load failed.");
-                Assert.AreEqual(GetKey(list[x]), GetKey(actual), "Load failed: key mismatch.");
+                Assert.AreEqual(compositeKey, TestDatabaseInstance.GetCompositeKey(actual), "Load failed: key mismatch.");
                 Assert.AreEqual(list[x].Data, actual.Data, "Load failed: data mismatch.");
             }
         }
