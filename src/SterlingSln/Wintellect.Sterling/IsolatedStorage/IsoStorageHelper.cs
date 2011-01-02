@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.IsolatedStorage;
-using System.Linq;
 using System.Windows;
 using Wintellect.Sterling.Exceptions;
 
@@ -144,17 +143,25 @@ namespace Wintellect.Sterling.IsolatedStorage
         }
 
         /// <summary>
-        ///     Purge a directory and everything beneath it
+        /// Purge a directory and everything beneath it
         /// </summary>
         /// <param name="path">The path</param>
         public void Purge(string path)
         {
-            _paths.Clear();
-            _files.Clear();
+            Purge(path, true);
+        }
 
-            if (!path.EndsWith("/"))
+        /// <summary>
+        /// Purge a directory and everything beneath it
+        /// </summary>
+        /// <param name="path">The path</param>
+        /// <param name="clear">A value indicating whether the internal lists should be cleared</param>
+        private static void Purge(string path, bool clear)
+        {
+            if (clear)
             {
-                path = path + "/";
+                _paths.Clear();
+                _files.Clear();
             }
 
             try
@@ -165,76 +172,32 @@ namespace Wintellect.Sterling.IsolatedStorage
                     return;
                 }
 
-                // sort by levels deep
-                var list = (from d in _GetAllDirectories(path) orderby d.Count(c => c.Equals('/')) descending select d);
-
-                foreach (var dir in list)
+                // clear the sub directories
+                foreach (var dir in _iso.GetDirectoryNames(Path.Combine(path, "*")))
                 {
-                    foreach(var file in _GetAllFiles(dir))
-                    {
-                        _iso.DeleteFile(file);
-                    }
-                    _iso.DeleteDirectory(dir.Substring(0, dir.Length - 1));
-                }
-                
-                foreach (var file in _GetAllFiles(path).Where(file => _iso.FileExists(file)))
-                {
-                    _iso.DeleteFile(file);
+                    Purge(Path.Combine(path, dir), false);
                 }
 
-                _iso.DeleteDirectory(path.Substring(0, path.Length-1));
+                // clear the files
+                foreach (var file in _iso.GetFileNames(Path.Combine(path, "*")))
+                {
+                    _iso.DeleteFile(Path.Combine(path, file));
+                }
+
+                _iso.DeleteDirectory(path.TrimEnd('\\', '/'));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new SterlingIsolatedStorageException(ex);
             }
         }
+
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
         {            
-        }
-
-        // Method to retrieve all directories, recursively, within a store.
-        private static string[] _GetAllDirectories(string pattern)
-        {            
-            // Retrieve directories.
-            var directories = _iso.GetDirectoryNames(pattern + "*");
-
-            var directoryList = directories.Select(dir => string.Format("{0}{1}/", pattern, dir)).ToList();
-
-            // Retrieve subdirectories of matches.
-            for (int i = 0, max = directories.Length; i < max; i++)
-            {
-                var directory = directoryList[i];
-                var more = _GetAllDirectories(directory);                
-                // Insert the subdirectories into the list and
-                // update the counter and upper bound.
-                directoryList.InsertRange(i + 1, more);
-                i += more.Length;
-                max += more.Length;
-            }
-
-            return directoryList.ToArray();
-        }
-
-        /// <summary>
-        ///     All files
-        /// </summary>
-        /// <param name="dir">Base directory</param>
-        /// <returns></returns>
-        private static IEnumerable<string> _GetAllFiles(string dir)
-        {
-            if (!dir.EndsWith("/"))
-            {
-                dir += "/";
-            }
-
-            var pattern = dir + "*";
-
-            return _iso.GetFileNames(pattern).Select(file => string.Format("{0}{1}", dir, file)).ToList(); 
-        }         
+        }             
     }
 }
