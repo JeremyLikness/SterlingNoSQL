@@ -67,6 +67,44 @@ namespace Wintellect.Sterling.Test.Database
         }
 
         [TestMethod]
+        public void TestSaveShutdownReInitialize()
+        {
+            // test saving and reloading
+            var expected1 = TestModel.MakeTestModel();
+            var expected2 = TestModel.MakeTestModel();
+
+            _databaseInstance.Save(expected1);
+            _databaseInstance.Save(expected2);
+
+            _databaseInstance.Flush();
+            
+            // shut it down
+
+            _engine.Dispose();
+            _databaseInstance = null;
+
+            // bring it back up
+            _engine = new SterlingEngine();
+            _engine.Activate();
+            _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestDatabaseInstance>();
+
+            var actual1 = _databaseInstance.Load<TestModel>(expected1.Key);
+            var actual2 = _databaseInstance.Load<TestModel>(expected2.Key);
+
+            Assert.IsNotNull(actual1, "Load failed for 1.");
+            Assert.AreEqual(expected1.Key, actual1.Key, "Load failed (1): key mismatch.");
+            Assert.AreEqual(expected1.Data, actual1.Data, "Load failed(1): data mismatch.");
+            Assert.IsNotNull(actual1.SubClass, "Load failed (1): sub class is null.");
+            Assert.AreEqual(expected1.SubClass.NestedText, actual1.SubClass.NestedText, "Load failed (1): sub class text mismtach.");
+
+            Assert.IsNotNull(actual2, "Load failed for 2.");
+            Assert.AreEqual(expected2.Key, actual2.Key, "Load failed (2): key mismatch.");
+            Assert.AreEqual(expected2.Data, actual2.Data, "Load failed (2): data mismatch.");
+            Assert.IsNotNull(actual2.SubClass, "Load failed (2): sub class is null.");
+            Assert.AreEqual(expected2.SubClass.NestedText, actual2.SubClass.NestedText, "Load failed (2): sub class text mismtach.");
+        }
+        
+        [TestMethod]
         public void TestSaveForeign()
         {
             var expected = TestAggregateModel.MakeAggregateModel();
