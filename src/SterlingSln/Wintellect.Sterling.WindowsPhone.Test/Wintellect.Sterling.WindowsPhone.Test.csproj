@@ -180,6 +180,9 @@
     <Compile Include="..\Wintellect.Sterling.Test\Helpers\TestModel.cs">
       <Link>Helpers\TestModel.cs</Link>
     </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test\Helpers\TestModelAsList.cs">
+      <Link>Helpers\TestModelAsList.cs</Link>
+    </Compile>
     <Compile Include="..\Wintellect.Sterling.Test\Helpers\TestSerializer.cs">
       <Link>Helpers\TestSerializer.cs</Link>
     </Compile>
