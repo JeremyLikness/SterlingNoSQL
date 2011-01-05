@@ -11,8 +11,6 @@ namespace Wintellect.Sterling.Database
         public object Instance { get; set; }
         public object Key { get; set; }
 
-        public int HashCode { get; set; }
-        
         public override bool Equals(object obj)
         {
             var other = obj as CycleItem;
