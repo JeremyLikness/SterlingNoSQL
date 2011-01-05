@@ -73,5 +73,40 @@ namespace Wintellect.Sterling.Test.Database
                 Assert.AreEqual(expected.Children[x].Data, actual.Children[x].Data, "Save/load failed: data mismatch.");                
             }
         }
+
+        [TestMethod]
+        public void TestModelAsList()
+        {
+            var expected = TestModelAsListModel.MakeTestModelAsList();
+            var key = _databaseInstance.Save(expected);
+            var actual = _databaseInstance.Load<TestModelAsListModel>(key);
+            Assert.IsNotNull(actual, "Save/load failed: model is null.");
+            Assert.AreEqual(expected.Id, actual.Id, "Save/load failed: key mismatch.");
+            Assert.AreEqual(expected.Count, actual.Count, "Save/load failed: list size mismatch.");
+            for (var x = 0; x < expected.Count; x++)
+            {
+                Assert.AreEqual(expected[x].Key, actual[x].Key, "Save/load failed: key mismatch.");
+                Assert.AreEqual(expected[x].Data, actual[x].Data, "Save/load failed: data mismatch.");
+            }
+        }
+
+        [TestMethod]
+        public void TestModelAsListWithParentReference()
+        {
+            var expected = TestModelAsListModel.MakeTestModelAsListWithParentReference();
+            var key = _databaseInstance.Save(expected);
+           
+            var actual = _databaseInstance.Load<TestModelAsListModel>(key);
+            Assert.IsNotNull(actual, "Save/load failed: model is null.");
+            Assert.AreEqual(expected.Id, actual.Id, "Save/load failed: key mismatch.");
+            Assert.AreEqual(expected.Count, actual.Count, "Save/load failed: list size mismatch.");
+            for (var x = 0; x < expected.Count; x++)
+            {
+                Assert.AreEqual(expected[x].Key, actual[x].Key, "Save/load failed: key mismatch.");
+                Assert.AreEqual(expected[x].Data, actual[x].Data, "Save/load failed: data mismatch.");
+                Assert.AreEqual(expected, expected[x].Parent, "Parent doesn't match");
+            }
+        }
+
     }
 }

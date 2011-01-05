@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using Wintellect.Sterling.Database;
 using Wintellect.Sterling.Events;
 using Wintellect.Sterling.Indexes;
 using Wintellect.Sterling.Keys;
@@ -111,8 +112,18 @@ namespace Wintellect.Sterling
         /// </summary>
         /// <param name="type">The type to save</param>
         /// <param name="instance">The instance</param>
+        /// <param name="cache">The cycle cache</param>
+        /// <returns>The key</returns>
+        object Save(Type type, object instance, CycleCache cache);
+
+        /// <summary>
+        ///     Save when key is not known
+        /// </summary>
+        /// <param name="type">The type to save</param>
+        /// <param name="instance">The instance</param>
         /// <returns>The key</returns>
         object Save(Type type, object instance);
+
 
         /// <summary>
         ///     Save asynchronously
@@ -150,7 +161,16 @@ namespace Wintellect.Sterling
         /// <param name="key">The key</param>
         /// <returns>The instance</returns>
         T Load<T>(object key) where T : class, new();
-        
+
+        /// <summary>
+        ///     Load it without knowledge of the key type
+        /// </summary>
+        /// <param name="type">The type to load</param>
+        /// <param name="key">The key</param>
+        /// <param name="cache">The cycle cache</param>
+        /// <returns>The instance</returns>
+        object Load(Type type, object key, CycleCache cache);
+
         /// <summary>
         ///     Load it without knowledge of the key type
         /// </summary>
@@ -158,6 +178,7 @@ namespace Wintellect.Sterling
         /// <param name="key">The key</param>
         /// <returns>The instance</returns>
         object Load(Type type, object key);
+
 
         /// <summary>
         ///     Delete it 

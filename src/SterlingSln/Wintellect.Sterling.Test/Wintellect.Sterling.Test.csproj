@@ -117,6 +117,7 @@
     <Compile Include="Helpers\TestForeignModel.cs" />
     <Compile Include="Helpers\TestListModel.cs" />
     <Compile Include="Helpers\TestModel.cs" />
+    <Compile Include="Helpers\TestModelAsList.cs" />
     <Compile Include="Helpers\TestSerializer.cs" />
     <Compile Include="Indexes\TestSingleIndex.cs" />
     <Compile Include="IsolatedStorage\TestIsoHelper.cs" />

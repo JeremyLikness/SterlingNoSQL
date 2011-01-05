@@ -19,6 +19,7 @@ namespace Wintellect.Sterling.Serialization
         // a few constants to serialize null values to the stream
         private const ushort NULL = 0;
         private const ushort NOTNULL = 1;
+        const string LIST_TYPE_ITEM = "Item";                    
 
         /// <summary>
         ///     "Remember" how lists map to avoid reflecting each time
@@ -164,6 +165,17 @@ namespace Wintellect.Sterling.Serialization
                         propType = Enum.GetUnderlyingType(propType);
                     }
 
+                    if (p.Name.Equals(LIST_TYPE_ITEM) && p.DeclaringType.GetInterfaces().Contains(typeof(IList)))
+                    {
+                        _propertyCache[type].Add(
+                            new SerializationCache(
+                                p.DeclaringType,
+                                propType, PropertyType.List,
+                                (parent, property) => new object(),
+                                parent => parent));
+                        continue;
+                    }
+
                     var value = p.GetGetMethod().Invoke(instance, new object[] { });
 
                     // Try to get the value's type. PropertyType could be abstract
@@ -305,7 +317,8 @@ namespace Wintellect.Sterling.Serialization
         /// <param name="type">The type to save (passed to support NULL)</param>
         /// <param name="instance">The instance to type</param>
         /// <param name="bw">The writer to save it to</param>
-        public void Save(Type type, object instance, BinaryWriter bw)
+        /// <param name="cache">Cycle cache</param>
+        public void Save(Type type, object instance, BinaryWriter bw, CycleCache cache)
         {
             _logManager.Log(SterlingLogLevel.Verbose, string.Format("Sterling is serializing type {0}", type.FullName),
                             null);
@@ -331,7 +344,7 @@ namespace Wintellect.Sterling.Serialization
                 {
                     // foreign table - write if it is null or not, and if not null, write the key
                     // then serialize it separately
-                    _SerializeClass(type, p.GetMethod(instance), bw);
+                    _SerializeClass(type, p.GetMethod(instance), bw, cache);
                 }
                 else if (p.SerializationType.Equals(PropertyType.Property))
                 {
@@ -339,18 +352,18 @@ namespace Wintellect.Sterling.Serialization
                 }
                 else if (p.SerializationType.Equals(PropertyType.List) || p.SerializationType.Equals(PropertyType.Array))
                 {
-                    _SerializeList(p.ListType, (IList)p.GetMethod(instance), bw);
+                    _SerializeList(p.ListType, (IList)p.GetMethod(instance), bw, cache);
                 }
                 else if (p.SerializationType.Equals(PropertyType.Dictionary))
                 {
-                    _SerializeDictionary(p.DictionaryKeyType, p.DictionaryValueType, (IDictionary)p.GetMethod(instance), bw);
+                    _SerializeDictionary(p.DictionaryKeyType, p.DictionaryValueType, (IDictionary)p.GetMethod(instance), bw, cache);
                 }
                 else if (p.SerializationType.Equals(PropertyType.ComplexType))
                 {
                     var propertyValue = p.GetMethod(instance);
                     var propertyType = propertyValue == null ? p.PropType : propertyValue.GetType();
                     bw.Write(_typeResolver(propertyType.AssemblyQualifiedName));
-                    Save(propertyType, propertyValue, bw);
+                    Save(propertyType, propertyValue, bw, cache);
                 }
             }
         }
@@ -361,7 +374,8 @@ namespace Wintellect.Sterling.Serialization
         /// <param name="listType">The type of elements in the list</param>
         /// <param name="instance">The list to serialize</param>
         /// <param name="bw">The stream to serialize to</param>
-        private void _SerializeList(Type listType, IList instance, BinaryWriter bw)
+        /// <param name="cache">Cache</param>
+        private void _SerializeList(Type listType, IList instance, BinaryWriter bw, CycleCache cache)
         {
             var count = instance == null ? 0 : instance.Count;
 
@@ -375,7 +389,7 @@ namespace Wintellect.Sterling.Serialization
             //serialize to database (as class) or as property?
             if (_database.IsRegistered(listType) || !_serializer.CanSerialize(listType))
             {
-                serialize = obj => _SerializeClass(listType, obj, bw);
+                serialize = obj => _SerializeClass(listType, obj, bw, cache);
             }
             else
             {
@@ -396,7 +410,8 @@ namespace Wintellect.Sterling.Serialization
         /// <param name="valueType">The type of dictionary's Value</param>
         /// <param name="instance">The dictionary to serialize</param>
         /// <param name="bw">The stream to serialize to</param>
-        private void _SerializeDictionary(Type keyType, Type valueType, IDictionary instance, BinaryWriter bw)
+        /// <param name="cache">Cycle cache</param>
+        private void _SerializeDictionary(Type keyType, Type valueType, IDictionary instance, BinaryWriter bw, CycleCache cache)
         {
             Type keyListType, valueListType;
             var count = instance == null ? 0 : instance.Count;
@@ -414,7 +429,7 @@ namespace Wintellect.Sterling.Serialization
                 //serialize to database (as class) or as property?
                 if (_database.IsRegistered(keyType) || !_serializer.CanSerialize(keyType))
                 {
-                    serializeKey = obj => _SerializeClass(keyType, obj, bw);
+                    serializeKey = obj => _SerializeClass(keyType, obj, bw, cache);
                 }
                 else
                 {
@@ -423,7 +438,7 @@ namespace Wintellect.Sterling.Serialization
             }
             else
             {
-                serializeKey = obj => _SerializeList(keyListType, (IList)obj, bw);
+                serializeKey = obj => _SerializeList(keyListType, (IList)obj, bw, cache);
             }
 
             if ((valueListType = _IsGenericList(valueType)) == null)
@@ -431,7 +446,7 @@ namespace Wintellect.Sterling.Serialization
                 //serialize to database (as class) or as property?
                 if (_database.IsRegistered(valueType) || !_serializer.CanSerialize(valueType))
                 {
-                    serializeValue = obj => _SerializeClass(keyType, obj, bw);
+                    serializeValue = obj => _SerializeClass(keyType, obj, bw, cache);
                 }
                 else
                 {
@@ -440,7 +455,7 @@ namespace Wintellect.Sterling.Serialization
             }
             else
             {
-                serializeValue = obj => _SerializeList(valueListType, (IList)obj, bw);
+                serializeValue = obj => _SerializeList(valueListType, (IList)obj, bw, cache);
             }
 
             foreach (var key in instance.Keys)
@@ -482,7 +497,8 @@ namespace Wintellect.Sterling.Serialization
         /// <param name="type">The type</param>
         /// <param name="foreignTable">The referenced type</param>
         /// <param name="bw">The writer</param>
-        private void _SerializeClass(Type type, object foreignTable, BinaryWriter bw)
+        /// <param name="cache">Cycle cache</param>
+        private void _SerializeClass(Type type, object foreignTable, BinaryWriter bw, CycleCache cache)
         {
             // serialize to the stream if the foreign key is nulled
             bw.Write(foreignTable == null ? NULL : NOTNULL);
@@ -509,15 +525,17 @@ namespace Wintellect.Sterling.Serialization
                                 foreignKey.GetType().FullName, foreignKey, type.FullName), null);
 
             _serializer.Serialize(foreignKey, bw);
-            _database.Save(foreignTable.GetType(), foreignTable);
+            _database.Save(foreignTable.GetType(), foreignTable, cache);
         }
 
         /// <summary>
         ///     Recursive load operation
         /// </summary>
         /// <param name="type">The type to save (passed to support NULL)</param>
+        /// <param name="key">The associated key (for cycle detection)</param>
         /// <param name="br">The reader</param>
-        public object Load(Type type, BinaryReader br)
+        /// <param name="cache">Cycle cache</param>
+        public object Load(Type type, object key, BinaryReader br, CycleCache cache)
         {
             _logManager.Log(SterlingLogLevel.Verbose,
                             string.Format("Sterling is de-serializing type {0}", type.FullName), null);
@@ -535,7 +553,10 @@ namespace Wintellect.Sterling.Serialization
             // make a template
             var instance = Activator.CreateInstance(type);
 
-            // build the reflection cache
+            // push to the stack
+            cache.Add(type, instance, key);            
+
+            // build the reflection cache);
             if (!_propertyCache.ContainsKey(type))
             {
                 //_CacheProperties(type);
@@ -548,7 +569,7 @@ namespace Wintellect.Sterling.Serialization
                 // recursive save? 
                 if (p.SerializationType.Equals(PropertyType.Class))
                 {
-                    p.SetMethod(instance, _DeserializeClass(type, p.PropType, br));
+                    p.SetMethod(instance, _DeserializeClass(type, p.PropType, br, cache));
                 }
                 else if (p.SerializationType.Equals(PropertyType.Property))
                 {
@@ -559,28 +580,35 @@ namespace Wintellect.Sterling.Serialization
                     // We've to support interfaces (ie: IList<MyClass>)
                     // build the base list (this will be List<T> for example because we know the exact type)
                     var list = (IList)Activator.CreateInstance(p.PropType);
-                    p.SetMethod(instance, list);
-                    _DeserializeList(type, p.ListType, list, br, p.PropType);
+                    if (instance.GetType().GetInterfaces().Contains(typeof(IList)))
+                    {
+                        _DeserializeList(type, p.ListType, (IList)instance, br, p.PropType, cache);
+                    }
+                    else
+                    {
+                        p.SetMethod(instance, list);
+                        _DeserializeList(type, p.ListType, list, br, p.PropType, cache);
+                    }
                 }
                 else if (p.SerializationType.Equals(PropertyType.Array))
                 {
                     Array array;
-                    _DeserializeArray(type, p.ListType, out array, br, p.PropType);
+                    _DeserializeArray(type, p.ListType, out array, br, p.PropType, cache);
                     p.SetMethod(instance, array);
                 }
                 else if (p.SerializationType.Equals(PropertyType.Dictionary))
                 {
                     var dict = (IDictionary)Activator.CreateInstance(p.PropType);
                     p.SetMethod(instance, dict);
-                    _DeserializeDictionary(type, p.DictionaryKeyType, p.DictionaryValueType, dict, br, p.PropType);
+                    _DeserializeDictionary(type, p.DictionaryKeyType, p.DictionaryValueType, dict, br, p.PropType, cache);
                 }
                 else if (p.SerializationType.Equals(PropertyType.ComplexType))
                 {
                     var propertyTypeIndex = br.ReadInt32();
                     var propertyType = Type.GetType(_typeIndexer(propertyTypeIndex));
-                    p.SetMethod(instance, Load(propertyType, br));
+                    p.SetMethod(instance, Load(propertyType, Guid.NewGuid(), br, cache)); // dummy key for the cache
                 }                
-            }
+            }            
 
             return instance;
         }
@@ -593,7 +621,8 @@ namespace Wintellect.Sterling.Serialization
         /// <param name="instance">The array to build</param>
         /// <param name="br">The reader</param>
         /// <param name="p">The full type of the array (the array itself, not the elements)</param>
-        private void _DeserializeArray(Type parentType, Type arrayType, out Array instance, BinaryReader br, Type p)
+        /// <param name="cache">Cycle cache</param>
+        private void _DeserializeArray(Type parentType, Type arrayType, out Array instance, BinaryReader br, Type p, CycleCache cache)
         {
             var idx = br.ReadInt32();
             instance = Array.CreateInstance(arrayType, idx);
@@ -601,7 +630,7 @@ namespace Wintellect.Sterling.Serialization
             for (var i = 0; i < idx; i++)
             {
                 var obj = _database.IsRegistered(arrayType) || !_serializer.CanSerialize(arrayType)
-                                 ? _DeserializeClass(parentType, arrayType, br)
+                                 ? _DeserializeClass(parentType, arrayType, br, cache)
                                  : _DeserializeProperty(p, br, arrayType);
 
                 instance.SetValue(obj, i);
@@ -617,8 +646,9 @@ namespace Wintellect.Sterling.Serialization
         /// <param name="instance">The dictionary to build</param>
         /// <param name="br">The reader</param>
         /// <param name="p">The full type of the dictionary (the dictionary itself, not the elements)</param>
+        /// <param name="cache">Cycle cache</param>
         private void _DeserializeDictionary(Type parentType, Type keyType, Type valueType,
-            IDictionary instance, BinaryReader br, Type p)
+            IDictionary instance, BinaryReader br, Type p, CycleCache cache)
         {
             var idx = br.ReadInt32();
 
@@ -629,13 +659,13 @@ namespace Wintellect.Sterling.Serialization
                 if ((listKeyType = _IsGenericList(keyType)) == null)
                 {
                     key = _database.IsRegistered(keyType) || !_serializer.CanSerialize(keyType)
-                                     ? _DeserializeClass(parentType, keyType, br)
+                                     ? _DeserializeClass(parentType, keyType, br, cache)
                                      : _DeserializeProperty(p, br, keyType);
                 }
                 else
                 {
                     key = Activator.CreateInstance(keyType);
-                    _DeserializeList(parentType, listKeyType, (IList)key, br, p);
+                    _DeserializeList(parentType, listKeyType, (IList)key, br, p, cache);
                 }
 
                 Type listValueType;
@@ -643,13 +673,13 @@ namespace Wintellect.Sterling.Serialization
                 if ((listValueType = _IsGenericList(valueType)) == null)
                 {
                     value = _database.IsRegistered(valueType) || !_serializer.CanSerialize(valueType)
-                                 ? _DeserializeClass(parentType, valueType, br)
+                                 ? _DeserializeClass(parentType, valueType, br, cache)
                                  : _DeserializeProperty(p, br, valueType);
                 }
                 else
                 {
                     value = Activator.CreateInstance(valueType);
-                    _DeserializeList(parentType, listValueType, (IList)value, br, p);
+                    _DeserializeList(parentType, listValueType, (IList)value, br, p, cache);
                 }
 
                 instance.Add(key, value);
@@ -664,14 +694,15 @@ namespace Wintellect.Sterling.Serialization
         /// <param name="instance">The list to build</param>
         /// <param name="br">The reader</param>
         /// <param name="p">The full type of the list (the list itself, not the elements)</param>
-        private void _DeserializeList(Type parentType, Type listType, IList instance, BinaryReader br, Type p)
+        /// <param name="cache">Cycle cache</param>
+        private void _DeserializeList(Type parentType, Type listType, IList instance, BinaryReader br, Type p, CycleCache cache)
         {
             var idx = br.ReadInt32();
 
             for (var i = 0; i < idx; i++)
             {
                 var obj = _database.IsRegistered(listType) || !_serializer.CanSerialize(listType)
-                                 ? _DeserializeClass(parentType, listType, br)
+                                 ? _DeserializeClass(parentType, listType, br, cache)
                                  : _DeserializeProperty(p, br, listType);
                 instance.Add(obj);
             }
@@ -712,8 +743,9 @@ namespace Wintellect.Sterling.Serialization
         /// <param name="type">The parent type</param>
         /// <param name="targetType">The foreign type</param>
         /// <param name="br">The reader</param>
+        /// <param name="cache">Cycle cache</param>
         /// <returns>The de-serialized class</returns>
-        private object _DeserializeClass(Type type, Type targetType, BinaryReader br)
+        private object _DeserializeClass(Type type, Type targetType, BinaryReader br, CycleCache cache)
         {
             _logManager.Log(SterlingLogLevel.Verbose,
                             string.Format("Sterling is de-serializing foreign key of type {0} for parent {1}",
@@ -731,7 +763,7 @@ namespace Wintellect.Sterling.Serialization
             targetType = Type.GetType(_typeIndexer(typeIndex));
 
             var keyType = _database.GetKeyType(targetType);
-            return _database.Load(targetType, _serializer.Deserialize(keyType, br));
+            return _database.Load(targetType, _serializer.Deserialize(keyType, br), cache);
         }
     }
 }

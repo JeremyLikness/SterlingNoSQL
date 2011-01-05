@@ -20,7 +20,7 @@ namespace Wintellect.Sterling.Test.Helpers
             SubClass = new TestSubclass();
         }
 
-        private static int _idx = 0;
+        private static int _idx;
 
         /// <summary>
         ///     The key
@@ -34,6 +34,8 @@ namespace Wintellect.Sterling.Test.Helpers
 
         public TestSubclass SubClass { get; set; }
 
+        public TestModelAsListModel Parent { get; set; }
+
         /// <summary>
         ///     The date
         /// </summary>
@@ -41,7 +43,12 @@ namespace Wintellect.Sterling.Test.Helpers
 
         public static TestModel MakeTestModel()
         {
-            return new TestModel {Data = Guid.NewGuid().ToString(), Date = DateTime.Now, Key = _idx++, SubClass = new TestSubclass { NestedText = Guid.NewGuid().ToString()}};
+            return new TestModel { Data = Guid.NewGuid().ToString(), Date = DateTime.Now, Key = _idx++, SubClass = new TestSubclass { NestedText = Guid.NewGuid().ToString() } };
+        }
+
+        internal static TestModel MakeTestModel(TestModelAsListModel parentModel)
+        {
+            return new TestModel { Data = Guid.NewGuid().ToString(), Date = DateTime.Now, Key = _idx++, SubClass = new TestSubclass { NestedText = Guid.NewGuid().ToString() }, Parent = parentModel };
         }
     }
 }

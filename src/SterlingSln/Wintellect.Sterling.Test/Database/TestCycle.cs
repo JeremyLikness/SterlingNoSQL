@@ -87,8 +87,7 @@ namespace Wintellect.Sterling.Test.Database
             Assert.AreEqual(child.Value, actual.Value, "Failed to load cycle with non-null child: value mismatch on direct child load.");            
         }
 
-        // This line commented because the condition is not yet handled
-        //[TestMethod] 
+        [TestMethod] 
         public void TestCyclePositiveCase()
         {
             var test = new CycleClass { Id = 1, Value = 1 };

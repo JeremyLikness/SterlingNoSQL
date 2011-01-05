@@ -302,12 +302,24 @@ namespace Wintellect.Sterling.Database
         }
 
         /// <summary>
+        ///     Entry point for save
+        /// </summary>
+        /// <param name="type">Type to save</param>
+        /// <param name="instance">Instance</param>
+        /// <returns>The key saved</returns>
+        public object Save(Type type, object instance)
+        {
+            return Save(type, instance, new CycleCache());
+        }
+
+        /// <summary>
         ///     Save when key is not known
         /// </summary>
         /// <param name="type">The type of the instance</param>
         /// <param name="instance">The instance</param>
+        /// <param name="cache">Cycle cache</param>
         /// <returns>The key</returns>
-        public object Save(Type type, object instance)
+        public object Save(Type type, object instance, CycleCache cache)
         {
             if (!_tableDefinitions.ContainsKey(type))
             {
@@ -315,6 +327,14 @@ namespace Wintellect.Sterling.Database
             }
 
             var key = _tableDefinitions[type].FetchKeyFromInstance(instance);
+
+            if (cache.Check(instance))
+            {
+                return key;
+            }
+            
+            cache.Add(type, instance, key);
+
             var keyIndex = _tableDefinitions[type].Keys.AddKey(key);
             
             _iso.EnsureDirectory(_pathProvider.GetDatabasePath(Name));
@@ -326,7 +346,7 @@ namespace Wintellect.Sterling.Database
                 {
                     var serializationHelper = new SerializationHelper(this, Serializer, SterlingFactory.GetLogger(), s => _pathProvider.GetTypeIndex(s),
                         i => _pathProvider.GetTypeAtIndex(i));
-                    serializationHelper.Save(type, instance, bw);          
+                    serializationHelper.Save(type, instance, bw, cache);          
           
                     bw.Flush();
                     
@@ -467,35 +487,42 @@ namespace Wintellect.Sterling.Database
         }
 
         /// <summary>
+        ///     Load entry point with new cycle cache
+        /// </summary>
+        /// <param name="type">The type to load</param>
+        /// <param name="key">The key</param>
+        /// <returns>The object</returns>
+        public object Load(Type type, object key)
+        {
+            return Load(type, key, new CycleCache());
+        }
+
+        /// <summary>
         ///     Load it without knowledge of the key type
         /// </summary>
         /// <param name="type">The type to load</param>
         /// <param name="key">The key</param>
         /// <returns>The instance</returns>
-        public object Load(Type type, object key)
+        public object Load(Type type, object key, CycleCache cache)
         {
-            Type newType = type;
-            bool assignable = false;
-            int keyIndex = -1;
+            var newType = type;
+            var assignable = false;
+            var keyIndex = -1;
 
             using (var iso = new IsoStorageHelper())
             {
                 if (!_tableDefinitions.ContainsKey(type))
                 {
                     // check if type is a base type
-                    foreach (Type t in _tableDefinitions.Keys)
+                    foreach (var t in _tableDefinitions.Keys.Where(type.IsAssignableFrom))
                     {
-                        if (type.IsAssignableFrom(t))
-                        {
-                            assignable = true;
-                            keyIndex = _tableDefinitions[t].Keys.GetIndexForKey(key);
+                        assignable = true;
+                        keyIndex = _tableDefinitions[t].Keys.GetIndexForKey(key);
 
-                            if (keyIndex >= 0)
-                            {
-                                newType = t;
-                                break;
-                            }
-                        }
+                        if (keyIndex < 0) continue;
+
+                        newType = t;
+                        break;
                     }
                 }
                 else
@@ -516,13 +543,18 @@ namespace Wintellect.Sterling.Database
                     return null;
                 }
 
-                object obj;
+                var obj = cache.CheckKey(newType, key);
+
+                if (obj != null)
+                {
+                    return obj;
+                }
 
                 using (var br = iso.GetReader(_pathProvider.GetInstancePath(Name, newType, keyIndex)))
                 {
                     var serializationHelper = new SerializationHelper(this, Serializer, SterlingFactory.GetLogger(), s=>_pathProvider.GetTypeIndex(s),
                         i=>_pathProvider.GetTypeAtIndex(i));
-                    obj = serializationHelper.Load(newType, br);
+                    obj = serializationHelper.Load(newType, key, br, cache);
                 }
 
                 _RaiseOperation(SterlingOperation.Load, newType, key);
