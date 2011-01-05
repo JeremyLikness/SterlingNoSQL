@@ -71,11 +71,14 @@ namespace Wintellect.Sterling.Serialization
                 return listType;
             }
 
-            lock (((ICollection)_listTypes).SyncRoot)
+            if (!_listTypes.ContainsKey(type))
             {
-                if (!_listTypes.ContainsKey(type))
+                lock (((ICollection) _listTypes).SyncRoot)
                 {
-                    _listTypes.Add(type, listType);
+                    if (!_listTypes.ContainsKey(type))
+                    {
+                        _listTypes.Add(type, listType);
+                    }
                 }
             }
 
@@ -118,11 +121,14 @@ namespace Wintellect.Sterling.Serialization
             keyType = gTypes[0];
             valueType = gTypes[1];
 
-            lock (((ICollection)_dictTypes).SyncRoot)
+            if (!_dictTypes.ContainsKey(type))
             {
-                if (!_dictTypes.ContainsKey(type))
+                lock (((ICollection) _dictTypes).SyncRoot)
                 {
-                    _dictTypes.Add(type, new Tuple<Type, Type>(gTypes[0], gTypes[1]));
+                    if (!_dictTypes.ContainsKey(type))
+                    {
+                        _dictTypes.Add(type, new Tuple<Type, Type>(gTypes[0], gTypes[1]));
+                    }
                 }
             }
 
@@ -140,13 +146,11 @@ namespace Wintellect.Sterling.Serialization
 
             lock (((ICollection)_propertyCache).SyncRoot)
             {
+                // fast "out" if already exits
                 if (_propertyCache.ContainsKey(type)) return;
 
                 _propertyCache.Add(type,
-                                   new List
-                                       <
-                                       SerializationCache
-                                       >());
+                                   new List<SerializationCache>());
 
                 var properties = from p in type.GetProperties()
                                  where p.GetGetMethod() != null && p.GetSetMethod() != null
@@ -345,26 +349,34 @@ namespace Wintellect.Sterling.Serialization
                     // foreign table - write if it is null or not, and if not null, write the key
                     // then serialize it separately
                     _SerializeClass(type, p.GetMethod(instance), bw, cache);
+                    continue;
                 }
-                else if (p.SerializationType.Equals(PropertyType.Property))
+                
+                if (p.SerializationType.Equals(PropertyType.Property))
                 {
                     _SerializeProperty(type, p.GetMethod(instance), bw, p.PropType);
+                    continue;
                 }
-                else if (p.SerializationType.Equals(PropertyType.List) || p.SerializationType.Equals(PropertyType.Array))
+                
+                if (p.SerializationType.Equals(PropertyType.List) || p.SerializationType.Equals(PropertyType.Array))
                 {
                     _SerializeList(p.ListType, (IList)p.GetMethod(instance), bw, cache);
+                    continue;
                 }
-                else if (p.SerializationType.Equals(PropertyType.Dictionary))
+                
+                if (p.SerializationType.Equals(PropertyType.Dictionary))
                 {
                     _SerializeDictionary(p.DictionaryKeyType, p.DictionaryValueType, (IDictionary)p.GetMethod(instance), bw, cache);
+                    continue;
                 }
-                else if (p.SerializationType.Equals(PropertyType.ComplexType))
-                {
-                    var propertyValue = p.GetMethod(instance);
-                    var propertyType = propertyValue == null ? p.PropType : propertyValue.GetType();
-                    bw.Write(_typeResolver(propertyType.AssemblyQualifiedName));
-                    Save(propertyType, propertyValue, bw, cache);
-                }
+
+                if (!p.SerializationType.Equals(PropertyType.ComplexType)) continue;
+
+                // complex type only
+                var propertyValue = p.GetMethod(instance);
+                var propertyType = propertyValue == null ? p.PropType : propertyValue.GetType();
+                bw.Write(_typeResolver(propertyType.AssemblyQualifiedName));
+                Save(propertyType, propertyValue, bw, cache);
             }
         }
 
@@ -570,12 +582,16 @@ namespace Wintellect.Sterling.Serialization
                 if (p.SerializationType.Equals(PropertyType.Class))
                 {
                     p.SetMethod(instance, _DeserializeClass(type, p.PropType, br, cache));
+                    continue;
                 }
-                else if (p.SerializationType.Equals(PropertyType.Property))
+                
+                if (p.SerializationType.Equals(PropertyType.Property))
                 {
                     p.SetMethod(instance, _DeserializeProperty(type, br, p.PropType));
+                    continue;
                 }
-                else if (p.SerializationType.Equals(PropertyType.List))
+                
+                if (p.SerializationType.Equals(PropertyType.List))
                 {
                     // We've to support interfaces (ie: IList<MyClass>)
                     // build the base list (this will be List<T> for example because we know the exact type)
@@ -589,26 +605,32 @@ namespace Wintellect.Sterling.Serialization
                         p.SetMethod(instance, list);
                         _DeserializeList(type, p.ListType, list, br, p.PropType, cache);
                     }
+                    continue;
                 }
-                else if (p.SerializationType.Equals(PropertyType.Array))
+                
+                if (p.SerializationType.Equals(PropertyType.Array))
                 {
                     Array array;
                     _DeserializeArray(type, p.ListType, out array, br, p.PropType, cache);
                     p.SetMethod(instance, array);
+                    continue;
                 }
-                else if (p.SerializationType.Equals(PropertyType.Dictionary))
+                
+                if (p.SerializationType.Equals(PropertyType.Dictionary))
                 {
                     var dict = (IDictionary)Activator.CreateInstance(p.PropType);
                     p.SetMethod(instance, dict);
                     _DeserializeDictionary(type, p.DictionaryKeyType, p.DictionaryValueType, dict, br, p.PropType, cache);
+                    continue;
                 }
-                else if (p.SerializationType.Equals(PropertyType.ComplexType))
-                {
-                    var propertyTypeIndex = br.ReadInt32();
-                    var propertyType = Type.GetType(_typeIndexer(propertyTypeIndex));
-                    p.SetMethod(instance, Load(propertyType, Guid.NewGuid(), br, cache)); // dummy key for the cache
-                }                
-            }            
+
+                if (!p.SerializationType.Equals(PropertyType.ComplexType)) continue;
+
+                // case for complex type
+                var propertyTypeIndex = br.ReadInt32();
+                var propertyType = Type.GetType(_typeIndexer(propertyTypeIndex));
+                p.SetMethod(instance, Load(propertyType, Guid.NewGuid(), br, cache)); // dummy key for the cache
+            }
 
             return instance;
         }
