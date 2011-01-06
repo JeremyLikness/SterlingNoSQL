@@ -159,6 +159,7 @@ namespace Wintellect.Sterling.Test.Database
         {
             var saveEvent = new ManualResetEvent(false);
             var loadEvent = new ManualResetEvent(false);
+
             var events = new[]
             {
                 saveEvent,
@@ -173,19 +174,34 @@ namespace Wintellect.Sterling.Test.Database
 
             var savedCount = 0;
             var save = new BackgroundWorker();
+
+            var errorMsg = string.Empty; 
+
             save.DoWork += (o, e) =>
             {
-                foreach (var item in _modelList)
+                try
                 {
-                    _databaseInstance.Save(item);
-                    savedCount++;
+                    foreach (var item in _modelList)
+                    {
+                        _databaseInstance.Save(item);
+                        savedCount++;
+                    }
+
+                    if (MODELS != savedCount)
+                    {
+                        throw new Exception("Save failed: Not all models were saved.");
+                    }                    
+                }
+                catch (Exception ex)
+                {
+                    errorMsg = ex.AsExceptionString();
+                }
+                finally
+                {
+                    saveEvent.Set();
                 }
 
-                Assert.AreEqual(MODELS, savedCount, "Save failed: Not all models were saved.");
-                saveEvent.Set();
-            };
-            save.RunWorkerAsync();
-
+            };            
             var load = new BackgroundWorker();
             load.DoWork += (o, e) =>
             {
@@ -193,24 +209,119 @@ namespace Wintellect.Sterling.Test.Database
                 {
                     var query = from key in _databaseInstance.Query<TestModel, int>()
                                 select key.LazyValue.Value;
+                    var cnt = query.Count();
 
                     var list = new List<TestModel>(query);
-                    var loadedCount = list.Count;
-
-                    Assert.AreEqual(MODELS, loadedCount, "Load failed: Not all models were loaded.");
+                    
+                    if (list.Count < 1)
+                    {
+                        throw new Exception("Test failed: did not load any items.");
+                    }
+                    
                 }
                 catch (Exception ex)
                 {
-                    Assert.Fail(ex.Message);
+                    errorMsg = ex.AsExceptionString();
                 }
                 finally
                 {
                     loadEvent.Set();
                 }
             };
+
+            save.RunWorkerAsync();
+            load.RunWorkerAsync();
+            
+            WaitHandle.WaitAll(events);
+
+            Assert.IsTrue(string.IsNullOrEmpty(errorMsg), string.Format("Failed concurrent load: {0}", errorMsg));
+
+            EnqueueTestComplete();
+        }
+
+        [Asynchronous]
+        [Tag("Concurrent")]
+        [TestMethod]
+        public void TestConcurrentSaveAndLoadWithIndex()
+        {
+            var saveEvent = new ManualResetEvent(false);
+            var loadEvent = new ManualResetEvent(false);
+            var events = new[]
+            {
+                saveEvent,
+                loadEvent
+            };
+
+            // Initialize the DB with some data.
+            foreach (var item in _modelList)
+            {
+                _databaseInstance.Save(item);
+            }
+
+            var savedCount = 0;
+            var save = new BackgroundWorker();
+
+            var errorMsg = string.Empty;
+
+            save.DoWork += (o, e) =>
+            {
+                try
+                {
+                    foreach (var item in _modelList)
+                    {
+                        _databaseInstance.Save(item);
+                        savedCount++;
+                    }
+
+                    if (MODELS != savedCount)
+                    {
+                        throw new Exception("Save failed: Not all models were saved.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    errorMsg = ex.AsExceptionString();
+                }
+                finally
+                {
+                    saveEvent.Set();
+                }
+            };
+            
+            var load = new BackgroundWorker();
+            load.DoWork += (o, e) =>
+            {
+                try
+                {
+                    var now = DateTime.Now;
+                    var query = from key in _databaseInstance.Query<TestModel, DateTime, string, int>("IndexDateData")
+                                where key.Index.Item1.Month == now.Month
+                                select key.LazyValue.Value;
+
+                    var list = new List<TestModel>(query);
+                   
+                    if (list.Count < 1)
+                    {
+                        throw new Exception("Test failed: did not load any models.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    errorMsg = ex.AsExceptionString();
+                }
+                finally
+                {
+                    loadEvent.Set();
+                }
+            };
+
+            save.RunWorkerAsync();
             load.RunWorkerAsync();
 
             WaitHandle.WaitAll(events);
+
+            Assert.IsTrue(string.IsNullOrEmpty(errorMsg), string.Format("Concurrent test failed: {0}", errorMsg));
+
             EnqueueTestComplete();
         }
     }

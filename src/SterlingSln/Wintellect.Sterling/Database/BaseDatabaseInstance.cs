@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using Wintellect.Sterling.Events;
 using Wintellect.Sterling.Exceptions;
@@ -23,6 +24,11 @@ namespace Wintellect.Sterling.Database
         ///     Master database locks
         /// </summary>
         private static readonly Dictionary<Type, object> _locks = new Dictionary<Type, object>();
+
+        /// <summary>
+        ///     Path locks
+        /// </summary>
+        private static readonly Dictionary<string, object> _pathLock = new Dictionary<string, object>();
 
         /// <summary>
         ///     The table definitions
@@ -212,7 +218,15 @@ namespace Wintellect.Sterling.Database
                 throw new SterlingTableNotFoundException(typeof (T), Name);
             }
 
-            return ((TableDefinition<T, TKey>) _tableDefinitions[typeof (T)]).KeyList.Query;
+            return 
+                new List<TableKey<T, TKey>>(
+                ((TableDefinition<T, TKey>) _tableDefinitions[typeof (T)]).KeyList.Query)
+#if WINPHONE7
+            .AsEnumerable();
+#else
+            .AsQueryable();
+#endif
+
         }
 
         /// <summary>
@@ -253,7 +267,12 @@ namespace Wintellect.Sterling.Database
                 throw new SterlingIndexNotFoundException(indexName, typeof (T));
             }
 
-            return collection.Query;
+            return new List<TableIndex<T, TIndex, TKey>>(collection.Query)
+#if WINPHONE7
+            .AsEnumerable();
+#else
+                .AsQueryable();
+#endif
         }
 
         /// <summary>
@@ -298,7 +317,12 @@ namespace Wintellect.Sterling.Database
                 throw new SterlingIndexNotFoundException(indexName, typeof (T));
             }
 
-            return collection.Query;
+            return new List<TableIndex<T, Tuple<TIndex1, TIndex2>, TKey>>(collection.Query)
+#if WINPHONE7
+            .AsEnumerable();
+#else
+            .AsQueryable();
+#endif
         }
 
         /// <summary>
@@ -352,9 +376,15 @@ namespace Wintellect.Sterling.Database
                     
                     memStream.Seek(0, SeekOrigin.Begin);
 
-                    using (var isoWriter = _iso.GetWriter(_pathProvider.GetInstancePath(Name, type, keyIndex)))
+                    var path = _pathProvider.GetInstancePath(Name, type, keyIndex);
+                    var pathLock = PathLock.GetLock(path);
+
+                    lock (pathLock)
                     {
-                        isoWriter.Write(memStream.ToArray());
+                        using (var isoWriter = _iso.GetWriter(path))
+                        {
+                            isoWriter.Write(memStream.ToArray());
+                        }
                     }
                 }                                                                          
             }            
@@ -550,11 +580,18 @@ namespace Wintellect.Sterling.Database
                     return obj;
                 }
 
-                using (var br = iso.GetReader(_pathProvider.GetInstancePath(Name, newType, keyIndex)))
+                var path = _pathProvider.GetInstancePath(Name, newType, keyIndex);
+                var pathLock = PathLock.GetLock(path);
+
+                lock (pathLock)
                 {
-                    var serializationHelper = new SerializationHelper(this, Serializer, SterlingFactory.GetLogger(), s=>_pathProvider.GetTypeIndex(s),
-                        i=>_pathProvider.GetTypeAtIndex(i));
-                    obj = serializationHelper.Load(newType, key, br, cache);
+                    using (var br = iso.GetReader(path))
+                    {
+                        var serializationHelper = new SerializationHelper(this, Serializer, SterlingFactory.GetLogger(),
+                                                                          s => _pathProvider.GetTypeIndex(s),
+                                                                          i => _pathProvider.GetTypeAtIndex(i));
+                        obj = serializationHelper.Load(newType, key, br, cache);
+                    }
                 }
 
                 _RaiseOperation(SterlingOperation.Load, newType, key);

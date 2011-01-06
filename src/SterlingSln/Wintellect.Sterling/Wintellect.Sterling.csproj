@@ -65,6 +65,7 @@
     <Compile Include="Database\Extensions.cs" />
     <Compile Include="Database\ITableDefinition.cs" />
     <Compile Include="Database\LogManager.cs" />
+    <Compile Include="Database\PathLock.cs" />
     <Compile Include="Database\TableDefinition.cs" />
     <Compile Include="Events\SterlingOperationArgs.cs" />
     <Compile Include="Exceptions\Exceptions.Designer.cs">

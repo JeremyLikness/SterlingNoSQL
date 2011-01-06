@@ -99,6 +99,7 @@
     <Compile Include="Database\TestTruncate.cs" />
     <Compile Include="Helpers\BadDatabaseInstance.cs" />
     <Compile Include="Helpers\DupDatabaseInstance.cs" />
+    <Compile Include="Helpers\ExceptionHelper.cs" />
     <Compile Include="Helpers\TestAggregateListModel.cs" />
     <Compile Include="Helpers\TestAggregateModel.cs" />
     <Compile Include="Helpers\TestBaseClassModel.cs" />
