@@ -5,6 +5,8 @@ using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Windows;
 using Wintellect.Sterling.Exceptions;
+using System.Threading;
+using Wintellect.Sterling.Database;
 
 namespace Wintellect.Sterling.IsolatedStorage
 {
@@ -185,7 +187,8 @@ namespace Wintellect.Sterling.IsolatedStorage
                     _iso.GetFileNames(Path.Combine(path, "*"))
                     .Select(file => Path.Combine(path, file)))
                 {
-                    if (_iso.FileExists(filePath))
+                    var pathLock = PathLock.GetLock(filePath.Replace("\\", "/"));
+                    lock (pathLock)
                     {
                         _iso.DeleteFile(filePath);
                     }
@@ -194,7 +197,7 @@ namespace Wintellect.Sterling.IsolatedStorage
                 var dirPath = path.TrimEnd('\\', '/');
                 if (_iso.DirectoryExists(dirPath))
                 {
-                    _iso.DeleteDirectory(dirPath);                    
+                    _iso.DeleteDirectory(dirPath);                   
                 }
             }
             catch (Exception ex)
