@@ -62,11 +62,7 @@ namespace Wintellect.Sterling
         /// <typeparam name="T">The type to query</typeparam>
         /// <typeparam name="TKey">The type of the key</typeparam>
         /// <returns>The list of keys to query</returns>
-#if WINPHONE7
-        IEnumerable<TableKey<T, TKey>> Query<T, TKey>() where T : class, new();
-#else
-        IQueryable<TableKey<T, TKey>> Query<T, TKey>() where T : class, new();
-#endif
+        List<TableKey<T, TKey>> Query<T, TKey>() where T : class, new();
 
         /// <summary>
         ///     Query (index)
@@ -76,11 +72,7 @@ namespace Wintellect.Sterling
         /// <typeparam name="TKey">The type of the key</typeparam>
         /// <param name="indexName">The name of the index</param>
         /// <returns>The list of indexes to query</returns>
-#if WINPHONE7        
-        IEnumerable<TableIndex<T, TIndex, TKey>> Query<T, TIndex, TKey>(string indexName) where T : class, new();
-#else
-        IQueryable<TableIndex<T, TIndex, TKey>> Query<T, TIndex, TKey>(string indexName) where T : class, new();
-#endif
+        List<TableIndex<T, TIndex, TKey>> Query<T, TIndex, TKey>(string indexName) where T : class, new();
 
         /// <summary>
         ///     Query (index)
@@ -91,13 +83,8 @@ namespace Wintellect.Sterling
         /// <typeparam name="TKey">The type of the key</typeparam>
         /// <param name="indexName">The name of the index</param>
         /// <returns>The list of indexes to query</returns>    
-#if WINPHONE7    
-        IEnumerable<TableIndex<T, Tuple<TIndex1, TIndex2>, TKey>> Query<T, TIndex1, TIndex2, TKey>(string indexName)
+        List<TableIndex<T, Tuple<TIndex1, TIndex2>, TKey>> Query<T, TIndex1, TIndex2, TKey>(string indexName)
             where T : class, new();
-#else
-        IQueryable<TableIndex<T, Tuple<TIndex1, TIndex2>, TKey>> Query<T, TIndex1, TIndex2, TKey>(string indexName)
-            where T : class, new();
-#endif
 
         /// <summary>
         ///     Save it (no knowledge of key)

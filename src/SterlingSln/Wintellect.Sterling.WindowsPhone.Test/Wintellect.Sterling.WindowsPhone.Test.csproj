@@ -129,6 +129,9 @@
     <Compile Include="..\Wintellect.Sterling.Test\Helpers\DupDatabaseInstance.cs">
       <Link>Helpers\DupDatabaseInstance.cs</Link>
     </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test\Helpers\ExceptionHelper.cs">
+      <Link>Helpers\ExceptionHelper.cs</Link>
+    </Compile>
     <Compile Include="..\Wintellect.Sterling.Test\Helpers\TestAggregateListModel.cs">
       <Link>Helpers\TestAggregateListModel.cs</Link>
     </Compile>

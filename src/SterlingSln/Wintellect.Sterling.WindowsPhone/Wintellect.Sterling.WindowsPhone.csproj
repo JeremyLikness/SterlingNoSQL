@@ -71,6 +71,9 @@
     <Compile Include="..\Wintellect.Sterling\Database\LogManager.cs">
       <Link>Database\LogManager.cs</Link>
     </Compile>
+    <Compile Include="..\Wintellect.Sterling\Database\PathLock.cs">
+      <Link>Database\PathLock.cs</Link>
+    </Compile>
     <Compile Include="..\Wintellect.Sterling\Database\SterlingDatabase.cs">
       <Link>Database\SterlingDatabase.cs</Link>
     </Compile>
