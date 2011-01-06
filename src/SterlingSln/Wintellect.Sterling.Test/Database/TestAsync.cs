@@ -1,5 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -147,6 +150,68 @@ namespace Wintellect.Sterling.Test.Database
                 bw.RunWorkerAsync();
             };
             TestPanel.Children.Add(grid);
+        }
+
+        [Asynchronous]
+        [Tag("Concurrent")]
+        [TestMethod]
+        public void TestConcurrentSaveAndLoad()
+        {
+            var saveEvent = new ManualResetEvent(false);
+            var loadEvent = new ManualResetEvent(false);
+            var events = new[]
+            {
+                saveEvent,
+                loadEvent
+            };
+
+            // Initialize the DB with some data.
+            foreach (var item in _modelList)
+            {
+                _databaseInstance.Save(item);
+            }
+
+            var savedCount = 0;
+            var save = new BackgroundWorker();
+            save.DoWork += (o, e) =>
+            {
+                foreach (var item in _modelList)
+                {
+                    _databaseInstance.Save(item);
+                    savedCount++;
+                }
+
+                Assert.AreEqual(MODELS, savedCount, "Save failed: Not all models were saved.");
+                saveEvent.Set();
+            };
+            save.RunWorkerAsync();
+
+            var load = new BackgroundWorker();
+            load.DoWork += (o, e) =>
+            {
+                try
+                {
+                    var query = from key in _databaseInstance.Query<TestModel, int>()
+                                select key.LazyValue.Value;
+
+                    var list = new List<TestModel>(query);
+                    var loadedCount = list.Count;
+
+                    Assert.AreEqual(MODELS, loadedCount, "Load failed: Not all models were loaded.");
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message);
+                }
+                finally
+                {
+                    loadEvent.Set();
+                }
+            };
+            load.RunWorkerAsync();
+
+            WaitHandle.WaitAll(events);
+            EnqueueTestComplete();
         }
     }
 }
