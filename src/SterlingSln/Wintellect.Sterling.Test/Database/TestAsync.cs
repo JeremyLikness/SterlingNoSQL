@@ -15,16 +15,16 @@ namespace Wintellect.Sterling.Test.Database
 {
     [Tag("Async")]
     [TestClass]
-    public class TestAsync : SilverlightTest 
+    public class TestAsync : SilverlightTest
     {
         private SterlingEngine _engine;
         private ISterlingDatabaseInstance _databaseInstance;
         private List<TestModel> _modelList;
 
 #if WINDOWS_PHONE
-        private const int MODELS = 100; 
+        private const int MODELS = 100;
 #else
-        private const int MODELS = 1000; 
+        private const int MODELS = 1000;
 #endif
 
         [TestInitialize]
@@ -43,18 +43,13 @@ namespace Wintellect.Sterling.Test.Database
         [TestCleanup]
         public void TestCleanup()
         {
-            try
+            _databaseInstance.Purge();
+
+            _engine.Dispose();
+            _databaseInstance = null;
+            using (var iso = new IsoStorageHelper())
             {
-                _databaseInstance.Purge();
-            }
-            finally
-            {
-                _engine.Dispose();
-                _databaseInstance = null;
-                using (var iso = new IsoStorageHelper())
-                {
-                    iso.Purge(PathProvider.BASE);
-                }
+                iso.Purge(PathProvider.BASE);
             }
         }
 
@@ -68,7 +63,7 @@ namespace Wintellect.Sterling.Test.Database
             textBlock.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
             var progress = new ProgressBar {Minimum = 0, Maximum = 100, Value = 0};
             grid.Children.Add(progress);
-            grid.Children.Add(textBlock);            
+            grid.Children.Add(textBlock);
             grid.Loaded += (sender, args) =>
                                {
                                    var bw = _databaseInstance.SaveAsync((IList) _modelList);
@@ -85,7 +80,7 @@ namespace Wintellect.Sterling.Test.Database
                                                                                    "Asynchronous save was canceled.");
                                                                     Assert.IsNull(e.Error,
                                                                                   "Asynchronous save failed with error.");
-                                                                    EnqueueTestComplete();                                                                    
+                                                                    EnqueueTestComplete();
                                                                 };
                                    bw.RunWorkerAsync();
                                };
@@ -100,22 +95,22 @@ namespace Wintellect.Sterling.Test.Database
             var textBlock = new TextBlock();
             textBlock.SetValue(FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Center);
             textBlock.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
-            var progress = new ProgressBar { IsIndeterminate = true };
+            var progress = new ProgressBar {IsIndeterminate = true};
             grid.Children.Add(progress);
             grid.Children.Add(textBlock);
             grid.Loaded += (sender, args) =>
-            {
-                var bw = _databaseInstance.SaveAsync((IList)_modelList);
-                bw.RunWorkerCompleted += (o, e) =>
-                {
-                    Assert.IsFalse(e.Cancelled,
-                                   "Asynchronous save was canceled.");
-                    Assert.IsNull(e.Error,
-                                  "Asynchronous save failed with error.");
-                    EnqueueTestComplete();                    
-                };
-                bw.RunWorkerAsync();
-            };
+                               {
+                                   var bw = _databaseInstance.SaveAsync((IList) _modelList);
+                                   bw.RunWorkerCompleted += (o, e) =>
+                                                                {
+                                                                    Assert.IsFalse(e.Cancelled,
+                                                                                   "Asynchronous save was canceled.");
+                                                                    Assert.IsNull(e.Error,
+                                                                                  "Asynchronous save failed with error.");
+                                                                    EnqueueTestComplete();
+                                                                };
+                                   bw.RunWorkerAsync();
+                               };
             TestPanel.Children.Add(grid);
         }
 
@@ -127,34 +122,34 @@ namespace Wintellect.Sterling.Test.Database
             var textBlock = new TextBlock();
             textBlock.SetValue(FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Center);
             textBlock.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
-            var progress = new ProgressBar { Minimum = 0, Maximum = 100, Value = 0 };
+            var progress = new ProgressBar {Minimum = 0, Maximum = 100, Value = 0};
             grid.Children.Add(progress);
             grid.Children.Add(textBlock);
             grid.Loaded += (sender, args) =>
-            {
-                var bw = _databaseInstance.SaveAsync((IList)_modelList);
-                bw.WorkerReportsProgress = true;
-                bw.WorkerSupportsCancellation = true;
-                bw.ProgressChanged += (o, e) =>
-                {
-                    textBlock.Text = string.Format("{0}%",
-                                                   e.ProgressPercentage);
-                    progress.Value = e.ProgressPercentage;
-                    if (e.ProgressPercentage > 50)
-                    {
-                        bw.CancelAsync();
-                    }
-                };
-                bw.RunWorkerCompleted += (o, e) =>
-                                             {
-                                                 Assert.IsTrue(e.Cancelled,
-                                                                "Asynchronous save was not canceled.");
-                                                 Assert.IsNull(e.Error,
-                                                               "Asynchronous save failed with error.");
-                                                 EnqueueTestComplete();                                                 
-                                             };
-                bw.RunWorkerAsync();
-            };
+                               {
+                                   var bw = _databaseInstance.SaveAsync((IList) _modelList);
+                                   bw.WorkerReportsProgress = true;
+                                   bw.WorkerSupportsCancellation = true;
+                                   bw.ProgressChanged += (o, e) =>
+                                                             {
+                                                                 textBlock.Text = string.Format("{0}%",
+                                                                                                e.ProgressPercentage);
+                                                                 progress.Value = e.ProgressPercentage;
+                                                                 if (e.ProgressPercentage > 50)
+                                                                 {
+                                                                     bw.CancelAsync();
+                                                                 }
+                                                             };
+                                   bw.RunWorkerCompleted += (o, e) =>
+                                                                {
+                                                                    Assert.IsTrue(e.Cancelled,
+                                                                                  "Asynchronous save was not canceled.");
+                                                                    Assert.IsNull(e.Error,
+                                                                                  "Asynchronous save failed with error.");
+                                                                    EnqueueTestComplete();
+                                                                };
+                                   bw.RunWorkerAsync();
+                               };
             TestPanel.Children.Add(grid);
         }
 
@@ -167,10 +162,10 @@ namespace Wintellect.Sterling.Test.Database
             var loadEvent = new ManualResetEvent(false);
 
             var events = new[]
-            {
-                saveEvent,
-                loadEvent
-            };
+                             {
+                                 saveEvent,
+                                 loadEvent
+                             };
 
             // Initialize the DB with some data.
             foreach (var item in _modelList)
@@ -181,63 +176,61 @@ namespace Wintellect.Sterling.Test.Database
             var savedCount = 0;
             var save = new BackgroundWorker();
 
-            var errorMsg = string.Empty; 
+            var errorMsg = string.Empty;
 
             save.DoWork += (o, e) =>
-            {
-                try
-                {
-                    foreach (var item in _modelList)
-                    {
-                        _databaseInstance.Save(item);
-                        savedCount++;
-                    }
+                               {
+                                   try
+                                   {
+                                       foreach (var item in _modelList)
+                                       {
+                                           _databaseInstance.Save(item);
+                                           savedCount++;
+                                       }
 
-                    if (MODELS != savedCount)
-                    {
-                        throw new Exception("Save failed: Not all models were saved.");
-                    }                    
-                }
-                catch (Exception ex)
-                {
-                    errorMsg = ex.AsExceptionString();
-                }
-                finally
-                {
-                    saveEvent.Set();
-                }
-
-            };            
+                                       if (MODELS != savedCount)
+                                       {
+                                           throw new Exception("Save failed: Not all models were saved.");
+                                       }
+                                   }
+                                   catch (Exception ex)
+                                   {
+                                       errorMsg = ex.AsExceptionString();
+                                   }
+                                   finally
+                                   {
+                                       saveEvent.Set();
+                                   }
+                               };
             var load = new BackgroundWorker();
             load.DoWork += (o, e) =>
-            {
-                try
-                {
-                    var query = from key in _databaseInstance.Query<TestModel, int>()
-                                select key.LazyValue.Value;
-                    var cnt = query.Count();
+                               {
+                                   try
+                                   {
+                                       var query = from key in _databaseInstance.Query<TestModel, int>()
+                                                   select key.LazyValue.Value;
+                                       var cnt = query.Count();
 
-                    var list = new List<TestModel>(query);
-                    
-                    if (list.Count < 1)
-                    {
-                        throw new Exception("Test failed: did not load any items.");
-                    }
-                    
-                }
-                catch (Exception ex)
-                {
-                    errorMsg = ex.AsExceptionString();
-                }
-                finally
-                {
-                    loadEvent.Set();
-                }
-            };
+                                       var list = new List<TestModel>(query);
+
+                                       if (list.Count < 1)
+                                       {
+                                           throw new Exception("Test failed: did not load any items.");
+                                       }
+                                   }
+                                   catch (Exception ex)
+                                   {
+                                       errorMsg = ex.AsExceptionString();
+                                   }
+                                   finally
+                                   {
+                                       loadEvent.Set();
+                                   }
+                               };
 
             save.RunWorkerAsync();
             load.RunWorkerAsync();
-            
+
             WaitHandle.WaitAll(events);
 
             Assert.IsTrue(string.IsNullOrEmpty(errorMsg), string.Format("Failed concurrent load: {0}", errorMsg));
@@ -253,10 +246,10 @@ namespace Wintellect.Sterling.Test.Database
             var saveEvent = new ManualResetEvent(false);
             var loadEvent = new ManualResetEvent(false);
             var events = new[]
-            {
-                saveEvent,
-                loadEvent
-            };
+                             {
+                                 saveEvent,
+                                 loadEvent
+                             };
 
             // Initialize the DB with some data.
             foreach (var item in _modelList)
@@ -270,56 +263,58 @@ namespace Wintellect.Sterling.Test.Database
             var errorMsg = string.Empty;
 
             save.DoWork += (o, e) =>
-            {
-                try
-                {
-                    foreach (var item in _modelList)
-                    {
-                        _databaseInstance.Save(item);
-                        savedCount++;
-                    }
+                               {
+                                   try
+                                   {
+                                       foreach (var item in _modelList)
+                                       {
+                                           _databaseInstance.Save(item);
+                                           savedCount++;
+                                       }
 
-                    if (MODELS != savedCount)
-                    {
-                        throw new Exception("Save failed: Not all models were saved.");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    errorMsg = ex.AsExceptionString();
-                }
-                finally
-                {
-                    saveEvent.Set();
-                }
-            };
-            
+                                       if (MODELS != savedCount)
+                                       {
+                                           throw new Exception("Save failed: Not all models were saved.");
+                                       }
+                                   }
+                                   catch (Exception ex)
+                                   {
+                                       errorMsg = ex.AsExceptionString();
+                                   }
+                                   finally
+                                   {
+                                       saveEvent.Set();
+                                   }
+                               };
+
             var load = new BackgroundWorker();
             load.DoWork += (o, e) =>
-            {
-                try
-                {
-                    var now = DateTime.Now;
-                    var query = from key in _databaseInstance.Query<TestModel, DateTime, string, int>("IndexDateData")
-                                where key.Index.Item1.Month == now.Month
-                                select key.LazyValue.Value;
+                               {
+                                   try
+                                   {
+                                       var now = DateTime.Now;
+                                       var query =
+                                           from key in
+                                               _databaseInstance.Query<TestModel, DateTime, string, int>("IndexDateData")
+                                           where key.Index.Item1.Month == now.Month
+                                           select key.LazyValue.Value;
 
-                    var list = new List<TestModel>(query);
-                   
-                    if (list.Count < 1)
-                    {
-                        throw new Exception("Test failed: did not load any models.");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    errorMsg = ex.AsExceptionString();
-                }
-                finally
-                {
-                    loadEvent.Set();
-                }
-            };
+                                       var list = new List<TestModel>(query);
+
+                                       if (list.Count < 1)
+                                       {
+                                           throw new Exception("Test failed: did not load any models.");
+                                       }
+                                   }
+                                   catch (Exception ex)
+                                   {
+                                       errorMsg = ex.AsExceptionString();
+                                   }
+                                   finally
+                                   {
+                                       loadEvent.Set();
+                                   }
+                               };
 
             save.RunWorkerAsync();
             load.RunWorkerAsync();

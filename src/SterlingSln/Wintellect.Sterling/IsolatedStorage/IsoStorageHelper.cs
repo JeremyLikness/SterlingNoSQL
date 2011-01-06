@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.IsolatedStorage;
+using System.Linq;
 using System.Windows;
 using Wintellect.Sterling.Exceptions;
 
@@ -178,13 +179,23 @@ namespace Wintellect.Sterling.IsolatedStorage
                     Purge(Path.Combine(path, dir), false);
                 }
 
-                // clear the files
-                foreach (var file in _iso.GetFileNames(Path.Combine(path, "*")))
+                // clear the files - don't use a where clause because we want to get closer to the delete operation
+                // with the filter
+                foreach (var filePath in
+                    _iso.GetFileNames(Path.Combine(path, "*"))
+                    .Select(file => Path.Combine(path, file)))
                 {
-                    _iso.DeleteFile(Path.Combine(path, file));
+                    if (_iso.FileExists(filePath))
+                    {
+                        _iso.DeleteFile(filePath);
+                    }
                 }
 
-                _iso.DeleteDirectory(path.TrimEnd('\\', '/'));
+                var dirPath = path.TrimEnd('\\', '/');
+                if (_iso.DirectoryExists(dirPath))
+                {
+                    _iso.DeleteDirectory(dirPath);                    
+                }
             }
             catch (Exception ex)
             {
