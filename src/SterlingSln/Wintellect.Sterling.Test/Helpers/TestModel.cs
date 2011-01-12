@@ -1,4 +1,5 @@
 ﻿using System;
+using Wintellect.Sterling.Serialization;
 
 namespace Wintellect.Sterling.Test.Helpers
 {
@@ -6,6 +7,16 @@ namespace Wintellect.Sterling.Test.Helpers
     ///     A sub class Sterling isn't explicitly aware of
     /// </summary>
     public class TestSubclass
+    {
+        public string NestedText { get; set; }
+    }
+
+    /// <summary>
+    ///     A sub class Sterling isn't explicitly aware of
+    ///     That is suppressed
+    /// </summary>
+    [SterlingIgnore]
+    public class TestSubclass2
     {
         public string NestedText { get; set; }
     }
@@ -31,8 +42,13 @@ namespace Wintellect.Sterling.Test.Helpers
         ///     Data
         /// </summary>
         public string Data { get; set; }
+        
+        [SterlingIgnore]
+        public string Data2 { get; set; }
 
         public TestSubclass SubClass { get; set; }
+
+        public TestSubclass2 SubClass2 { get; set; }
 
         public TestModelAsListModel Parent { get; set; }
 
@@ -43,12 +59,15 @@ namespace Wintellect.Sterling.Test.Helpers
 
         public static TestModel MakeTestModel()
         {
-            return new TestModel { Data = Guid.NewGuid().ToString(), Date = DateTime.Now, Key = _idx++, SubClass = new TestSubclass { NestedText = Guid.NewGuid().ToString() } };
+            return new TestModel { Data = Guid.NewGuid().ToString(), Data2 = Guid.NewGuid().ToString(), Date = DateTime.Now, Key = _idx++, SubClass = new TestSubclass { NestedText = Guid.NewGuid().ToString() },
+                                   SubClass2 = new TestSubclass2 { NestedText = Guid.NewGuid().ToString() }
+            };
         }
 
         internal static TestModel MakeTestModel(TestModelAsListModel parentModel)
         {
-            return new TestModel { Data = Guid.NewGuid().ToString(), Date = DateTime.Now, Key = _idx++, SubClass = new TestSubclass { NestedText = Guid.NewGuid().ToString() }, Parent = parentModel };
+            return new TestModel { Data = Guid.NewGuid().ToString(), Data2 = Guid.NewGuid().ToString(), Date = DateTime.Now, Key = _idx++, SubClass = new TestSubclass { NestedText = Guid.NewGuid().ToString() }, 
+                SubClass2 = new TestSubclass2 { NestedText = Guid.NewGuid().ToString() }, Parent = parentModel };
         }
     }
 }

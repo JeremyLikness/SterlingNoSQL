@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
+using Wintellect.Sterling.Serialization;
 
 namespace Wintellect.Sterling.Database
 {
@@ -40,5 +43,26 @@ namespace Wintellect.Sterling.Database
             ((TableDefinition<T, TKey>)table).RegisterIndex(name, indexer);
             return table;
         }
+
+        /// <summary>
+        ///     Is a property ignored?
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public static bool IsIgnored(this PropertyInfo p)
+        {
+            return (from c in p.GetCustomAttributes(false) where c is SterlingIgnoreAttribute select c).Any();
+        }
+
+        /// <summary>
+        ///     Is a property ignored?
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool IsIgnored(this Type type)
+        {
+            return (from c in type.GetCustomAttributes(false) where c is SterlingIgnoreAttribute select c).Any();
+        }
+
     }
 }

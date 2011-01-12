@@ -503,6 +503,7 @@ namespace Wintellect.Sterling.Database
         /// </summary>
         /// <param name="type">The type to load</param>
         /// <param name="key">The key</param>
+        /// <param name="cache">Cache queue</param>
         /// <returns>The instance</returns>
         public object Load(Type type, object key, CycleCache cache)
         {
@@ -660,17 +661,7 @@ namespace Wintellect.Sterling.Database
 
             if (handler == null) return;
 
-            Action raise = () => handler(this, new SterlingOperationArgs(operation, targetType, key));
-
-            var dispatcher = Deployment.Current.Dispatcher;
-            if (dispatcher.CheckAccess())
-            {
-                raise();
-            }
-            else
-            {
-                dispatcher.BeginInvoke(raise);
-            }
+            handler(this, new SterlingOperationArgs(operation, targetType, key));
         }
 
         public event EventHandler<SterlingOperationArgs> SterlingOperationPerformed;

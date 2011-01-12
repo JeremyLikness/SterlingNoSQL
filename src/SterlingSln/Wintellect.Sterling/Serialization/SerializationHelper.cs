@@ -154,11 +154,12 @@ namespace Wintellect.Sterling.Serialization
 
                 var properties = from p in type.GetProperties()
                                  where p.GetGetMethod() != null && p.GetSetMethod() != null
+                                 && !p.IsIgnored() && !p.PropertyType.IsIgnored()
                                  select p;
 
                 foreach (var p in properties)
-                {
-                    var propType = p.PropertyType;
+                {                    
+                    var propType = p.PropertyType;                    
 
                     if (propType.IsGenericType && propType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
                     {
@@ -188,6 +189,12 @@ namespace Wintellect.Sterling.Serialization
                     {
                         valueType = value.GetType();
                     }
+
+                    // ignored type?
+                    if (valueType != null && valueType.IsIgnored())
+                    {
+                        continue;
+                    }                                        
 
                     // this is registered "keyed" type, so we serialize the foreign key
                     if (_database.IsRegistered(propType) || (value != null && _database.IsRegistered(valueType)))

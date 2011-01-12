@@ -107,7 +107,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Users\JeremyLikness\Documents\Visual Studio 2010\Projects\Sterling\src\SterlingSln\Wintellect.Sterling.WindowsPhone\Wintellect.Sterling.WindowsPhone.csproj">
+    <ProjectReference Include="..\Wintellect.Sterling.WindowsPhone\Wintellect.Sterling.WindowsPhone.csproj">
       <Project>{7842BE18-DAE7-408A-8863-7C0DE2FFB9D8}</Project>
       <Name>Wintellect.Sterling.WindowsPhone</Name>
     </ProjectReference>

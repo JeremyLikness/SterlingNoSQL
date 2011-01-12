@@ -191,6 +191,9 @@
     <Compile Include="..\Wintellect.Sterling\Serialization\SerializationHelper.cs">
       <Link>Serialization\SerializationHelper.cs</Link>
     </Compile>
+    <Compile Include="..\Wintellect.Sterling\Serialization\SterlingIgnoreAttribute.cs">
+      <Link>Serialization\SterlingIgnoreAttribute.cs</Link>
+    </Compile>
     <Compile Include="..\Wintellect.Sterling\SterlingDefaultLogger.cs">
       <Link>SterlingDefaultLogger.cs</Link>
     </Compile>

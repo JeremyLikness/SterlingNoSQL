@@ -1,4 +1,5 @@
-﻿using Microsoft.Silverlight.Testing;
+﻿using System;
+using Microsoft.Silverlight.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Exceptions;
 using Wintellect.Sterling.IsolatedStorage;
@@ -62,7 +63,9 @@ namespace Wintellect.Sterling.Test.Database
 
             Assert.AreEqual(expected.Key, actual.Key, "Load failed: key mismatch.");
             Assert.AreEqual(expected.Data, actual.Data, "Load failed: data mismatch.");
-            Assert.IsNotNull(actual.SubClass, "Load failed: sub class is null.");           
+            Assert.IsNull(actual.Data2, "Load failed: suppressed data property not valid on de-serialize.");
+            Assert.IsNotNull(actual.SubClass, "Load failed: sub class is null.");
+            Assert.IsNull(actual.SubClass2, "Load failed: supressed sub class should be null.");           
             Assert.AreEqual(expected.SubClass.NestedText, actual.SubClass.NestedText, "Load failed: sub class text mismtach.");
         }
 

@@ -1,0 +1,13 @@
+using System;
+
+namespace Wintellect.Sterling.Serialization
+{
+    /// <summary>
+    ///     Attribute to tag a property, class, etc. that should not be serialized
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Enum | AttributeTargets.Struct, AllowMultiple = false)]
+    public class SterlingIgnoreAttribute : Attribute 
+    {
+        
+    }
+}
