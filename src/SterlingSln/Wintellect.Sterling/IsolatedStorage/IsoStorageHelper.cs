@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Linq;
-using System.Windows;
 using Wintellect.Sterling.Exceptions;
-using System.Threading;
 using Wintellect.Sterling.Database;
 
 namespace Wintellect.Sterling.IsolatedStorage
@@ -31,8 +29,7 @@ namespace Wintellect.Sterling.IsolatedStorage
         {
             if (_iso != null) return;
 
-            _iso = IsolatedStorageFile.GetUserStoreForApplication();
-            Application.Current.Exit += (o, e) => _iso.Dispose();
+            _iso = IsolatedStorageFile.GetUserStoreForApplication();           
         }
 
         /// <summary>
