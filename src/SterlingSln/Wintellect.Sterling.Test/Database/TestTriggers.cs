@@ -20,6 +20,7 @@ namespace Wintellect.Sterling.Test.Database
     public class TriggerClassTrigger : BaseSterlingTrigger<TriggerClass, int>
     {
         private static int _nextKey;
+        private static readonly object _mutex = new object();
 
         public TriggerClassTrigger(ISterlingDatabaseInstance database)
         {
@@ -34,10 +35,11 @@ namespace Wintellect.Sterling.Test.Database
             if (instance.Id == 5) return false;
             
             if (instance.Id > 0) return true;
-            
-            instance.Id = _nextKey;
-            Interlocked.Increment(ref _nextKey);
 
+            Monitor.Enter(_mutex);
+            instance.Id = _nextKey++;
+            Monitor.Exit(_mutex);
+                       
             return true;
         }
 

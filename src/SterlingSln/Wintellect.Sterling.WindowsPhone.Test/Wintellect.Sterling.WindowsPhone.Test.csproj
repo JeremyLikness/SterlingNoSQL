@@ -120,6 +120,9 @@
     <Compile Include="..\Wintellect.Sterling.Test\Database\TestTableDefinition.cs">
       <Link>Database\TestTableDefinition.cs</Link>
     </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test\Database\TestTriggers.cs">
+      <Link>Database\TestTriggers.cs</Link>
+    </Compile>
     <Compile Include="..\Wintellect.Sterling.Test\Database\TestTruncate.cs">
       <Link>Database\TestTruncate.cs</Link>
     </Compile>
