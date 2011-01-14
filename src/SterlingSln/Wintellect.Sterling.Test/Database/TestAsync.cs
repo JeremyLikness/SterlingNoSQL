@@ -160,13 +160,7 @@ namespace Wintellect.Sterling.Test.Database
         {
             var saveEvent = new ManualResetEvent(false);
             var loadEvent = new ManualResetEvent(false);
-
-            var events = new[]
-                             {
-                                 saveEvent,
-                                 loadEvent
-                             };
-
+            
             // Initialize the DB with some data.
             foreach (var item in _modelList)
             {
@@ -231,7 +225,8 @@ namespace Wintellect.Sterling.Test.Database
             save.RunWorkerAsync();
             load.RunWorkerAsync();
 
-            WaitHandle.WaitAll(events);
+            saveEvent.WaitOne(60000);
+            loadEvent.WaitOne(60000);
 
             Assert.IsTrue(string.IsNullOrEmpty(errorMsg), string.Format("Failed concurrent load: {0}", errorMsg));
 
@@ -245,12 +240,7 @@ namespace Wintellect.Sterling.Test.Database
         {
             var saveEvent = new ManualResetEvent(false);
             var loadEvent = new ManualResetEvent(false);
-            var events = new[]
-                             {
-                                 saveEvent,
-                                 loadEvent
-                             };
-
+            
             // Initialize the DB with some data.
             foreach (var item in _modelList)
             {
@@ -319,7 +309,8 @@ namespace Wintellect.Sterling.Test.Database
             save.RunWorkerAsync();
             load.RunWorkerAsync();
 
-            WaitHandle.WaitAll(events);
+            saveEvent.WaitOne(60000);
+            loadEvent.WaitOne(60000); 
 
             Assert.IsTrue(string.IsNullOrEmpty(errorMsg), string.Format("Concurrent test failed: {0}", errorMsg));
 

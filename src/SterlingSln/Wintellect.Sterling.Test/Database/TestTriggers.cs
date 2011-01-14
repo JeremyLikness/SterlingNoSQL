@@ -102,6 +102,7 @@ namespace Wintellect.Sterling.Test.Database
         [TestCleanup]
         public void TestCleanup()
         {
+            _databaseInstance.Purge();
             _engine.Dispose();
             _databaseInstance = null;
             using (var iso = new IsoStorageHelper())
