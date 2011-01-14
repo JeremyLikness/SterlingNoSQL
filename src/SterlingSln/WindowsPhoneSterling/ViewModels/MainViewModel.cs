@@ -102,12 +102,8 @@ namespace WindowsPhoneSterling
                 new ItemViewModel() { LineOne = "runtime sixteen", LineTwo = "Nascetur pharetra placerat pulvinar", LineThree = "Pulvinar sagittis senectus sociosqu suscipit torquent ultrices vehicula volutpat maecenas praesent accumsan bibendum" }
             };
 
-            var idx = 0;
-
             foreach (var item in sampleData)
-            {
-                idx++;
-                item.Id = idx;
+            {                
                 App.Database.Save(item);                
             }            
         }

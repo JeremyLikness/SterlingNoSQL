@@ -90,6 +90,12 @@ namespace WindowsPhoneSterling
             _logger = new SterlingDefaultLogger(SterlingLogLevel.Information);
             _engine.Activate();
             _database = _engine.SterlingDatabase.RegisterDatabase<ItemDatabase>();
+            var maxIdx =
+                _database.Query<ItemViewModel, int>().Any() ?
+                (from id in _database.Query<ItemViewModel, int>()
+                 select id.Key).Max() + 1 : 1;
+            _database.RegisterTrigger<ItemViewModel, int>(new WindowsPhoneSterling.Sterling.ItemDatabase.ItemTrigger(maxIdx));
+                         
         }
 
         private void _DeactivateEngine()

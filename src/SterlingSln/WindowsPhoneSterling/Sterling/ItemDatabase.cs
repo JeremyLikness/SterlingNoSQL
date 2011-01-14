@@ -14,6 +14,36 @@ namespace WindowsPhoneSterling.Sterling
 {
     public class ItemDatabase : BaseDatabaseInstance 
     {
+        public class ItemTrigger : BaseSterlingTrigger<ItemViewModel, int>
+        {
+            private int _nextId;
+
+            public ItemTrigger(int nextId)
+            {
+                _nextId = nextId;
+            }
+
+            public override bool BeforeSave(ItemViewModel instance)
+            {
+                if (instance.Id < 1)
+                {
+                    instance.Id = _nextId++;
+                }
+
+                return true;
+            }
+
+            public override void AfterSave(ItemViewModel instance)
+            {
+                return;
+            }
+
+            public override bool BeforeDelete(int key)
+            {
+                return true;
+            }
+        }
+
 
         public override string Name
         {
