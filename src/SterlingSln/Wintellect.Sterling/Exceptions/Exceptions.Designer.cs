@@ -79,6 +79,15 @@ namespace Wintellect.Sterling.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot truncate when background operations are still running..
+        /// </summary>
+        public static string BaseDatabaseInstance_Truncate_Cannot_truncate_when_background_operations {
+            get {
+                return ResourceManager.GetString("BaseDatabaseInstance_Truncate_Cannot_truncate_when_background_operations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The operation {0} is not allowed. A Sterling engine is already active for this application. You must dispose the engine before activating a new one..
         /// </summary>
         public static string SterlingActivationException {

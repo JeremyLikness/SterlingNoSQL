@@ -25,6 +25,11 @@ namespace Wintellect.Sterling.Database
         /// </summary>
         private static readonly Dictionary<Type, object> _locks = new Dictionary<Type, object>();
 
+        /// <summary>
+        ///     Workers to track/flush
+        /// </summary>
+        private readonly List<BackgroundWorker> _workers = new List<BackgroundWorker>();
+        
         private readonly Dictionary<Type,List<WeakReference>> _triggers = new Dictionary<Type, List<WeakReference>>();
         
         /// <summary>
@@ -491,25 +496,41 @@ namespace Wintellect.Sterling.Database
 
             var bw = new BackgroundWorker();
 
+            lock (((ICollection)_workers).SyncRoot)
+            {
+                _workers.Add(bw);
+            }
+
             bw.DoWork += (o, e) =>
                              {
                                  var index = 0;
-                                 foreach (var item in list)
+
+                                 try
                                  {
-                                     if (bw.CancellationPending)
+                                     foreach (var item in list)
                                      {
-                                         e.Cancel = true;
-                                         break;
-                                     }
+                                         if (bw.CancellationPending)
+                                         {
+                                             e.Cancel = true;
+                                             break;
+                                         }
 
-                                     Save(item.GetType(), item);
+                                         Save(item.GetType(), item);
 
-                                     if (bw.WorkerReportsProgress)
-                                     {
+                                         if (!bw.WorkerReportsProgress) continue;
+
                                          var pct = index++*100/list.Count;
                                          bw.ReportProgress(pct);
                                      }
                                  }
+                                 finally
+                                 {
+                                     lock (((ICollection)_workers).SyncRoot)
+                                     {
+                                         _workers.Remove(bw);
+                                     }
+                                 }
+
                              };
 
             return bw;
@@ -519,7 +540,7 @@ namespace Wintellect.Sterling.Database
         ///     Flush all keys and indexes to storage
         /// </summary>
         public void Flush()
-        {
+        {            
             if (_locks == null || !_locks.ContainsKey(GetType())) return;
 
             lock (Lock)
@@ -693,14 +714,24 @@ namespace Wintellect.Sterling.Database
         /// <param name="type">The type</param>
         public void Truncate(Type type)
         {
-            _iso.Purge(_pathProvider.GetTablePath(Name, type));
-
-            _tableDefinitions[type].Keys.Truncate();
-            foreach (var index in _tableDefinitions[type].Indexes.Values)
+            if (_workers.Count > 0)
             {
-                index.Truncate();
+                throw new SterlingException(Exceptions.Exceptions.BaseDatabaseInstance_Truncate_Cannot_truncate_when_background_operations);
             }
-            
+
+            if (_locks == null || !_locks.ContainsKey(GetType())) return;
+
+            lock (Lock)
+            {
+                _iso.Purge(_pathProvider.GetTablePath(Name, type));
+
+                _tableDefinitions[type].Keys.Truncate();
+                foreach (var index in _tableDefinitions[type].Indexes.Values)
+                {
+                    index.Truncate();
+                }
+            }
+
             _RaiseOperation(SterlingOperation.Truncate, type, null);
         }
 
@@ -709,18 +740,39 @@ namespace Wintellect.Sterling.Database
         /// </summary>
         public void Purge()
         {
-            _iso.Purge(_pathProvider.GetDatabasePath(Name));
-           
+            if (_locks == null || !_locks.ContainsKey(GetType())) return;
 
-            // clear key lists from memory
-            foreach(var table in _tableDefinitions.Keys)
+            lock (Lock)
             {
-                _tableDefinitions[table].Keys.Truncate();
-                foreach (var index in _tableDefinitions[table].Indexes.Values)
+                var delay = 0;
+
+                // cancel all async operations, accumulate delays
+                lock (((ICollection) _workers).SyncRoot)
                 {
-                    index.Truncate();
+                    foreach (var worker in _workers)
+                    {
+                        worker.CancelAsync();
+                        delay += 100;
+                    }
                 }
-            }                        
+
+                if (delay > 0)
+                {
+                    Thread.Sleep(delay);
+                }
+
+                _iso.Purge(_pathProvider.GetDatabasePath(Name));
+
+                // clear key lists from memory
+                foreach (var table in _tableDefinitions.Keys)
+                {
+                    _tableDefinitions[table].Keys.Truncate();
+                    foreach (var index in _tableDefinitions[table].Indexes.Values)
+                    {
+                        index.Truncate();
+                    }
+                }
+            }
 
             _RaiseOperation(SterlingOperation.Purge, GetType(), Name);
         }

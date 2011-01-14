@@ -165,4 +165,7 @@
 	<data name="BaseDatabaseInstance_Delete_Delete_failed_for_type">
 		<value xml:space="preserve">Delete failed for type {0}: delete suppressed by trigger.</value>
 	</data>
+	<data name="BaseDatabaseInstance_Truncate_Cannot_truncate_when_background_operations">
+		<value xml:space="preserve">Cannot truncate when background operations are still running.</value>
+	</data>
 </root>
