@@ -17,7 +17,7 @@ namespace Wintellect.Sterling
     /// </summary>
     /// <typeparam name="T">The type it supports</typeparam>
     /// <typeparam name="TKey">The key</typeparam>
-    internal interface ISterlingTrigger<in T, in TKey> : ISterlingTrigger where T: class, new() 
+    internal interface ISterlingTrigger<T, TKey> : ISterlingTrigger where T: class, new() 
     {
         bool BeforeSave(T instance);
         void AfterSave(T instance);
