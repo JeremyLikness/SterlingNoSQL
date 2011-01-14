@@ -16,6 +16,18 @@ namespace Wintellect.Sterling
     public interface ISterlingDatabaseInstance : ISterlingLock 
     {
         /// <summary>
+        ///     Register a trigger
+        /// </summary>
+        /// <param name="trigger">The trigger</param>
+        void RegisterTrigger<T,TKey>(BaseSterlingTrigger<T, TKey> trigger) where T : class, new();
+
+        /// <summary>
+        ///     Unregister the trigger
+        /// </summary>
+        /// <param name="trigger">The trigger</param>
+        void UnregisterTrigger<T, TKey>(BaseSterlingTrigger<T, TKey> trigger) where T : class, new();
+
+        /// <summary>
         ///     The name of the database instance
         /// </summary>
         string Name { get; }

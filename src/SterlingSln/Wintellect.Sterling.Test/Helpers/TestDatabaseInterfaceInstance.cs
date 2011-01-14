@@ -19,6 +19,24 @@ namespace Wintellect.Sterling.Test.Helpers
         }
 
         /// <summary>
+        ///     Register a trigger
+        /// </summary>
+        /// <param name="trigger">The trigger</param>
+        public void RegisterTrigger<T, TKey>(BaseSterlingTrigger<T, TKey> trigger) where T : class, new()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        ///     Unregister the trigger
+        /// </summary>
+        /// <param name="trigger">The trigger</param>
+        public void UnregisterTrigger<T, TKey>(BaseSterlingTrigger<T, TKey> trigger) where T : class, new()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         ///     The name of the database instance
         /// </summary>
         public string Name

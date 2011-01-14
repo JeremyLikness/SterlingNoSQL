@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Database\BaseDatabaseInstance.cs" />
+    <Compile Include="Database\BaseSterlingTrigger.cs" />
     <Compile Include="Database\CycleCache.cs" />
     <Compile Include="Database\CycleItem.cs" />
     <Compile Include="Database\Extensions.cs" />
@@ -87,6 +88,7 @@
     <Compile Include="Exceptions\SterlingNullException.cs" />
     <Compile Include="Exceptions\SterlingSerializerException.cs" />
     <Compile Include="Exceptions\SterlingTableNotFoundException.cs" />
+    <Compile Include="Exceptions\SterlingTriggerException.cs" />
     <Compile Include="Indexes\IIndexCollection.cs" />
     <Compile Include="Indexes\IndexCollection.cs" />
     <Compile Include="Indexes\IndexCollection2.cs" />
@@ -98,6 +100,7 @@
     <Compile Include="Database\SterlingDatabase.cs" />
     <Compile Include="ISterlingDatabaseInstance.cs" />
     <Compile Include="ISterlingLock.cs" />
+    <Compile Include="ISterlingTrigger.cs" />
     <Compile Include="Keys\IKeyCollection.cs" />
     <Compile Include="Keys\KeyCollection.cs" />
     <Compile Include="Keys\TableKey.cs" />

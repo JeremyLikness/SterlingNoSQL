@@ -61,6 +61,24 @@ namespace Wintellect.Sterling.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Delete failed for type {0}: delete suppressed by trigger..
+        /// </summary>
+        public static string BaseDatabaseInstance_Delete_Delete_failed_for_type {
+            get {
+                return ResourceManager.GetString("BaseDatabaseInstance_Delete_Delete_failed_for_type", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save suppressed by trigger..
+        /// </summary>
+        public static string BaseDatabaseInstance_Save_Save_suppressed_by_trigger {
+            get {
+                return ResourceManager.GetString("BaseDatabaseInstance_Save_Save_suppressed_by_trigger", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The operation {0} is not allowed. A Sterling engine is already active for this application. You must dispose the engine before activating a new one..
         /// </summary>
         public static string SterlingActivationException {
@@ -174,6 +192,15 @@ namespace Wintellect.Sterling.Exceptions {
         public static string SterlingTableNotFoundException {
             get {
                 return ResourceManager.GetString("SterlingTableNotFoundException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sterling trigger exception occurred for trigger {0}: {1}.
+        /// </summary>
+        public static string SterlingTriggerException_SterlingTriggerException_Sterling_trigger_exception {
+            get {
+                return ResourceManager.GetString("SterlingTriggerException_SterlingTriggerException_Sterling_trigger_exception", resourceCulture);
             }
         }
     }

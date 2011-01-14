@@ -25,11 +25,8 @@ namespace Wintellect.Sterling.Database
         /// </summary>
         private static readonly Dictionary<Type, object> _locks = new Dictionary<Type, object>();
 
-        /// <summary>
-        ///     Path locks
-        /// </summary>
-        private static readonly Dictionary<string, object> _pathLock = new Dictionary<string, object>();
-
+        private readonly Dictionary<Type,List<WeakReference>> _triggers = new Dictionary<Type, List<WeakReference>>();
+        
         /// <summary>
         ///     The table definitions
         /// </summary>
@@ -93,6 +90,71 @@ namespace Wintellect.Sterling.Database
         public object Lock
         {
             get { return _locks[GetType()]; }
+        }        
+
+        /// <summary>
+        ///     Register a trigger
+        /// </summary>
+        /// <param name="trigger">The trigger</param>
+        public void RegisterTrigger<T, TKey>(BaseSterlingTrigger<T, TKey> trigger) where T : class, new()
+        {
+            if (!_triggers.ContainsKey(typeof(T)))
+            {
+                lock(((ICollection)_triggers).SyncRoot)
+                {
+                    if (!_triggers.ContainsKey(typeof(T)))
+                    {
+                        _triggers.Add(typeof(T), new List<WeakReference>());
+                    }
+                }
+            }
+
+            _triggers[typeof(T)].Add(new WeakReference(trigger));
+        }
+
+        /// <summary>
+        ///     Unregister the trigger
+        /// </summary>
+        /// <param name="trigger">The trigger</param>
+        public void UnregisterTrigger<T, TKey>(BaseSterlingTrigger<T, TKey> trigger) where T : class, new()
+        {
+            if (!_triggers.ContainsKey(typeof (T))) return;
+
+            lock(((ICollection)_triggers).SyncRoot)
+            {
+                var triggerRef = (from w in _triggers[typeof (T)]
+                                  where w.Target is BaseSterlingTrigger<T, TKey>
+                                  select w).FirstOrDefault();
+
+                if (triggerRef != null)
+                {
+                    _triggers[typeof (T)].Remove(triggerRef);
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Fire the triggers for a type
+        /// </summary>
+        /// <param name="type">The target type</param>
+        private IEnumerable<ISterlingTrigger> _TriggerList(Type type)
+        {
+            if (_triggers.ContainsKey(type))
+            {
+                List<ISterlingTrigger> triggers;
+                
+                lock (((ICollection) _triggers).SyncRoot)
+                {
+                    triggers = (from w in _triggers[type]
+                                where w.Target is ISterlingTrigger
+                                      && w.IsAlive
+                                select w.Target as ISterlingTrigger).ToList();
+                }
+
+                return triggers;                
+            }
+
+            return Enumerable.Empty<ISterlingTrigger>();
         }
 
         /// <summary>
@@ -198,7 +260,7 @@ namespace Wintellect.Sterling.Database
         /// <param name="instance">The instance</param>
         public TKey Save<T, TKey>(T instance) where T : class, new()
         {
-            return (TKey) Save((object) instance);
+            return (TKey) Save(typeof(T), instance);
         }
 
         /// <summary>
@@ -321,6 +383,12 @@ namespace Wintellect.Sterling.Database
                 throw new SterlingTableNotFoundException(instance.GetType(), Name);
             }
 
+            // call any before save triggers 
+            foreach (var trigger in _TriggerList(type).Where(trigger => !trigger.BeforeSave(type, instance)))
+            {
+                throw new SterlingTriggerException(Exceptions.Exceptions.BaseDatabaseInstance_Save_Save_suppressed_by_trigger, trigger.GetType());
+            }
+
             var key = _tableDefinitions[type].FetchKeyFromInstance(instance);
 
             if (cache.Check(instance))
@@ -328,7 +396,7 @@ namespace Wintellect.Sterling.Database
                 return key;
             }
             
-            cache.Add(type, instance, key);
+            cache.Add(type, instance, key);           
 
             var keyIndex = _tableDefinitions[type].Keys.AddKey(key);
             
@@ -364,6 +432,12 @@ namespace Wintellect.Sterling.Database
             foreach (var index in _tableDefinitions[type].Indexes.Values)
             {
                 index.AddIndex(instance, key);
+            }
+
+            // call post-save triggers
+            foreach(var trigger in _TriggerList(type))
+            {
+                trigger.AfterSave(type, instance);
             }
 
             _RaiseOperation(SterlingOperation.Save, type, key);
@@ -593,8 +667,13 @@ namespace Wintellect.Sterling.Database
                 throw new SterlingTableNotFoundException(type, Name);
             }
 
-            var keyEntry = _tableDefinitions[type].Keys.GetIndexForKey(key);
+            // call any before save triggers 
+            foreach (var trigger in _TriggerList(type).Where(trigger => !trigger.BeforeDelete(type, key)))
+            {
+                throw new SterlingTriggerException(string.Format(Exceptions.Exceptions.BaseDatabaseInstance_Delete_Delete_failed_for_type, type), trigger.GetType());
+            }
 
+            var keyEntry = _tableDefinitions[type].Keys.GetIndexForKey(key);
 
             _iso.Delete(_pathProvider.GetInstancePath(Name, type, keyEntry));
 

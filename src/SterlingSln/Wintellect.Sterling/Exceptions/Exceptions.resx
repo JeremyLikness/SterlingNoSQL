@@ -156,4 +156,13 @@
   <data name="SterlingTableNotFoundException" xml:space="preserve">
     <value>A definition for type {0} was not found in Sterling database {1}.</value>
   </data>
+	<data name="SterlingTriggerException_SterlingTriggerException_Sterling_trigger_exception">
+		<value xml:space="preserve">Sterling trigger exception occurred for trigger {0}: {1}</value>
+	</data>
+	<data name="BaseDatabaseInstance_Save_Save_suppressed_by_trigger">
+		<value xml:space="preserve">Save suppressed by trigger.</value>
+	</data>
+	<data name="BaseDatabaseInstance_Delete_Delete_failed_for_type">
+		<value xml:space="preserve">Delete failed for type {0}: delete suppressed by trigger.</value>
+	</data>
 </root>
