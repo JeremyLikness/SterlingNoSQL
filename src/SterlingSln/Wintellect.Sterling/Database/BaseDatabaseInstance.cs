@@ -30,7 +30,7 @@ namespace Wintellect.Sterling.Database
         /// </summary>
         private readonly List<BackgroundWorker> _workers = new List<BackgroundWorker>();
         
-        private readonly Dictionary<Type,List<WeakReference>> _triggers = new Dictionary<Type, List<WeakReference>>();
+        private readonly Dictionary<Type,List<ISterlingTrigger>> _triggers = new Dictionary<Type, List<ISterlingTrigger>>();
         
         /// <summary>
         ///     The table definitions
@@ -109,12 +109,12 @@ namespace Wintellect.Sterling.Database
                 {
                     if (!_triggers.ContainsKey(typeof(T)))
                     {
-                        _triggers.Add(typeof(T), new List<WeakReference>());
+                        _triggers.Add(typeof(T), new List<ISterlingTrigger>());
                     }
                 }
             }
 
-            _triggers[typeof(T)].Add(new WeakReference(trigger));
+            _triggers[typeof(T)].Add(trigger);
         }
 
         /// <summary>
@@ -125,15 +125,14 @@ namespace Wintellect.Sterling.Database
         {
             if (!_triggers.ContainsKey(typeof (T))) return;
 
-            lock(((ICollection)_triggers).SyncRoot)
+            if (_triggers[typeof(T)].Contains(trigger))
             {
-                var triggerRef = (from w in _triggers[typeof (T)]
-                                  where w.Target is BaseSterlingTrigger<T, TKey>
-                                  select w).FirstOrDefault();
-
-                if (triggerRef != null)
+                lock (((ICollection) _triggers).SyncRoot)
                 {
-                    _triggers[typeof (T)].Remove(triggerRef);
+                    if (_triggers[typeof(T)].Contains(trigger))
+                    {
+                        _triggers[typeof (T)].Remove(trigger);
+                    }
                 }
             }
         }
@@ -150,10 +149,7 @@ namespace Wintellect.Sterling.Database
                 
                 lock (((ICollection) _triggers).SyncRoot)
                 {
-                    triggers = (from w in _triggers[type]
-                                where w.Target is ISterlingTrigger
-                                      && w.IsAlive
-                                select w.Target as ISterlingTrigger).ToList();
+                    triggers = new List<ISterlingTrigger>(_triggers[type]);
                 }
 
                 return triggers;                
