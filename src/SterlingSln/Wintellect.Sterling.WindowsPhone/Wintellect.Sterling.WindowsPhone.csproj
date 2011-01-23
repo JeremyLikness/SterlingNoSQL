@@ -56,6 +56,9 @@
     <Compile Include="..\Wintellect.Sterling\Database\BaseDatabaseInstance.cs">
       <Link>Database\BaseDatabaseInstance.cs</Link>
     </Compile>
+    <Compile Include="..\Wintellect.Sterling\Database\BaseSterlingByteInterceptor.cs">
+      <Link>Database\BaseSterlingByteInterceptor.cs</Link>
+    </Compile>
     <Compile Include="..\Wintellect.Sterling\Database\BaseSterlingTrigger.cs">
       <Link>Database\BaseSterlingTrigger.cs</Link>
     </Compile>
@@ -158,6 +161,9 @@
     <Compile Include="..\Wintellect.Sterling\IsolatedStorage\PathProvider.cs">
       <Link>IsolatedStorage\PathProvider.cs</Link>
     </Compile>
+    <Compile Include="..\Wintellect.Sterling\ISterlingByteInterceptor.cs">
+      <Link>ISterlingByteInterceptor.cs</Link>
+    </Compile>
     <Compile Include="..\Wintellect.Sterling\ISterlingDatabase.cs">
       <Link>ISterlingDatabase.cs</Link>
     </Compile>
@@ -215,8 +221,6 @@
     <Compile Include="..\Wintellect.Sterling\SterlingLogLevel.cs">
       <Link>SterlingLogLevel.cs</Link>
     </Compile>
-    <Compile Include="Database\BaseSterlingByteInterceptor.cs" />
-    <Compile Include="ISterlingByteInterceptor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SL4Stub\IStructuralComparable.cs" />
     <Compile Include="SL4Stub\IStructuralEquatable.cs" />

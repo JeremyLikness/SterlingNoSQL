@@ -75,6 +75,9 @@
     <Compile Include="..\Wintellect.Sterling.Test\Database\TestAsync.cs">
       <Link>Database\TestAsync.cs</Link>
     </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test\Database\TestByteStreamInterceptor.cs">
+      <Link>Database\TestByteStreamInterceptor.cs</Link>
+    </Compile>
     <Compile Include="..\Wintellect.Sterling.Test\Database\TestCycle.cs">
       <Link>Database\TestCycle.cs</Link>
     </Compile>
@@ -225,7 +228,6 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Database\TestByteStreamInterceptor.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>

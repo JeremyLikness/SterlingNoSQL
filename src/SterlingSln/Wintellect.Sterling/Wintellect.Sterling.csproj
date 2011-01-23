@@ -60,10 +60,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Database\BaseDatabaseInstance.cs" />
+    <Compile Include="Database\BaseSterlingByteInterceptor.cs" />
     <Compile Include="Database\BaseSterlingTrigger.cs" />
     <Compile Include="Database\CycleCache.cs" />
     <Compile Include="Database\CycleItem.cs" />
     <Compile Include="Database\Extensions.cs" />
+    <Compile Include="ISterlingByteInterceptor.cs" />
     <Compile Include="Database\ITableDefinition.cs" />
     <Compile Include="Database\LogManager.cs" />
     <Compile Include="Database\PathLock.cs" />

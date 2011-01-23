@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Security.Cryptography;
-using Microsoft.Silverlight.Testing;
+﻿using Microsoft.Silverlight.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Database;
 using Wintellect.Sterling.IsolatedStorage;
 
-namespace Wintellect.Sterling.WindowsPhone.Test.Database
+namespace Wintellect.Sterling.Test.Database
 {
 
     public class ByteStreamData
@@ -18,8 +16,8 @@ namespace Wintellect.Sterling.WindowsPhone.Test.Database
 
         public string Data
         {
-            get { return _data;}
-            set { _data = value;}
+            get { return _data; }
+            set { _data = value; }
         }
 
         private string _id;
@@ -97,7 +95,7 @@ namespace Wintellect.Sterling.WindowsPhone.Test.Database
             byteStreamData.ID = "data";
             byteStreamData.Data = data;
 
-            
+
             ByteStreamTestIntercept testInterceptor = new ByteStreamTestIntercept();
             _databaseInstance.RegisterInterceptor<ByteStreamTestIntercept>(testInterceptor);
 
