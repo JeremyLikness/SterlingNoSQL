@@ -118,6 +118,40 @@ namespace Wintellect.Sterling.Database
         }
 
         /// <summary>
+        /// The byte stream interceptor list. 
+        /// </summary>
+        private List<BaseSterlingByteInterceptor> _byteInterceptorList = new List<BaseSterlingByteInterceptor>();
+
+        /// <summary>
+        /// Registers the BaseSterlingByteInterceptor
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="byteInterceptor"></param>
+        public void RegisterInterceptor<T>(BaseSterlingByteInterceptor byteInterceptor) where T : class, new()
+        {
+            if (byteInterceptor == null)
+            {
+                throw new ArgumentNullException("BaseSterlingByteInterceptor", " interceptor can't be null");
+            }
+            else
+            {
+                _byteInterceptorList.Add(byteInterceptor);
+            }
+        }
+
+        /// <summary>
+        /// Clears the _byteInterceptorList object
+        /// </summary>
+        public void UnRegisterInterceptor()
+        {
+            if (_byteInterceptorList != null)
+            {
+                _byteInterceptorList.Clear();
+            }
+        }
+
+
+        /// <summary>
         ///     Unregister the trigger
         /// </summary>
         /// <param name="trigger">The trigger</param>
@@ -404,16 +438,30 @@ namespace Wintellect.Sterling.Database
             _iso.EnsureDirectory(_pathProvider.GetDatabasePath(Name));
             _iso.EnsureDirectory(_pathProvider.GetTablePath(Name, type));
 
-            using (var memStream = new MemoryStream())
+            var memStream = new MemoryStream();
+
+            try
             {
                 using (var bw = new BinaryWriter(memStream))
                 {
                     var serializationHelper = new SerializationHelper(this, Serializer, SterlingFactory.GetLogger(), s => _pathProvider.GetTypeIndex(s),
                         i => _pathProvider.GetTypeAtIndex(i));
-                    serializationHelper.Save(type, instance, bw, cache);          
-          
+                    serializationHelper.Save(type, instance, bw, cache);
+
                     bw.Flush();
-                    
+
+                    if (_byteInterceptorList.Count > 0)
+                    {
+                        byte[] bytes = memStream.GetBuffer();
+
+                        foreach (BaseSterlingByteInterceptor byteInterceptor in _byteInterceptorList)
+                        {
+                            bytes = byteInterceptor.Save(bytes);
+                        }
+
+                        memStream = new MemoryStream(bytes);
+                    }
+
                     memStream.Seek(0, SeekOrigin.Begin);
 
                     var path = _pathProvider.GetInstancePath(Name, type, keyIndex);
@@ -426,8 +474,17 @@ namespace Wintellect.Sterling.Database
                             isoWriter.Write(memStream.ToArray());
                         }
                     }
-                }                                                                          
-            }            
+                }
+            }
+            finally
+            {
+                if (memStream != null)
+                {
+                    memStream.Flush();
+                    memStream.Close();
+                    memStream = null;
+                }
+            }
 
             // update the indexes
             foreach (var index in _tableDefinitions[type].Indexes.Values)
@@ -648,12 +705,48 @@ namespace Wintellect.Sterling.Database
 
                 lock (pathLock)
                 {
-                    using (var br = iso.GetReader(path))
+                    BinaryReader br = null;
+                    MemoryStream memStream = null;
+
+                    try
                     {
+                        br = iso.GetReader(path);
+
                         var serializationHelper = new SerializationHelper(this, Serializer, SterlingFactory.GetLogger(),
                                                                           s => _pathProvider.GetTypeIndex(s),
                                                                           i => _pathProvider.GetTypeAtIndex(i));
+                        if (_byteInterceptorList.Count > 0)
+                        {
+
+                            byte[] bytes = br.ReadBytes((int)br.BaseStream.Length);
+                            BaseSterlingByteInterceptor[] loadList = _byteInterceptorList.ToArray();
+                            loadList.Reverse();
+
+                            foreach (BaseSterlingByteInterceptor byteInterceptor in loadList)
+                            {
+                                bytes = byteInterceptor.Load(bytes);
+                            }
+
+                            memStream = new MemoryStream(bytes);
+
+                            br.Close();
+                            br = null;
+                            br = new BinaryReader(memStream);
+
+                        }
                         obj = serializationHelper.Load(newType, key, br, cache);
+                    }
+                    finally
+                    {
+                        br.Close();
+                        br = null;
+
+                        if (memStream != null)
+                        {
+                            memStream.Flush();
+                            memStream.Close();
+                            memStream = null;
+                        }
                     }
                 }
 

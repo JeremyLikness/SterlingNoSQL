@@ -22,6 +22,18 @@ namespace Wintellect.Sterling
         void RegisterTrigger<T,TKey>(BaseSterlingTrigger<T, TKey> trigger) where T : class, new();
 
         /// <summary>
+        /// Registers the byte stream interceptor
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="interecptor"></param>
+        void RegisterInterceptor<T>(BaseSterlingByteInterceptor intereceptor) where T : class, new();
+
+        /// <summary>
+        /// Clears the byte stream interceptor list
+        /// </summary>
+        void UnRegisterInterceptor();
+
+        /// <summary>
         ///     Unregister the trigger
         /// </summary>
         /// <param name="trigger">The trigger</param>

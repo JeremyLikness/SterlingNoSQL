@@ -37,6 +37,21 @@ namespace Wintellect.Sterling.Test.Helpers
         }
 
         /// <summary>
+        /// Register byte stream interceptors
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="interecptor"></param>
+        public void RegisterInterceptor<T>(BaseSterlingByteInterceptor interecptor) where T : class, new()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UnRegisterInterceptor()
+        {
+            throw new NotImplementedException();
+        }
+        
+        /// <summary>
         ///     The name of the database instance
         /// </summary>
         public string Name

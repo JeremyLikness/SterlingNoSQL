@@ -215,6 +215,8 @@
     <Compile Include="..\Wintellect.Sterling\SterlingLogLevel.cs">
       <Link>SterlingLogLevel.cs</Link>
     </Compile>
+    <Compile Include="Database\BaseSterlingByteInterceptor.cs" />
+    <Compile Include="ISterlingByteInterceptor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SL4Stub\IStructuralComparable.cs" />
     <Compile Include="SL4Stub\IStructuralEquatable.cs" />
