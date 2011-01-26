@@ -70,6 +70,15 @@ namespace Wintellect.Sterling.Exceptions {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Interceptor can&apos;t be null.
+        /// </summary>
+        public static string BaseDatabaseInstance_RegisterInterceptor_Interceptor_not_null {
+            get {
+                return ResourceManager.GetString("BaseDatabaseInstance_RegisterInterceptor_Interceptor_not_null", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Save suppressed by trigger..
         /// </summary>
         public static string BaseDatabaseInstance_Save_Save_suppressed_by_trigger {

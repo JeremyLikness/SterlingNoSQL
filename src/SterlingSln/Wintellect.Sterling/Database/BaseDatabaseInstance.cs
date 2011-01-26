@@ -120,29 +120,35 @@ namespace Wintellect.Sterling.Database
         /// <summary>
         /// The byte stream interceptor list. 
         /// </summary>
-        private List<BaseSterlingByteInterceptor> _byteInterceptorList = new List<BaseSterlingByteInterceptor>();
+        private readonly List<BaseSterlingByteInterceptor> _byteInterceptorList = new List<BaseSterlingByteInterceptor>();
 
         /// <summary>
         /// Registers the BaseSterlingByteInterceptor
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="byteInterceptor"></param>
-        public void RegisterInterceptor<T>(BaseSterlingByteInterceptor byteInterceptor) where T : class, new()
+        public void RegisterInterceptor<T>() where T : BaseSterlingByteInterceptor, new()
+        {            
+            _byteInterceptorList.Add((T)Activator.CreateInstance(typeof(T)));
+        }
+
+        public void UnRegisterInterceptor<T>() where T: BaseSterlingByteInterceptor, new()
         {
-            if (byteInterceptor == null)
+            var interceptor = (from i 
+                                   in _byteInterceptorList 
+                               where i.GetType().Equals(typeof(T)) 
+                               select i).FirstOrDefault();
+
+            if (interceptor != null)
             {
-                throw new ArgumentNullException("BaseSterlingByteInterceptor", " interceptor can't be null");
+                _byteInterceptorList.Remove(interceptor);
             }
-            else
-            {
-                _byteInterceptorList.Add(byteInterceptor);
-            }
+
         }
 
         /// <summary>
         /// Clears the _byteInterceptorList object
         /// </summary>
-        public void UnRegisterInterceptor()
+        public void UnRegisterInterceptors()
         {
             if (_byteInterceptorList != null)
             {
@@ -454,10 +460,7 @@ namespace Wintellect.Sterling.Database
                     {
                         byte[] bytes = memStream.GetBuffer();
 
-                        foreach (BaseSterlingByteInterceptor byteInterceptor in _byteInterceptorList)
-                        {
-                            bytes = byteInterceptor.Save(bytes);
-                        }
+                        bytes = _byteInterceptorList.Aggregate(bytes, (current, byteInterceptor) => byteInterceptor.Save(current));
 
                         memStream = new MemoryStream(bytes);
                     }
@@ -478,13 +481,10 @@ namespace Wintellect.Sterling.Database
             }
             finally
             {
-                if (memStream != null)
-                {
-                    memStream.Flush();
-                    memStream.Close();
-                    memStream = null;
-                }
+                memStream.Flush();
+                memStream.Close();
             }
+            
 
             // update the indexes
             foreach (var index in _tableDefinitions[type].Indexes.Values)
@@ -719,33 +719,29 @@ namespace Wintellect.Sterling.Database
                         {
 
                             byte[] bytes = br.ReadBytes((int)br.BaseStream.Length);
-                            BaseSterlingByteInterceptor[] loadList = _byteInterceptorList.ToArray();
-                            loadList.Reverse();
-
-                            foreach (BaseSterlingByteInterceptor byteInterceptor in loadList)
-                            {
-                                bytes = byteInterceptor.Load(bytes);
-                            }
-
+                            
+                            bytes = _byteInterceptorList.ToArray().Reverse().Aggregate(bytes,
+                                                                                       (current, byteInterceptor) =>
+                                                                                       byteInterceptor.Load(current));
+                            
                             memStream = new MemoryStream(bytes);
 
                             br.Close();
-                            br = null;
                             br = new BinaryReader(memStream);
-
                         }
                         obj = serializationHelper.Load(newType, key, br, cache);
                     }
                     finally
                     {
-                        br.Close();
-                        br = null;
-
+                        if (br != null)
+                        {
+                            br.Close();
+                        }
+                        
                         if (memStream != null)
                         {
                             memStream.Flush();
-                            memStream.Close();
-                            memStream = null;
+                            memStream.Close();                            
                         }
                     }
                 }

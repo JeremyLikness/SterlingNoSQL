@@ -168,4 +168,7 @@
 	<data name="BaseDatabaseInstance_Truncate_Cannot_truncate_when_background_operations">
 		<value xml:space="preserve">Cannot truncate when background operations are still running.</value>
 	</data>
+	<data name="BaseDatabaseInstance_RegisterInterceptor_Interceptor_not_null">
+		<value><![CDATA[Interceptor can't be null]]></value>
+	</data>
 </root>

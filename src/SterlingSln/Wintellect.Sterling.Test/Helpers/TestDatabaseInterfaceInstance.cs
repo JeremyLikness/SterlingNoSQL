@@ -40,13 +40,21 @@ namespace Wintellect.Sterling.Test.Helpers
         /// Register byte stream interceptors
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="interecptor"></param>
-        public void RegisterInterceptor<T>(BaseSterlingByteInterceptor interecptor) where T : class, new()
+        public void RegisterInterceptor<T>() where T : BaseSterlingByteInterceptor, new()
         {
             throw new NotImplementedException();
         }
 
-        public void UnRegisterInterceptor()
+        /// <summary>
+        /// Register byte stream interceptors
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        public void UnRegisterInterceptor<T>() where T : BaseSterlingByteInterceptor, new()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UnRegisterInterceptors()
         {
             throw new NotImplementedException();
         }

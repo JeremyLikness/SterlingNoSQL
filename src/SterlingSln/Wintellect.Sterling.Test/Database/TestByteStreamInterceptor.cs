@@ -8,37 +8,13 @@ namespace Wintellect.Sterling.Test.Database
 
     public class ByteStreamData
     {
-        public string ID
-        {
-            get { return _id; }
-            set { _id = value; }
-        }
+        public string Id { get; set; }
 
-        public string Data
-        {
-            get { return _data; }
-            set { _data = value; }
-        }
-
-        private string _id;
-        private string _data;
+        public string Data { get; set; }
     }
 
     public class TestByteStreamInterceptorDatabase : BaseDatabaseInstance
-    {
-        public class ByteInterceptor : BaseSterlingByteInterceptor
-        {
-            override public byte[] Save(byte[] sourceStream)
-            {
-                return sourceStream;
-            }
-
-            override public byte[] Load(byte[] sourceStream)
-            {
-                return sourceStream;
-            }
-        }
-
+    {        
         public override string Name
         {
             get { return "TestByteStreamInterceptorDatabase"; }
@@ -48,24 +24,56 @@ namespace Wintellect.Sterling.Test.Database
         {
             return new System.Collections.Generic.List<ITableDefinition>
             {
-                CreateTableDefinition<ByteStreamData,string>(dataDefinition => dataDefinition.ID)
+                CreateTableDefinition<ByteStreamData,string>(dataDefinition => dataDefinition.Id)
             };
         }
     }
 
-    public class ByteStreamTestIntercept : TestByteStreamInterceptorDatabase.ByteInterceptor
+    public class ByteInterceptor : BaseSterlingByteInterceptor
     {
-        public override byte[] Load(byte[] sourceStream)
+        override public byte[] Save(byte[] sourceStream)
         {
-            return sourceStream;
+            var retVal = new byte[sourceStream.Length];
+            for (var x = 0; x < sourceStream.Length; x++)
+            {
+                retVal[x] = (byte)(sourceStream[x] ^ 0x80); // xor
+            }
+            return retVal;
         }
 
-        public override byte[] Save(byte[] sourceStream)
+        override public byte[] Load(byte[] sourceStream)
         {
-            return sourceStream;
+            var retVal = new byte[sourceStream.Length];
+            for (var x = 0; x < sourceStream.Length; x++)
+            {
+                retVal[x] = (byte)(sourceStream[x] ^ 0x80); // xor
+            }
+            return retVal;
         }
     }
 
+    public class ByteInterceptor2 : BaseSterlingByteInterceptor
+    {
+        override public byte[] Save(byte[] sourceStream)
+        {
+            var retVal = new byte[sourceStream.Length];
+            for (var x = 0; x < sourceStream.Length; x++)
+            {
+                retVal[x] = (byte)(sourceStream[x] ^ 0x22); // xor
+            }
+            return retVal;
+        }
+
+        override public byte[] Load(byte[] sourceStream)
+        {
+            var retVal = new byte[sourceStream.Length];
+            for (var x = 0; x < sourceStream.Length; x++)
+            {
+                retVal[x] = (byte)(sourceStream[x] ^ 0x22); // xor
+            }
+            return retVal;
+        }
+    }
 
     [Tag("Byte")]
     [Tag("Database")]
@@ -86,26 +94,42 @@ namespace Wintellect.Sterling.Test.Database
             _engine.Activate();
             _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestByteStreamInterceptorDatabase>();
         }
+
         [TestMethod]
         public void TestData()
         {
             const string data = "Data to be intercepted";
 
-            ByteStreamData byteStreamData = new ByteStreamData();
-            byteStreamData.ID = "data";
-            byteStreamData.Data = data;
+            var byteStreamData = new ByteStreamData {Id = "data", Data = data};
 
+            _databaseInstance.RegisterInterceptor<ByteInterceptor>();
+            _databaseInstance.RegisterInterceptor<ByteInterceptor2>();
 
-            ByteStreamTestIntercept testInterceptor = new ByteStreamTestIntercept();
-            _databaseInstance.RegisterInterceptor<ByteStreamTestIntercept>(testInterceptor);
+            _databaseInstance.Save(byteStreamData);
 
-            _databaseInstance.Save<ByteStreamData>(byteStreamData);
+            var loadedByteStreamData = _databaseInstance.Load<ByteStreamData>("data");
 
-            ByteStreamData loadedByteStreamData = _databaseInstance.Load<ByteStreamData>("data");
+            Assert.AreEqual(data, loadedByteStreamData.Data, "Byte interceptor test failed: data does not match");
 
-            Assert.AreEqual(data, loadedByteStreamData.Data);
-            _databaseInstance.UnRegisterInterceptor();
+            _databaseInstance.UnRegisterInterceptor<ByteInterceptor2>();
 
+            try
+            {
+                loadedByteStreamData = _databaseInstance.Load<ByteStreamData>("data");
+            }
+            catch
+            {
+                loadedByteStreamData = null;
+            }
+
+            Assert.IsTrue(loadedByteStreamData == null || !(data.Equals(loadedByteStreamData.Data)), 
+                "Byte interceptor test failed: Sterling deserialized intercepted data without interceptor.");
+
+            _databaseInstance.RegisterInterceptor<ByteInterceptor2>();
+
+            loadedByteStreamData = _databaseInstance.Load<ByteStreamData>("data");
+
+            Assert.AreEqual(data, loadedByteStreamData.Data, "Byte interceptor test failed: data does not match");
         }
 
         [TestCleanup]

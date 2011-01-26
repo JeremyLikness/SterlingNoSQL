@@ -7,9 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.Windows
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.WindowsPhone.Test", "Wintellect.Sterling.WindowsPhone.Test\Wintellect.Sterling.WindowsPhone.Test.csproj", "{D6DBEA81-0DF4-4B60-8D5E-3212AB9F0B5B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling", "Wintellect.Sterling\Wintellect.Sterling.csproj", "{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 4
+		SccNumberOfProjects = 5
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -22,6 +24,9 @@ Global
 		SccProjectUniqueName3 = Wintellect.Sterling.WindowsPhone.Test\\Wintellect.Sterling.WindowsPhone.Test.csproj
 		SccProjectName3 = Wintellect.Sterling.WindowsPhone.Test
 		SccLocalPath3 = Wintellect.Sterling.WindowsPhone.Test
+		SccProjectUniqueName4 = Wintellect.Sterling\\Wintellect.Sterling.csproj
+		SccProjectName4 = Wintellect.Sterling
+		SccLocalPath4 = Wintellect.Sterling
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +49,10 @@ Global
 		{D6DBEA81-0DF4-4B60-8D5E-3212AB9F0B5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6DBEA81-0DF4-4B60-8D5E-3212AB9F0B5B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D6DBEA81-0DF4-4B60-8D5E-3212AB9F0B5B}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

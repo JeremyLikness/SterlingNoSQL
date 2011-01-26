@@ -84,9 +84,6 @@
     <Compile Include="..\Wintellect.Sterling.Test\Database\TestDelete.cs">
       <Link>Database\TestDelete.cs</Link>
     </Compile>
-    <Compile Include="..\Wintellect.Sterling.Test\Database\TestDeserialization.cs">
-      <Link>Database\TestDeserialization.cs</Link>
-    </Compile>
     <Compile Include="..\Wintellect.Sterling.Test\Database\TestDictionary.cs">
       <Link>Database\TestDictionary.cs</Link>
     </Compile>

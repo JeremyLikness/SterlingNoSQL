@@ -85,7 +85,6 @@
     <Compile Include="Database\TestByteStreamInterceptor.cs" />
     <Compile Include="Database\TestCycle.cs" />
     <Compile Include="Database\TestDelete.cs" />
-    <Compile Include="Database\TestDeserialization.cs" />
     <Compile Include="Database\TestDictionary.cs" />
     <Compile Include="Database\TestEnum.cs" />
     <Compile Include="Database\TestIndexQuery.cs" />
