@@ -200,6 +200,9 @@
     <Compile Include="..\Wintellect.Sterling\Serialization\ISterlingSerializer.cs">
       <Link>Serialization\ISterlingSerializer.cs</Link>
     </Compile>
+    <Compile Include="..\Wintellect.Sterling\Serialization\PropertyOrField.cs">
+      <Link>Serialization\PropertyOrField.cs</Link>
+    </Compile>
     <Compile Include="..\Wintellect.Sterling\Serialization\SerializationCache.cs">
       <Link>Serialization\SerializationCache.cs</Link>
     </Compile>

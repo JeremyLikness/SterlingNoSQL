@@ -2,6 +2,7 @@
 using System.Collections;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Wintellect.Sterling.Database;
 using Wintellect.Sterling.Exceptions;
 using System.Collections.Generic;
@@ -90,7 +91,7 @@ namespace Wintellect.Sterling.Serialization
             return type.IsArray;
         }
 
-        private bool _IsGenericDictionary(Type type, out Type keyType, out Type valueType)
+        private static bool _IsGenericDictionary(Type type, out Type keyType, out Type valueType)
         {
             keyType = null;
             valueType = null;
@@ -152,14 +153,19 @@ namespace Wintellect.Sterling.Serialization
                 _propertyCache.Add(type,
                                    new List<SerializationCache>());
 
+                // first fields
+                var fields = from f in type.GetFields()
+                             where !f.IsIgnored() && !f.FieldType.IsIgnored()
+                             select new PropertyOrField(f);               
+
                 var properties = from p in type.GetProperties()
                                  where p.GetGetMethod() != null && p.GetSetMethod() != null
-                                 && !p.IsIgnored() && !p.PropertyType.IsIgnored()
-                                 select p;
+                                       && !p.IsIgnored() && !p.PropertyType.IsIgnored()
+                                 select new PropertyOrField(p);                                 
 
-                foreach (var p in properties)
+                foreach (var p in properties.Concat(fields))
                 {                    
-                    var propType = p.PropertyType;                    
+                    var propType = p.PfType;                    
 
                     if (propType.IsGenericType && propType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
                     {
@@ -181,7 +187,7 @@ namespace Wintellect.Sterling.Serialization
                         continue;
                     }
 
-                    var value = p.GetGetMethod().Invoke(instance, new object[] { });
+                    var value = p.GetValue(instance);
 
                     // Try to get the value's type. PropertyType could be abstract
 
@@ -207,8 +213,8 @@ namespace Wintellect.Sterling.Serialization
                                 v,
                                 null,
                                 PropertyType.Class,
-                                (parent, property) => p1.GetSetMethod().Invoke(parent, new[] { property }),
-                                parent => p1.GetGetMethod().Invoke(parent, new object[] { })));
+                                p1.Setter,                                
+                                p1.Getter));
                         continue;
                     }
                     
@@ -217,12 +223,12 @@ namespace Wintellect.Sterling.Serialization
                     {
                         var p1 = p;
 
-                        Func<object, object> getter = parent => p1.GetGetMethod().Invoke(parent, new object[] { });
+                        var getter = p1.Getter;
 
                         // cast to underlying type
-                        if (p.PropertyType.IsEnum)
+                        if (p.PfType.IsEnum)
                         {
-                            getter = parent => Convert.ChangeType(p1.GetGetMethod().Invoke(parent, new object[] { }),
+                            getter = parent => Convert.ChangeType(p1.GetValue(instance),
                                                                   propType, null);
                         }
 
@@ -231,36 +237,36 @@ namespace Wintellect.Sterling.Serialization
                                 propType,
                                 null,
                                 PropertyType.Property,
-                                (parent, property) => p1.GetSetMethod().Invoke(parent, new[] { property }),
+                                p1.Setter,
                                 getter));
                         continue;
                     }
                     
-                    if (_IsArray(p.PropertyType))
+                    if (_IsArray(p.PfType))
                     {
                         var p1 = p;
                         _propertyCache[type].Add(
                             new SerializationCache(
-                                p.PropertyType,
-                                p.PropertyType.GetElementType(),
+                                p.PfType,
+                                p.PfType.GetElementType(),
                                 PropertyType.Array,
-                                (parent, property) => p1.GetSetMethod().Invoke(parent, new[] { property }),
-                                parent => p1.GetGetMethod().Invoke(parent, new object[] { })));
+                                p1.Setter,
+                                p1.Getter));
                         continue;
                     }
                     
                     Type dictKeyType;
                     Type dictValueType;
-                    if (_IsGenericDictionary(p.PropertyType, out dictKeyType, out dictValueType))
+                    if (_IsGenericDictionary(p.PfType, out dictKeyType, out dictValueType))
                     {
                         var p1 = p;
                         _propertyCache[type].Add(
                             new SerializationCache(
-                                p.PropertyType,
+                                p.PfType,
                                 dictKeyType,
                                 dictValueType,
-                                (parent, property) => p1.GetSetMethod().Invoke(parent, new[] { property }),
-                                parent => p1.GetGetMethod().Invoke(parent, new object[] { })));
+                                p1.Setter,
+                                p1.Getter));
                         continue;
                     }
                     
@@ -270,7 +276,7 @@ namespace Wintellect.Sterling.Serialization
                         // check if we can handle this as a list
 
                         // try to get the type of each object of the list
-                        var v = p.GetGetMethod().Invoke(instance, new object[] { });
+                        var v = p.GetValue(instance);
                         
                         var ie = v as IEnumerable;
 
@@ -283,10 +289,10 @@ namespace Wintellect.Sterling.Serialization
                                 var p1 = p;
                                 _propertyCache[type].Add(
                                     new SerializationCache(
-                                        p.PropertyType,
+                                        p.PfType,
                                         listType, PropertyType.List,
-                                        (parent, property) => p1.GetSetMethod().Invoke(parent, new[] { property }),
-                                        parent => p1.GetGetMethod().Invoke(parent, new object[] { })));
+                                        p1.Setter,
+                                        p1.Getter));
                             }
                             continue;
                         }
@@ -296,10 +302,10 @@ namespace Wintellect.Sterling.Serialization
                     var pLocal = p;
                     _propertyCache[type].Add(
                                     new SerializationCache(
-                                        p.PropertyType,
+                                        p.PfType,
                                         listType, PropertyType.ComplexType,
-                                        (parent, property) => pLocal.GetSetMethod().Invoke(parent, new[] { property }),
-                                        parent => pLocal.GetGetMethod().Invoke(parent, new object[] { })));
+                                        pLocal.Setter,
+                                        pLocal.Getter));
                 }
             }
         }

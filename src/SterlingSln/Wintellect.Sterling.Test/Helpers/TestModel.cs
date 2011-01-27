@@ -29,7 +29,7 @@ namespace Wintellect.Sterling.Test.Helpers
         public TestModel()
         {
             SubClass = new TestSubclass();
-        }
+        }        
 
         private static int _idx;
 

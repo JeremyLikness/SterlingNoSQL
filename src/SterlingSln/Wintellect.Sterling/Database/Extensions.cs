@@ -57,6 +57,16 @@ namespace Wintellect.Sterling.Database
         /// <summary>
         ///     Is a property ignored?
         /// </summary>
+        /// <param name="f"></param>
+        /// <returns></returns>
+        public static bool IsIgnored(this FieldInfo f)
+        {
+            return (from c in f.GetCustomAttributes(false) where c is SterlingIgnoreAttribute select c).Any();
+        }
+
+        /// <summary>
+        ///     Is a property ignored?
+        /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
         public static bool IsIgnored(this Type type)

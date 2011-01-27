@@ -90,6 +90,9 @@
     <Compile Include="..\Wintellect.Sterling.Test\Database\TestEnum.cs">
       <Link>Database\TestEnum.cs</Link>
     </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test\Database\TestField.cs">
+      <Link>Database\TestField.cs</Link>
+    </Compile>
     <Compile Include="..\Wintellect.Sterling.Test\Database\TestIndexQuery.cs">
       <Link>Database\TestIndexQuery.cs</Link>
     </Compile>

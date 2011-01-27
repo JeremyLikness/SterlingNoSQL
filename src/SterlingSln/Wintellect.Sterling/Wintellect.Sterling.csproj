@@ -112,6 +112,7 @@
     <Compile Include="Serialization\ExtendedSerializer.cs" />
     <Compile Include="Serialization\ISterlingSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serialization\PropertyOrField.cs" />
     <Compile Include="Serialization\SerializationCache.cs" />
     <Compile Include="Serialization\SerializationHelper.cs" />
     <Compile Include="Serialization\SterlingIgnoreAttribute.cs" />
