@@ -5,24 +5,24 @@ using Wintellect.Sterling.IsolatedStorage;
 
 namespace Wintellect.Sterling.Test.Database
 {
-    public class TestNullObjectField
+    public class TestObjectField
     {
         public int Key;
         public string Data;
     }
 
-    public class TestNullObjectFieldDatabase : BaseDatabaseInstance
+    public class TestObjectFieldDatabase : BaseDatabaseInstance
     {
         public override string Name
         {
-            get { return "TestNullObjectFieldDatabase"; }
+            get { return "TestObjectFieldDatabase"; }
         }
 
         protected override System.Collections.Generic.List<ITableDefinition> _RegisterTables()
         {
             return new System.Collections.Generic.List<ITableDefinition>
             {
-                CreateTableDefinition<TestNullObjectField,int>(dataDefinition => dataDefinition.Key)
+                CreateTableDefinition<TestObjectField,int>(dataDefinition => dataDefinition.Key)
             };
         }
     }
@@ -44,17 +44,17 @@ namespace Wintellect.Sterling.Test.Database
             }
             _engine = new SterlingEngine();
             _engine.Activate();
-            _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestNullObjectFieldDatabase>();
+            _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestObjectFieldDatabase>();
         }
 
         [TestMethod]
         public void TestData()
         {
-            var testNull = new TestNullObjectField {Key = 1, Data = "data"};
+            var testNull = new TestObjectField {Key = 1, Data = "data"};
 
             _databaseInstance.Save(testNull);
 
-            var loadedTestNull = _databaseInstance.Load<TestNullObjectField>(1);
+            var loadedTestNull = _databaseInstance.Load<TestObjectField>(1);
 
             // The values in the deserialized class should be populated.
             Assert.IsNotNull(loadedTestNull);
