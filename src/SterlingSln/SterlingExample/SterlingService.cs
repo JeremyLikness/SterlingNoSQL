@@ -36,9 +36,7 @@ namespace SterlingExample
         public Navigation Navigator { get; private set; }
 
         public ISterlingDatabaseInstance Database { get; private set; }
-
-        public UILogger Logger { get; private set; }
-
+        
         private SterlingDefaultLogger _logger; 
 
         /// <summary>
@@ -48,10 +46,7 @@ namespace SterlingExample
         public void StartService(ApplicationServiceContext context)
         {
             if (DesignerProperties.IsInDesignTool) return;
-
-            _engine = new SterlingEngine();
-            Logger = new UILogger();
-
+            _engine = new SterlingEngine();            
             Current = this;
         }
 
@@ -69,11 +64,7 @@ namespace SterlingExample
         public void Starting()
         {
             if (DesignerProperties.IsInDesignTool) return;
-
-            _loggerId =
-               _engine.SterlingDatabase.RegisterLogger(
-                   (level, message, exception) => ExecuteOnUIThread(()=>Logger.SetMessage(level, message, exception)));
-
+            
             if (Debugger.IsAttached)
             {
                 _logger = new SterlingDefaultLogger(SterlingLogLevel.Verbose);

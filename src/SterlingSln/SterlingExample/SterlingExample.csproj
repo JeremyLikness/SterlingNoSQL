@@ -87,7 +87,6 @@
     <Compile Include="Converter\FoodGroupCountConverter.cs" />
     <Compile Include="Converter\LogLevelConverter.cs" />
     <Compile Include="Database\FoodSerializer.cs" />
-    <Compile Include="Database\UILogger.cs" />
     <Compile Include="Database\FoodDatabase.cs" />
     <Compile Include="DelegateCommand.cs" />
     <Compile Include="Model\FoodDescription.cs" />
@@ -110,9 +109,6 @@
     <Compile Include="Views\BuildView.xaml.cs">
       <DependentUpon>BuildView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\DebugView.xaml.cs">
-      <DependentUpon>DebugView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\FoodDescription.xaml.cs">
       <DependentUpon>FoodDescription.xaml</DependentUpon>
     </Compile>
@@ -133,10 +129,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\BuildView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\DebugView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
