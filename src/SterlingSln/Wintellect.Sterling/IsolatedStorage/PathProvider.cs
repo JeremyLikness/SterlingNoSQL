@@ -218,6 +218,22 @@ namespace Wintellect.Sterling.IsolatedStorage
         }
 
         /// <summary>
+        ///     Gets the folder to a specific instance
+        /// </summary>
+        /// <remarks>
+        ///     Iso slows when there are many files in a given folder, so this allows
+        ///     for partitioning of folders
+        /// </remarks>
+        /// <param name="databaseName">The database</param>
+        /// <param name="tableType">The type of the table</param>
+        /// <param name="keyIndex">The key index</param>
+        /// <returns>The path</returns>
+        public string GetInstanceFolder(string databaseName, Type tableType, int keyIndex)
+        {
+            return string.Format("{0}{1}/", GetTablePath(databaseName, tableType), keyIndex/100);
+        }
+
+        /// <summary>
         ///     Gets the path to a specific instance
         /// </summary>
         /// <param name="databaseName">The database</param>
@@ -226,7 +242,7 @@ namespace Wintellect.Sterling.IsolatedStorage
         /// <returns>The path</returns>
         public string GetInstancePath(string databaseName, Type tableType, int keyIndex)
         {
-            return string.Format("{0}{1}", GetTablePath(databaseName, tableType), keyIndex);
+            return string.Format("{0}{1}", GetInstanceFolder(databaseName, tableType, keyIndex), keyIndex);
         }
 
         /// <summary>

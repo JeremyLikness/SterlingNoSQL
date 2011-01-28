@@ -21,11 +21,7 @@ namespace Wintellect.Sterling.Test.Database
         private ISterlingDatabaseInstance _databaseInstance;
         private List<TestModel> _modelList;
 
-#if WINDOWS_PHONE
-        private const int MODELS = 100;
-#else
-        private const int MODELS = 1000;
-#endif
+        private const int MODELS = 500;
 
         [TestInitialize]
         public void TestInit()

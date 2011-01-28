@@ -467,6 +467,8 @@ namespace Wintellect.Sterling.Database
 
                     memStream.Seek(0, SeekOrigin.Begin);
 
+                    _iso.EnsureDirectory(_pathProvider.GetInstanceFolder(Name, type, keyIndex));
+
                     var path = _pathProvider.GetInstancePath(Name, type, keyIndex);
                     var pathLock = PathLock.GetLock(path);
 
