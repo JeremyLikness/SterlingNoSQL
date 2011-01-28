@@ -165,11 +165,10 @@ namespace SterlingExample.ViewModel
                                                              NutrientDefinitionId = nutrientRefId,
                                                              AmountPerHundredGrams = amount
                                                          });
-                o.ReportProgress((int)(++progress*100.0/nutrientList.Count), progress);    
                 if (progress % 1000 == 0)
                 {
-                    Thread.Sleep(100); // throttle 
-                }
+                    o.ReportProgress((int) (++progress*50.0/nutrientList.Count) + 50, progress);
+                }                
             }
             nutrientList.Clear();
         }
@@ -185,6 +184,7 @@ namespace SterlingExample.ViewModel
         {            
             // parse these bad boys
             var size = 0;
+            var totalCount = 0;
 
             var foodDescriptions = Parsers.GetFoodDescriptions().ToList();
 
@@ -193,9 +193,14 @@ namespace SterlingExample.ViewModel
                 if (_nutrientData.ContainsKey(foodDescription.Id))
                 {
                     foodDescription.Nutrients = _nutrientData[foodDescription.Id];
+                    totalCount += foodDescription.Nutrients.Count;
+                }
+                else
+                {
+                    totalCount++;
                 }
                 SterlingService.Current.Database.Save(foodDescription);
-                o.ReportProgress((int) (++size*100.0/foodDescriptions.Count), size);
+                o.ReportProgress((int) (++size*100.0/foodDescriptions.Count), totalCount);
             }
 
             _nutrientData.Clear();
