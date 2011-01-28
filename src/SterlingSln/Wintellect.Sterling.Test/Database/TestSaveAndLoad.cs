@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Silverlight.Testing;
+﻿using Microsoft.Silverlight.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Exceptions;
 using Wintellect.Sterling.IsolatedStorage;
@@ -67,6 +66,8 @@ namespace Wintellect.Sterling.Test.Database
             Assert.IsNotNull(actual.SubClass, "Load failed: sub class is null.");
             Assert.IsNull(actual.SubClass2, "Load failed: supressed sub class should be null.");           
             Assert.AreEqual(expected.SubClass.NestedText, actual.SubClass.NestedText, "Load failed: sub class text mismtach.");
+            Assert.AreEqual(expected.SubStruct.NestedId, actual.SubStruct.NestedId, "Load failed: sub struct id mismtach.");
+            Assert.AreEqual(expected.SubStruct.NestedString, actual.SubStruct.NestedString, "Load failed: sub class string mismtach.");
         }
 
         [TestMethod]

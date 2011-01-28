@@ -11,6 +11,12 @@ namespace Wintellect.Sterling.Test.Helpers
         public string NestedText { get; set; }
     }
 
+    public struct TestSubStruct
+    {
+        public int NestedId;
+        public string NestedString;
+    }
+
     /// <summary>
     ///     A sub class Sterling isn't explicitly aware of
     ///     That is suppressed
@@ -50,6 +56,8 @@ namespace Wintellect.Sterling.Test.Helpers
 
         public TestSubclass2 SubClass2 { get; set; }
 
+        public TestSubStruct SubStruct { get; set; }
+
         public TestModelAsListModel Parent { get; set; }
 
         /// <summary>
@@ -60,14 +68,17 @@ namespace Wintellect.Sterling.Test.Helpers
         public static TestModel MakeTestModel()
         {
             return new TestModel { Data = Guid.NewGuid().ToString(), Data2 = Guid.NewGuid().ToString(), Date = DateTime.Now, Key = _idx++, SubClass = new TestSubclass { NestedText = Guid.NewGuid().ToString() },
-                                   SubClass2 = new TestSubclass2 { NestedText = Guid.NewGuid().ToString() }
+                                   SubClass2 = new TestSubclass2 { NestedText = Guid.NewGuid().ToString() },
+                                   SubStruct = new TestSubStruct { NestedId = _idx, NestedString = Guid.NewGuid().ToString() }
             };
         }
 
         internal static TestModel MakeTestModel(TestModelAsListModel parentModel)
         {
             return new TestModel { Data = Guid.NewGuid().ToString(), Data2 = Guid.NewGuid().ToString(), Date = DateTime.Now, Key = _idx++, SubClass = new TestSubclass { NestedText = Guid.NewGuid().ToString() }, 
-                SubClass2 = new TestSubclass2 { NestedText = Guid.NewGuid().ToString() }, Parent = parentModel };
+                SubClass2 = new TestSubclass2 { NestedText = Guid.NewGuid().ToString() }, 
+                SubStruct = new TestSubStruct { NestedId = _idx, NestedString = Guid.NewGuid().ToString() },
+                Parent = parentModel };
         }
     }
 }
