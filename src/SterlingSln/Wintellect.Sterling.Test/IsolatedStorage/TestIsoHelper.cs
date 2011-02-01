@@ -24,12 +24,12 @@ namespace Wintellect.Sterling.Test.IsolatedStorage
         [TestMethod]
         public void TestConstruction()
         {
-            using(var helper1 = new IsoStorageHelper())
+            var helper1 = new IsoStorageHelper();
             {
                 // just do this to confirm we can interact, we don't care about the result
                 Assert.IsFalse(helper1.FileExists(FILEPATH1), "File should not exist.");
 
-                using (var helper2 = new IsoStorageHelper())
+                var helper2 = new IsoStorageHelper();
                 {
                     // again, just making sure this works when we are nested
                     Assert.IsFalse(helper2.FileExists(FILEPATH2), "File should not exist in nested assert.");
@@ -43,7 +43,7 @@ namespace Wintellect.Sterling.Test.IsolatedStorage
         [TestMethod]
         public void TestWriter()
         {
-            using (var helper1 = new IsoStorageHelper())
+            var helper1 = new IsoStorageHelper();
             {
                 using (var bw = helper1.GetWriter(FILEPATH1))
                 {
@@ -96,7 +96,7 @@ namespace Wintellect.Sterling.Test.IsolatedStorage
                 }
             }
 
-            using (var helper = new IsoStorageHelper())
+            var helper = new IsoStorageHelper();
             {
                 Assert.IsTrue(helper.FileExists(FILEPATH1), "File exists for valid path failed.");
                 Assert.IsFalse(helper.FileExists(FILEPATH2), "False positive from helper for file path that doesn't exist.");
@@ -119,7 +119,7 @@ namespace Wintellect.Sterling.Test.IsolatedStorage
         [TestMethod]
         public void TestEnsureDirectory()
         {
-            using (var helper = new IsoStorageHelper())
+            var helper = new IsoStorageHelper();
             {
                 helper.EnsureDirectory(PATH1);
                 helper.EnsureDirectory(PATH1); // second time to make sure it doesn't error out
@@ -151,7 +151,7 @@ namespace Wintellect.Sterling.Test.IsolatedStorage
                 }
             }
 
-            using (var helper = new IsoStorageHelper())
+            var helper = new IsoStorageHelper();
             {
                 helper.Purge(PATH2);
             }

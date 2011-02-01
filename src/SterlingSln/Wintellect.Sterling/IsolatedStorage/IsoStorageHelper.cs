@@ -12,7 +12,7 @@ namespace Wintellect.Sterling.IsolatedStorage
     ///     This class is used to assist with manager the isolated storage references, allowing
     ///     for nested requests to use the same isolated storage reference
     /// </summary>
-    internal class IsoStorageHelper : IDisposable 
+    internal class IsoStorageHelper
     {
         private static readonly List<string> _paths = new List<string>();
         private static readonly List<string> _files = new List<string>();
@@ -201,14 +201,6 @@ namespace Wintellect.Sterling.IsolatedStorage
             {
                 throw new SterlingIsolatedStorageException(ex);
             }
-        }
-
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
-        {            
-        }             
+        }                  
     }
 }

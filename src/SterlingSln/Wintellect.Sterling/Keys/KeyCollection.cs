@@ -72,7 +72,7 @@ namespace Wintellect.Sterling.Keys
             _keyMap.Clear();
 
             var path = _pathProvider.GetKeysPath<T>(_databaseName);
-            using (var iso = new IsoStorageHelper())
+            var iso = new IsoStorageHelper();
             {
                 if (iso.FileExists(path))
                 {
@@ -104,7 +104,7 @@ namespace Wintellect.Sterling.Keys
         /// </summary>
         private void _SerializeKeys()
         {
-            using (var iso = new IsoStorageHelper())
+            var iso = new IsoStorageHelper();
             {
                 iso.EnsureDirectory(_pathProvider.GetDatabasePath(_databaseName));
                 iso.EnsureDirectory(_pathProvider.GetTablePath<T>(_databaseName));

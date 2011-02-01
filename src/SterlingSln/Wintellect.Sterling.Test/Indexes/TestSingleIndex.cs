@@ -39,7 +39,7 @@ namespace Wintellect.Sterling.Test.Indexes
                 _testModels.Add(TestModel.MakeTestModel());
             }
 
-            using (var iso = new IsoStorageHelper())
+            var iso = new IsoStorageHelper();
             {
                 iso.Purge(PathProvider.BASE);
             }
@@ -56,7 +56,7 @@ namespace Wintellect.Sterling.Test.Indexes
         [TestCleanup]
         public void Cleanup()
         {
-            using (var iso = new IsoStorageHelper())
+            var iso = new IsoStorageHelper();
             {
                 iso.Purge(PathProvider.BASE);
             }

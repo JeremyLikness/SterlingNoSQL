@@ -126,9 +126,9 @@ namespace Wintellect.Sterling.Indexes
         /// </summary>
         private void _DeserializeIndexes()
         {
-            _indexList.Clear();            
-                        
-            using (var iso = new IsoStorageHelper())
+            _indexList.Clear();
+
+            var iso = new IsoStorageHelper();
             {
                 if (!iso.FileExists(_IndexTable())) return;
                 using (var br = iso.GetReader(_IndexTable()))
@@ -151,7 +151,7 @@ namespace Wintellect.Sterling.Indexes
         /// </summary>
         private void _SerializeIndexes()
         {
-            using (var iso = new IsoStorageHelper())
+            var iso = new IsoStorageHelper();
             {
                 iso.EnsureDirectory(_pathProvider.GetDatabasePath(_databaseName));
                 iso.EnsureDirectory(_pathProvider.GetTablePath<T>(_databaseName));

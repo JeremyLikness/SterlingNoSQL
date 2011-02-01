@@ -661,7 +661,7 @@ namespace Wintellect.Sterling.Database
             var assignable = false;
             var keyIndex = -1;
 
-            using (var iso = new IsoStorageHelper())
+            var iso = new IsoStorageHelper();
             {
                 if (!_tableDefinitions.ContainsKey(type))
                 {

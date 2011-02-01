@@ -47,7 +47,7 @@ namespace Wintellect.Sterling.Test.Database
         [TestInitialize]
         public void TestInit()
         {
-            using (var iso = new IsoStorageHelper())
+            var iso = new IsoStorageHelper();
             {
                 iso.Purge(PathProvider.BASE);
             }
@@ -61,7 +61,7 @@ namespace Wintellect.Sterling.Test.Database
         {
             _engine.Dispose();
             _databaseInstance = null;
-            using (var iso = new IsoStorageHelper())
+            var iso = new IsoStorageHelper();
             {
                 iso.Purge(PathProvider.BASE);
             }

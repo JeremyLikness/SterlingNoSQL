@@ -46,7 +46,7 @@ namespace Wintellect.Sterling.Test.Database
         [TestCleanup]
         public void TestDone()
         {
-            using (var iso = new IsoStorageHelper())
+            var iso = new IsoStorageHelper();
             {
                 iso.Purge(PathProvider.BASE);
             }

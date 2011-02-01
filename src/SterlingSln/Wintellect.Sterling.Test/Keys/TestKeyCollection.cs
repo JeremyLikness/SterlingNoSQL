@@ -36,7 +36,7 @@ namespace Wintellect.Sterling.Test.Keys
         [TestInitialize]
         public void TestInit()
         {
-            using (var iso = new IsoStorageHelper())
+            var iso = new IsoStorageHelper();
             {
                 iso.Purge(PathProvider.BASE);
             }  
@@ -50,7 +50,7 @@ namespace Wintellect.Sterling.Test.Keys
         [TestCleanup]
         public void TestDone()
         {
-            using (var iso = new IsoStorageHelper())
+            var iso = new IsoStorageHelper();
             {
                 iso.Purge(PathProvider.BASE);
             }            
