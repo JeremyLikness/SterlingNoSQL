@@ -2,7 +2,6 @@
 using System.Collections;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using Wintellect.Sterling.Database;
 using Wintellect.Sterling.Exceptions;
 using System.Collections.Generic;
@@ -155,11 +154,15 @@ namespace Wintellect.Sterling.Serialization
 
                 // first fields
                 var fields = from f in type.GetFields()
-                             where !f.IsIgnored() && !f.FieldType.IsIgnored()
+                             where 
+                             !f.IsStatic &&
+                             !f.IsLiteral &&
+                             !f.IsIgnored() && !f.FieldType.IsIgnored()
                              select new PropertyOrField(f);               
 
                 var properties = from p in type.GetProperties()
-                                 where p.GetGetMethod() != null && p.GetSetMethod() != null
+                                 where                                 
+                                 p.GetGetMethod() != null && p.GetSetMethod() != null
                                        && !p.IsIgnored() && !p.PropertyType.IsIgnored()
                                  select new PropertyOrField(p);                                 
 

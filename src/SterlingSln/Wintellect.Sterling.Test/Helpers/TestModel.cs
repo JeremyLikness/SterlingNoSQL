@@ -39,6 +39,8 @@ namespace Wintellect.Sterling.Test.Helpers
 
         private static int _idx;
 
+        public const int SAMPLE_CONSTANT = 2;
+
         /// <summary>
         ///     The key
         /// </summary>

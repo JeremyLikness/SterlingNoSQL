@@ -76,7 +76,21 @@ namespace Wintellect.Sterling.Serialization
 
                 return obj => _fieldInfo.GetValue(obj);
             }
+        }
 
+        public override int GetHashCode()
+        {
+            return _propertyInfo == null ? _fieldInfo.GetHashCode() : _propertyInfo.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PropertyOrField && ((PropertyOrField) obj).PfType.Equals(PfType);
+        }
+
+        public override string ToString()
+        {
+            return _propertyInfo == null ? _fieldInfo.ToString() : _propertyInfo.ToString();
         }
     }
 }
