@@ -82,6 +82,7 @@
     <Compile Include="Database\TestAggregateList.cs" />
     <Compile Include="Database\TestArrays.cs" />
     <Compile Include="Database\TestAsync.cs" />
+    <Compile Include="Database\TestBackupRestore.cs" />
     <Compile Include="Database\TestByteStreamInterceptor.cs" />
     <Compile Include="Database\TestCycle.cs" />
     <Compile Include="Database\TestDelete.cs" />

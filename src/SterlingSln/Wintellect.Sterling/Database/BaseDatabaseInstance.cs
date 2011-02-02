@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Windows;
 using Wintellect.Sterling.Events;
 using Wintellect.Sterling.Exceptions;
 using Wintellect.Sterling.Indexes;
@@ -30,6 +29,9 @@ namespace Wintellect.Sterling.Database
         /// </summary>
         private readonly List<BackgroundWorker> _workers = new List<BackgroundWorker>();
         
+        /// <summary>
+        ///     List of triggers
+        /// </summary>
         private readonly Dictionary<Type,List<ISterlingTrigger>> _triggers = new Dictionary<Type, List<ISterlingTrigger>>();
         
         /// <summary>
@@ -82,6 +84,11 @@ namespace Wintellect.Sterling.Database
             }
 
             _pathProvider = SterlingFactory.GetPathProvider();
+        }
+
+        public string Path
+        {
+            get { return _pathProvider.GetDatabasePath(Name); }
         }
 
         public void Unload()

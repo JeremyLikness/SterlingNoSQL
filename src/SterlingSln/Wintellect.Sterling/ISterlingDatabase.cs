@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Wintellect.Sterling.Database;
 using Wintellect.Sterling.Serialization;
 
@@ -29,6 +30,20 @@ namespace Wintellect.Sterling
         /// <param name="message">The message data</param>
         /// <param name="exception">The exception</param>
         void Log(SterlingLogLevel level, string message, Exception exception);
+
+        /// <summary>
+        ///     Backup the database
+        /// </summary>
+        /// <typeparam name="T">The database type</typeparam>
+        /// <param name="writer">Writer to receive the backup</param>
+        void Backup<T>(BinaryWriter writer) where T : BaseDatabaseInstance;
+
+        /// <summary>
+        ///     Restore the database
+        /// </summary>
+        /// <typeparam name="T">The database type</typeparam>
+        /// <param name="reader">The stream providing the backup</param>
+        void Restore<T>(BinaryReader reader) where T : BaseDatabaseInstance;
 
         /// <summary>
         ///     Register a database type with the system

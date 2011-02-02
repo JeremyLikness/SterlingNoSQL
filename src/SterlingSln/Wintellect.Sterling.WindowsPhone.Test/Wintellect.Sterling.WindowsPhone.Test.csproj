@@ -75,6 +75,9 @@
     <Compile Include="..\Wintellect.Sterling.Test\Database\TestAsync.cs">
       <Link>Database\TestAsync.cs</Link>
     </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test\Database\TestBackupRestore.cs">
+      <Link>Database\TestBackupRestore.cs</Link>
+    </Compile>
     <Compile Include="..\Wintellect.Sterling.Test\Database\TestByteStreamInterceptor.cs">
       <Link>Database\TestByteStreamInterceptor.cs</Link>
     </Compile>

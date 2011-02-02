@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Wintellect.Sterling.Exceptions;
 using Wintellect.Sterling.Serialization;
@@ -17,6 +18,11 @@ namespace Wintellect.Sterling.Database
         ///     Master list of databases
         /// </summary>
         private readonly Dictionary<string,Tuple<Type,ISterlingDatabaseInstance>> _databases = new Dictionary<string,Tuple<Type,ISterlingDatabaseInstance>>();
+
+        /// <summary>
+        ///     Backup manager
+        /// </summary>
+        private readonly BackupManager _backupManager = new BackupManager();        
 
         /// <summary>
         ///     The main serializer
@@ -61,6 +67,46 @@ namespace Wintellect.Sterling.Database
         public void Log(SterlingLogLevel level, string message, Exception exception)
         {
             _logManager.Log(level, message, exception);
+        }
+
+        /// <summary>
+        ///     Back up the database
+        /// </summary>
+        /// <typeparam name="T">The database type</typeparam>
+        /// <param name="writer">A writer to receive the backup</param>
+        public void Backup<T>(BinaryWriter writer) where T : BaseDatabaseInstance
+        {
+            _RequiresActivation();
+
+            var databaseQuery = from d in _databases where d.Value.Item1.Equals(typeof (T)) select d.Value.Item2;
+            if (!databaseQuery.Any())
+            {
+                throw new SterlingDatabaseNotFoundException(typeof(T).FullName);
+            }
+            var database = databaseQuery.First();
+            database.Flush();
+            var path = ((BaseDatabaseInstance) database).Path;
+            _backupManager.Backup(writer, path);
+        }
+
+        /// <summary>
+        ///     Restore the database
+        /// </summary>
+        /// <typeparam name="T">Type of the database</typeparam>
+        /// <param name="reader">The reader with the backup information</param>
+        public void Restore<T>(BinaryReader reader) where T : BaseDatabaseInstance
+        {
+            _RequiresActivation();
+
+            var databaseQuery = from d in _databases where d.Value.Item1.Equals(typeof(T)) select d.Value.Item2;
+            if (!databaseQuery.Any())
+            {
+                throw new SterlingDatabaseNotFoundException(typeof(T).FullName);
+            }
+            var database = databaseQuery.First();
+            var path = ((BaseDatabaseInstance)database).Path;
+            database.Purge();
+            _backupManager.Restore(reader, path);
         }
 
         /// <summary>
