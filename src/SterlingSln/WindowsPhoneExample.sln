@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsPhoneSterling", "WindowsPhoneSterling\WindowsPhoneSterling.csproj", "{E0037D4F-AE3E-4F17-B80A-C0BB53A5E689}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.WindowsPhone", "..\..\..\Users\JeremyLikness\Documents\Visual Studio 2010\Projects\Sterling\src\SterlingSln\Wintellect.Sterling.WindowsPhone\Wintellect.Sterling.WindowsPhone.csproj", "{7842BE18-DAE7-408A-8863-7C0DE2FFB9D8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.WindowsPhone", "Wintellect.Sterling.WindowsPhone\Wintellect.Sterling.WindowsPhone.csproj", "{7842BE18-DAE7-408A-8863-7C0DE2FFB9D8}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
