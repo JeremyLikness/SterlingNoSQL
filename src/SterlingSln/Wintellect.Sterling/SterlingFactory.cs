@@ -11,19 +11,24 @@ namespace Wintellect.Sterling
         /// <summary>
         ///     Instance of the database
         /// </summary>
-        private static readonly ISterlingDatabase _database; 
+        private static ISterlingDatabase _database; 
 
         /// <summary>
         ///     The log manager
         /// </summary>
-        private static readonly LogManager _logManager;
+        private static LogManager _logManager;
 
         /// <summary>
         ///     Path provider
         /// </summary>
-        private static readonly PathProvider _pathProvider;
+        private static PathProvider _pathProvider;
 
         static SterlingFactory()
+        {
+            Initialize();
+        }
+
+        internal static void Initialize()
         {
             _logManager = new LogManager();
             _pathProvider = new PathProvider(_logManager);
