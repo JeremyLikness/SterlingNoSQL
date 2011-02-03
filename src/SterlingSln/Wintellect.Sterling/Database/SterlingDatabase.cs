@@ -214,6 +214,7 @@ namespace Wintellect.Sterling.Database
             lock(Lock)
             {
                 _activated = false;
+                SterlingFactory.GetPathProvider().Serialize();
                 _Unload();
                 _databases.Clear();
                 BaseDatabaseInstance.Deactivate();

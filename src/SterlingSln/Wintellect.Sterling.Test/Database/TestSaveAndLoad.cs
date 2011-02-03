@@ -73,6 +73,8 @@ namespace Wintellect.Sterling.Test.Database
         [TestMethod]
         public void TestSaveShutdownReInitialize()
         {
+            _databaseInstance.Purge();
+
             // test saving and reloading
             var expected1 = TestModel.MakeTestModel();
             var expected2 = TestModel.MakeTestModel();
@@ -86,6 +88,8 @@ namespace Wintellect.Sterling.Test.Database
 
             _engine.Dispose();
             _databaseInstance = null;
+
+            SterlingFactory.Initialize(); // simulate an application restart
 
             // bring it back up
             _engine = new SterlingEngine();

@@ -105,12 +105,12 @@ namespace Wintellect.Sterling.IsolatedStorage
                 {
                     if (!_typeMaster.Contains(typeName))
                     {
-                        _typeMaster.Add(typeName);
+                        _typeMaster.Add(typeName); 
                         _SerializeTypes();
                     }
                 }
             }
-
+            
             return _typeMaster.IndexOf(typeName);
         }
 
@@ -431,6 +431,16 @@ namespace Wintellect.Sterling.IsolatedStorage
                 _logManager.Log(SterlingLogLevel.Information,
                                 string.Format("Sterling de-serialized {0} table definitions from path {1}:{2}{3}",
                                               count, path, Environment.NewLine, stringBuilder), null);
+            }
+        }
+
+        public void Serialize()
+        {
+            _SerializeDatabases();
+            _SerializeTypes();
+            foreach(var database in _databaseMaster.Keys)
+            {
+                _SerializeTables(database);
             }
         }
     }
