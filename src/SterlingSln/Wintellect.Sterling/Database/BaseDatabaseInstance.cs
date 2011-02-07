@@ -465,7 +465,7 @@ namespace Wintellect.Sterling.Database
 
                     if (_byteInterceptorList.Count > 0)
                     {
-                        byte[] bytes = memStream.GetBuffer();
+                        var bytes = memStream.GetBuffer();
 
                         bytes = _byteInterceptorList.Aggregate(bytes, (current, byteInterceptor) => byteInterceptor.Save(current));
 

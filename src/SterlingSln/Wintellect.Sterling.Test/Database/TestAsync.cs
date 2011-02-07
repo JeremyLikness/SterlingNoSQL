@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Windows;
@@ -20,12 +21,14 @@ namespace Wintellect.Sterling.Test.Database
         private SterlingEngine _engine;
         private ISterlingDatabaseInstance _databaseInstance;
         private List<TestModel> _modelList;
+        private DateTime _startTime;
 
         private const int MODELS = 500;
 
         [TestInitialize]
         public void TestInit()
         {
+            _startTime = DateTime.Now;
             _engine = new SterlingEngine();
             _engine.Activate();
             _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestDatabaseInstance>();
@@ -36,9 +39,29 @@ namespace Wintellect.Sterling.Test.Database
             }
         }
 
+        /// <summary>
+        ///     Clean up
+        /// </summary>
+        /// <remarks>
+        ///     Uncomment the top block to display the time for each operation
+        /// </remarks>
         [TestCleanup]
         public void TestCleanup()
         {
+            //var duration = DateTime.Now - _startTime;
+
+            //var dispatcher = Deployment.Current.Dispatcher;
+            //Action action = () => MessageBox.Show(duration.ToString());
+
+            //if (dispatcher.CheckAccess())
+            //{
+            //    action();
+            //}
+            //else
+            //{
+            //    dispatcher.BeginInvoke(action);
+            //}
+
             _databaseInstance.Purge();
 
             _engine.Dispose();
