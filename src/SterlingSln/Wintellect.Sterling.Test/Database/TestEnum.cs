@@ -81,6 +81,26 @@ namespace Wintellect.Sterling.Test.Database
             var actual = _databaseInstance.Load<EnumClass>(1);
             Assert.AreEqual(test.Id, actual.Id, "Failed to load enum: key mismatch.");
             Assert.AreEqual(test.Value, actual.Value, "Failed to load enum: value mismatch.");
-        }       
+        }
+
+        [TestMethod]
+        public void TestMultipleEnumSaveAndLoad()
+        {
+            var test1 = new EnumClass { Id = 1, Value = TestEnums.Value1 };
+            var test2 = new EnumClass { Id = 2, Value = TestEnums.Value2 };
+
+            _databaseInstance.Save(test1);
+            _databaseInstance.Save(test2);
+
+            var actual1 = _databaseInstance.Load<EnumClass>(1);
+            var actual2 = _databaseInstance.Load<EnumClass>(2);
+
+            Assert.AreEqual(test1.Id, actual1.Id, "Failed to load enum: key 1 mismatch.");
+            Assert.AreEqual(test1.Value, actual1.Value, "Failed to load enum: value 1 mismatch.");
+
+            Assert.AreEqual(test2.Id, actual2.Id, "Failed to load enum: key 2 mismatch.");
+            Assert.AreEqual(test2.Value, actual2.Value, "Failed to load enum: value 2 mismatch.");
+        }
+
     }
 }

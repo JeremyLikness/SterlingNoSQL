@@ -231,7 +231,7 @@ namespace Wintellect.Sterling.Serialization
                         // cast to underlying type
                         if (p.PfType.IsEnum)
                         {
-                            getter = parent => Convert.ChangeType(p1.GetValue(instance),
+                            getter = parent => Convert.ChangeType(p1.GetValue(parent),
                                                                   propType, null);
                         }
 
