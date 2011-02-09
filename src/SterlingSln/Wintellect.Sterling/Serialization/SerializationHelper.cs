@@ -168,7 +168,10 @@ namespace Wintellect.Sterling.Serialization
 
                 foreach (var p in properties.Concat(fields))
                 {                    
-                    var propType = p.PfType;                    
+                    var propType = p.PfType;   
+                 
+                    // eagerly add to the type master
+                    _typeResolver(propType.AssemblyQualifiedName);
 
                     if (propType.IsGenericType && propType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
                     {
@@ -197,6 +200,9 @@ namespace Wintellect.Sterling.Serialization
                     if (value != null)
                     {
                         valueType = value.GetType();
+                        
+                        // eagerly add to the type master
+                        _typeResolver(valueType.AssemblyQualifiedName);
                     }
 
                     // ignored type?
