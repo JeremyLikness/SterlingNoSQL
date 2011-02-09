@@ -106,7 +106,7 @@ namespace Wintellect.Sterling.IsolatedStorage
                     if (!_typeMaster.Contains(typeName))
                     {
                         _typeMaster.Add(typeName); 
-                        _SerializeTypes();
+                        SerializeTypes();
                     }
                 }
             }
@@ -326,7 +326,7 @@ namespace Wintellect.Sterling.IsolatedStorage
             }            
         }
 
-        private void _SerializeTypes()
+        public void SerializeTypes()
         {
             _iso.EnsureDirectory(BASE);
             using (var bw = _iso.GetWriter(string.Format(TYPE, BASE)))
@@ -437,7 +437,7 @@ namespace Wintellect.Sterling.IsolatedStorage
         public void Serialize()
         {
             _SerializeDatabases();
-            _SerializeTypes();
+            SerializeTypes();
             foreach(var database in _databaseMaster.Keys)
             {
                 _SerializeTables(database);

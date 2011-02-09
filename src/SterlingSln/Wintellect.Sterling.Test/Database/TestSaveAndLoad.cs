@@ -82,10 +82,12 @@ namespace Wintellect.Sterling.Test.Database
             // test saving and reloading
             var expected1 = TestModel.MakeTestModel();
             var expected2 = TestModel.MakeTestModel();
-            var expectedComplex = new TestComplexModel();
-            expectedComplex.Id = 5;
-            expectedComplex.Dict = new Dictionary<string, string>();
-            expectedComplex.Models = new ObservableCollection<TestModel>();
+            var expectedComplex = new TestComplexModel
+                                      {
+                                          Id = 5,
+                                          Dict = new Dictionary<string, string>(),
+                                          Models = new ObservableCollection<TestModel>()
+                                      };
             for (var x = 0; x < 10; x++)
             {
                 expectedComplex.Dict.Add(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());

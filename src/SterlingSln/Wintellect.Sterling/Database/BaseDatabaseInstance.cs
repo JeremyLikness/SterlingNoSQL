@@ -866,6 +866,8 @@ namespace Wintellect.Sterling.Database
                         index.Truncate();
                     }
                 }
+
+                _pathProvider.SerializeTypes();
             }
 
             _RaiseOperation(SterlingOperation.Purge, GetType(), Name);
