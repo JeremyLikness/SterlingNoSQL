@@ -38,6 +38,7 @@ namespace Wintellect.Sterling.Test.Helpers
                                .WithIndex<TestModel, string, int>(DATAINDEX, t => t.Data)
                                .WithIndex<TestModel, DateTime, string, int>("IndexDateData",
                                                                             t => Tuple.Create(t.Date, t.Data)),
+                           CreateTableDefinition<TestComplexModel,int>(t=>t.Id),
                            CreateTableDefinition<TestForeignModel, Guid>(t => t.Key),
                            CreateTableDefinition<TestAggregateModel, string>(t => t.Key),
                            CreateTableDefinition<TestAggregateListModel, int>(t => t.ID), 

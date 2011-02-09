@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Wintellect.Sterling.Serialization;
 
 namespace Wintellect.Sterling.Test.Helpers
@@ -82,5 +84,12 @@ namespace Wintellect.Sterling.Test.Helpers
                 SubStruct = new TestSubStruct { NestedId = _idx, NestedString = Guid.NewGuid().ToString() },
                 Parent = parentModel };
         }
+    }
+
+    public class TestComplexModel
+    {
+        public int Id { get; set; }
+        public Dictionary<string, string> Dict { get; set; }
+        public ObservableCollection<TestModel> Models { get; set; }
     }
 }

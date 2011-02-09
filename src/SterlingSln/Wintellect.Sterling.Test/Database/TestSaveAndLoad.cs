@@ -1,4 +1,8 @@
-﻿using Microsoft.Silverlight.Testing;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using Microsoft.Silverlight.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Exceptions;
 using Wintellect.Sterling.IsolatedStorage;
@@ -78,9 +82,19 @@ namespace Wintellect.Sterling.Test.Database
             // test saving and reloading
             var expected1 = TestModel.MakeTestModel();
             var expected2 = TestModel.MakeTestModel();
-
+            var expectedComplex = new TestComplexModel();
+            expectedComplex.Id = 5;
+            expectedComplex.Dict = new Dictionary<string, string>();
+            expectedComplex.Models = new ObservableCollection<TestModel>();
+            for (var x = 0; x < 10; x++)
+            {
+                expectedComplex.Dict.Add(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
+                expectedComplex.Models.Add(TestModel.MakeTestModel());
+            }
+            
             _databaseInstance.Save(expected1);
             _databaseInstance.Save(expected2);
+            _databaseInstance.Save(expectedComplex);
 
             _databaseInstance.Flush();
             
@@ -136,6 +150,30 @@ namespace Wintellect.Sterling.Test.Database
             Assert.AreEqual(expected3.Data, actual3.Data, "Load failed (3): data mismatch.");
             Assert.IsNotNull(actual3.SubClass, "Load failed (3): sub class is null.");
             Assert.AreEqual(expected3.SubClass.NestedText, actual3.SubClass.NestedText, "Load failed (3): sub class text mismtach.");
+
+            // load the complex 
+            var actualComplex = _databaseInstance.Load<TestComplexModel>(5);
+            Assert.IsNotNull(actualComplex, "Load failed (complex): object is null.");
+            Assert.AreEqual(5, actualComplex.Id, "Load failed: id mismatch.");
+            Assert.IsNotNull(actualComplex.Dict, "Load failed: dictionary is null.");
+            foreach(var key in expectedComplex.Dict.Keys)
+            {
+                var value = expectedComplex.Dict[key];
+                Assert.IsTrue(actualComplex.Dict.ContainsKey(key), "Load failed: dictionary is missing key.");
+                Assert.AreEqual(value, actualComplex.Dict[key], "Load failed: dictionary has invalid value.");
+            }
+
+            Assert.IsNotNull(actualComplex.Models, "Load failed: complex missing the model collection.");
+
+            foreach(var model in expectedComplex.Models)
+            {
+                var targetModel = actualComplex.Models.Where(m => m.Key.Equals(model.Key)).FirstOrDefault();
+                Assert.IsNotNull(targetModel, "Load failed for nested model.");
+                Assert.AreEqual(model.Key, targetModel.Key, "Load failed for nested model: key mismatch.");
+                Assert.AreEqual(model.Data, targetModel.Data, "Load failed for nested model: data mismatch.");
+                Assert.IsNotNull(targetModel.SubClass, "Load failed for nested model: sub class is null.");
+                Assert.AreEqual(model.SubClass.NestedText, targetModel.SubClass.NestedText, "Load failed for nested model: sub class text mismtach.");
+            }
 
         }
         
