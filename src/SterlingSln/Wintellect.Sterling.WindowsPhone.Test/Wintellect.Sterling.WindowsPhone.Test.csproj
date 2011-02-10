@@ -135,6 +135,9 @@
     <Compile Include="..\Wintellect.Sterling.Test\Database\TestTruncate.cs">
       <Link>Database\TestTruncate.cs</Link>
     </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test\Database\TestWriteableBitmap.cs">
+      <Link>Database\TestWriteableBitmap.cs</Link>
+    </Compile>
     <Compile Include="..\Wintellect.Sterling.Test\Helpers\BadDatabaseInstance.cs">
       <Link>Helpers\BadDatabaseInstance.cs</Link>
     </Compile>
@@ -254,6 +257,9 @@
     <None Include="Properties\WMAppManifest.xml" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="..\Wintellect.Sterling.Test\Helpers\Sterling-Final-Small.png">
+      <Link>Helpers\Sterling-Final-Small.png</Link>
+    </Resource>
     <Content Include="ApplicationIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

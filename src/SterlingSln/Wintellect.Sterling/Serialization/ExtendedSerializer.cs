@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Windows.Media.Imaging;
 using Wintellect.Sterling.Exceptions;
 
 namespace Wintellect.Sterling.Serialization
@@ -68,6 +69,30 @@ namespace Wintellect.Sterling.Serialization
                                          bw.Write(dto.Offset.Ticks);
                                      },
                                  br => new DateTimeOffset(br.ReadInt64(), new TimeSpan(br.ReadInt64()))));
+
+            _serializers.Add(typeof (WriteableBitmap),
+                             new Tuple<Action<BinaryWriter, object>, Func<BinaryReader, object>>(
+                                 (bw, obj) =>
+                                     {
+                                         var bitmap = (WriteableBitmap) obj;
+                                         bw.Write(bitmap.PixelWidth);
+                                         bw.Write(bitmap.PixelHeight);
+                                         var count = bitmap.Pixels.Length*sizeof (int);
+                                         var pixels = new byte[count];
+                                         Buffer.BlockCopy(bitmap.Pixels, 0, pixels, 0, count);
+                                         bw.Write(pixels, 0, pixels.Length);
+                                     },
+                                 br =>
+                                     {
+                                         var width = br.ReadInt32();
+                                         var height = br.ReadInt32();
+                                         var bitmap = new WriteableBitmap(width, height);
+                                         var count = bitmap.Pixels.Length*sizeof (int);
+                                         var pixels = new byte[count];
+                                         br.Read(pixels, 0, count);
+                                         Buffer.BlockCopy(pixels, 0, bitmap.Pixels, 0, count);
+                                         return bitmap;
+                                     }));
         }
 
         /// <summary>

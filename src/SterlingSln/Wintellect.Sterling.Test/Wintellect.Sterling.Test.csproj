@@ -101,6 +101,7 @@
     <Compile Include="Database\TestSerializers.cs" />
     <Compile Include="Database\TestTriggers.cs" />
     <Compile Include="Database\TestTruncate.cs" />
+    <Compile Include="Database\TestWriteableBitmap.cs" />
     <Compile Include="Helpers\BadDatabaseInstance.cs" />
     <Compile Include="Helpers\DupDatabaseInstance.cs" />
     <Compile Include="Helpers\ExceptionHelper.cs" />
@@ -148,6 +149,7 @@
   <ItemGroup>
     <Content Include="Binaries\Microsoft.Silverlight.Testing.dll" />
     <Content Include="Binaries\Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight.dll" />
+    <Resource Include="Helpers\Sterling-Final-Small.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Wintellect.Sterling\Wintellect.Sterling.csproj">
