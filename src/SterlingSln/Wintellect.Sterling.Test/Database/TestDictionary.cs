@@ -51,8 +51,7 @@ namespace Wintellect.Sterling.Test.Database
             
             Assert.IsNotNull(actual, "Save/load failed: model is null.");
             Assert.AreEqual(expected.ID, actual.ID, "Save/load failed: key mismatch.");
-            Assert.IsNotNull(actual.DictionaryWithBaseClassAsValue, "Save/load failed: dictionary not initialized.");
-            Assert.AreEqual(0, actual.DictionaryWithBaseClassAsValue.Count, "Save/load failed: dictionary size mismatch.");
+            Assert.IsNull(actual.DictionaryWithBaseClassAsValue, "Save/load failed: dictionary is not null.");            
         }
 
         [TestMethod]

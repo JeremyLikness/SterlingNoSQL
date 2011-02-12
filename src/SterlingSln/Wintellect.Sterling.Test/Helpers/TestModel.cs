@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.Collections.ObjectModel;
 using Wintellect.Sterling.Serialization;
 
@@ -52,6 +52,8 @@ namespace Wintellect.Sterling.Test.Helpers
         ///     Data
         /// </summary>
         public string Data { get; set; }
+
+        public Guid? GuidNullable { get; set; }
         
         [SterlingIgnore]
         public string Data2 { get; set; }
@@ -72,7 +74,7 @@ namespace Wintellect.Sterling.Test.Helpers
         public static TestModel MakeTestModel()
         {
             return new TestModel { Data = Guid.NewGuid().ToString(), Data2 = Guid.NewGuid().ToString(), Date = DateTime.Now, Key = _idx++, SubClass = new TestSubclass { NestedText = Guid.NewGuid().ToString() },
-                                   SubClass2 = new TestSubclass2 { NestedText = Guid.NewGuid().ToString() },
+                                   SubClass2 = new TestSubclass2 { NestedText = Guid.NewGuid().ToString() }, GuidNullable = Guid.NewGuid(),
                                    SubStruct = new TestSubStruct { NestedId = _idx, NestedString = Guid.NewGuid().ToString() }
             };
         }
@@ -89,7 +91,7 @@ namespace Wintellect.Sterling.Test.Helpers
     public class TestComplexModel
     {
         public int Id { get; set; }
-        public Dictionary<string, string> Dict { get; set; }
+        public IDictionary Dict { get; set; }
         public ObservableCollection<TestModel> Models { get; set; }
     }
 }

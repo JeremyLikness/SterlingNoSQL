@@ -123,7 +123,9 @@
     <Compile Include="SterlingLogLevel.cs" />
     <Compile Include="Events\SterlingOperation.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="SterlingLicense.txt" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Exceptions\Exceptions.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>

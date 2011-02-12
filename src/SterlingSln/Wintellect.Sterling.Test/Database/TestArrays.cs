@@ -53,12 +53,9 @@ namespace Wintellect.Sterling.Test.Database
             
             Assert.IsNotNull(actual, "Save/load failed: model is null.");
             Assert.AreEqual(expected.ID, actual.ID, "Save/load failed: key mismatch.");
-            Assert.IsNotNull(actual.BaseClassArray, "Save/load: array is null");
-            Assert.IsNotNull(actual.ClassArray, "Save/load: array is null");
-            Assert.IsNotNull(actual.ValueTypeArray, "Save/load: array is null");
-            Assert.AreEqual(0, actual.BaseClassArray.Length, "Save/load failed: array size mismatch.");
-            Assert.AreEqual(0, actual.ClassArray.Length, "Save/load failed: array size mismatch.");
-            Assert.AreEqual(0, actual.ValueTypeArray.Length, "Save/load failed: array size mismatch.");
+            Assert.IsNull(actual.BaseClassArray, "Save/load: array should be null");
+            Assert.IsNull(actual.ClassArray, "Save/load: array should be null");
+            Assert.IsNull(actual.ValueTypeArray, "Save/load: array should be null");            
         }
 
         [TestMethod]

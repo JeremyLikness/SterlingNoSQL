@@ -110,6 +110,9 @@ namespace Wintellect.Sterling.IsolatedStorage
                     }
                 }
             }
+
+            var retVal = _typeMaster.IndexOf(typeName);
+            _logManager.Log(SterlingLogLevel.Verbose, string.Format("{0}=>{1}", retVal, typeName), null);
             
             return _typeMaster.IndexOf(typeName);
         }
@@ -125,6 +128,9 @@ namespace Wintellect.Sterling.IsolatedStorage
             {
                 throw new IndexOutOfRangeException("typeIndex");
             }
+
+            var retVal = _typeMaster[typeIndex];
+            _logManager.Log(SterlingLogLevel.Verbose, string.Format("{0}<={1}", retVal, typeIndex), null);
 
             return _typeMaster[typeIndex];
         }

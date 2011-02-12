@@ -19,14 +19,9 @@ namespace Wintellect.Sterling.Serialization
         // a few constants to serialize null values to the stream
         private const ushort NULL = 0;
         private const ushort NOTNULL = 1;
-        const string LIST_TYPE_ITEM = "Item";                    
-
-        /// <summary>
-        ///     "Remember" how lists map to avoid reflecting each time
-        /// </summary>
-        private static readonly Dictionary<Type, Type> _listTypes = new Dictionary<Type, Type>();
-        private static readonly Dictionary<Type, Tuple<Type, Type>> _dictTypes = new Dictionary<Type, Tuple<Type, Type>>();
-
+        private const string NULL_DISPLAY = "[NULL]";
+        private const string NOTNULL_DISPLAY = "[NOT NULL]";
+        
         /// <summary>
         ///     The import cache, stores what properties are available and how to access them
         /// </summary>
@@ -40,110 +35,15 @@ namespace Wintellect.Sterling.Serialization
         private readonly ISterlingSerializer _serializer;
         private readonly LogManager _logManager;
         private readonly Func<string, int> _typeResolver = s => 1;
-        private readonly Func<int, string> _typeIndexer = i => string.Empty;
-
-        /// <summary>
-        ///     Checks to see if it is a generic list, and, if it is, returns the type of the list
-        /// </summary>
-        /// <param name="type">The type</param>
-        /// <returns>NULL if not a generic list</returns>
-        private static Type _IsGenericList(Type type)
-        {
-            if (type == null)
-            {
-                return null;
-            }
-
-            if (_listTypes.ContainsKey(type))
-            {
-                return _listTypes[type];
-            }
-
-            Type listType = (from @interface in type.GetInterfaces()
-                             where @interface.IsGenericType
-                                   && (@interface.GetGenericTypeDefinition() == typeof(ICollection<>)
-                                       || @interface.GetGenericTypeDefinition() == typeof(IList<>)
-                                       || @interface.GetGenericTypeDefinition() == typeof(IList))
-                             select @interface.GetGenericArguments()[0]).FirstOrDefault();
-
-            if (listType == null)
-            {
-                return listType;
-            }
-
-            if (!_listTypes.ContainsKey(type))
-            {
-                lock (((ICollection) _listTypes).SyncRoot)
-                {
-                    if (!_listTypes.ContainsKey(type))
-                    {
-                        _listTypes.Add(type, listType);
-                    }
-                }
-            }
-
-            return listType;
-        }
-
-        private static bool _IsArray(Type type)
-        {
-            return type.IsArray;
-        }
-
-        private static bool _IsGenericDictionary(Type type, out Type keyType, out Type valueType)
-        {
-            keyType = null;
-            valueType = null;
-
-            if (type == null)
-            {
-                return false;
-            }
-
-            if (_dictTypes.ContainsKey(type))
-            {
-                keyType = _dictTypes[type].Item1;
-                valueType = _dictTypes[type].Item2;
-
-                return true;
-            }
-
-            var gTypes = (from @interface in type.GetInterfaces()
-                          where @interface.IsGenericType &&
-                          @interface.GetGenericTypeDefinition() == typeof(IDictionary<,>)
-                          select @interface.GetGenericArguments()).FirstOrDefault();
-
-            if (gTypes == null || gTypes.Length != 2)
-            {
-                return false;
-            }
-
-            keyType = gTypes[0];
-            valueType = gTypes[1];
-
-            if (!_dictTypes.ContainsKey(type))
-            {
-                lock (((ICollection) _dictTypes).SyncRoot)
-                {
-                    if (!_dictTypes.ContainsKey(type))
-                    {
-                        _dictTypes.Add(type, new Tuple<Type, Type>(gTypes[0], gTypes[1]));
-                    }
-                }
-            }
-
-            return true;
-        }
+        private readonly Func<int, string> _typeIndexer = i => string.Empty;               
 
         /// <summary>
         ///     Cache the properties for a type so we don't reflect every time
         /// </summary>
         /// <param name="type">The type to manage</param>
         /// <param name="instance"></param>
-        private void _CacheProperties(Type type, object instance)
+        private void _CacheProperties(Type type)
         {
-            Type valueType = null;
-
             lock (((ICollection)_propertyCache).SyncRoot)
             {
                 // fast "out" if already exits
@@ -152,16 +52,24 @@ namespace Wintellect.Sterling.Serialization
                 _propertyCache.Add(type,
                                    new List<SerializationCache>());
 
+                var isList = typeof (IList).IsAssignableFrom(type);
+                var isDictionary = typeof (IDictionary).IsAssignableFrom(type);
+                var isArray = typeof (Array).IsAssignableFrom(type);
+
+                var noDerived = isList || isDictionary || isArray; 
+
                 // first fields
                 var fields = from f in type.GetFields()
-                             where 
+                             where                              
                              !f.IsStatic &&
-                             !f.IsLiteral &&
+                             !f.IsLiteral &&                             
                              !f.IsIgnored() && !f.FieldType.IsIgnored()
                              select new PropertyOrField(f);               
-
+                
                 var properties = from p in type.GetProperties()
-                                 where                                 
+                                 where          
+                                 ((noDerived && p.DeclaringType.Equals(type) || !noDerived)) &&
+                                 p.CanRead && p.CanWrite &&
                                  p.GetGetMethod() != null && p.GetSetMethod() != null
                                        && !p.IsIgnored() && !p.PropertyType.IsIgnored()
                                  select new PropertyOrField(p);                                 
@@ -173,149 +81,10 @@ namespace Wintellect.Sterling.Serialization
                     // eagerly add to the type master
                     _typeResolver(propType.AssemblyQualifiedName);
 
-                    if (propType.IsGenericType && propType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
-                    {
-                        propType = Nullable.GetUnderlyingType(propType);
-                    }
-                    else if (propType.IsEnum)
-                    {
-                        propType = Enum.GetUnderlyingType(propType);
-                    }
+                    var p1 = p;
 
-                    if (p.Name.Equals(LIST_TYPE_ITEM) && p.DeclaringType.GetInterfaces().Contains(typeof(IList)))
-                    {
-                        _propertyCache[type].Add(
-                            new SerializationCache(
-                                p.DeclaringType,
-                                propType, PropertyType.List,
-                                (parent, property) => new object(),
-                                parent => parent));
-                        continue;
-                    }
-
-                    var value = p.GetValue(instance);
-
-                    // Try to get the value's type. PropertyType could be abstract
-
-                    if (value != null)
-                    {
-                        valueType = value.GetType();
-                        
-                        // eagerly add to the type master
-                        _typeResolver(valueType.AssemblyQualifiedName);
-                    }
-
-                    // ignored type?
-                    if (valueType != null && valueType.IsIgnored())
-                    {
-                        continue;
-                    }                                        
-
-                    // this is registered "keyed" type, so we serialize the foreign key
-                    if (_database.IsRegistered(propType) || (value != null && _database.IsRegistered(valueType)))
-                    {
-                        var p1 = p;
-                        var v = _database.IsRegistered(propType) ? propType : valueType;
-                        _propertyCache[type].Add(
-                            new SerializationCache(
-                            //p.PropertyType,
-                                v,
-                                null,
-                                PropertyType.Class,
-                                p1.Setter,                                
-                                p1.Getter));
-                        continue;
-                    }
-                    
-                    // this is a property
-                    if (_serializer.CanSerialize(propType))
-                    {
-                        var p1 = p;
-
-                        var getter = p1.Getter;
-
-                        // cast to underlying type
-                        if (p.PfType.IsEnum)
-                        {
-                            getter = parent => Convert.ChangeType(p1.GetValue(parent),
-                                                                  propType, null);
-                        }
-
-                        _propertyCache[type].Add(
-                            new SerializationCache(
-                                propType,
-                                null,
-                                PropertyType.Property,
-                                p1.Setter,
-                                getter));
-                        continue;
-                    }
-                    
-                    if (_IsArray(p.PfType))
-                    {
-                        var p1 = p;
-                        _propertyCache[type].Add(
-                            new SerializationCache(
-                                p.PfType,
-                                p.PfType.GetElementType(),
-                                PropertyType.Array,
-                                p1.Setter,
-                                p1.Getter));
-                        continue;
-                    }
-                    
-                    Type dictKeyType;
-                    Type dictValueType;
-                    if (_IsGenericDictionary(p.PfType, out dictKeyType, out dictValueType))
-                    {
-                        var p1 = p;
-                        _propertyCache[type].Add(
-                            new SerializationCache(
-                                p.PfType,
-                                dictKeyType,
-                                dictValueType,
-                                p1.Setter,
-                                p1.Getter));
-                        continue;
-                    }
-                    
-                    Type listType;
-                    if ((listType = _IsGenericList(propType)) != null)
-                    {
-                        // check if we can handle this as a list
-
-                        // try to get the type of each object of the list
-                        var v = p.GetValue(instance);
-                        
-                        var ie = v as IEnumerable;
-
-                        if (ie != null)
-                        {
-                            var cansave = ie.Cast<object>().All(o => _database.IsRegistered(o.GetType()));
-
-                            if (cansave || _database.IsRegistered(listType) || _serializer.CanSerialize(listType))
-                            {
-                                var p1 = p;
-                                _propertyCache[type].Add(
-                                    new SerializationCache(
-                                        p.PfType,
-                                        listType, PropertyType.List,
-                                        p1.Setter,
-                                        p1.Getter));
-                            }
-                            continue;
-                        }
-                    }
-
-                    // nothing else, so we'll call it complex and recurse
-                    var pLocal = p;
-                    _propertyCache[type].Add(
-                                    new SerializationCache(
-                                        p.PfType,
-                                        listType, PropertyType.ComplexType,
-                                        pLocal.Setter,
-                                        pLocal.Getter));
-                }
+                    _propertyCache[type].Add(new SerializationCache(propType, (parent, property) => p1.Setter(parent,property), p1.GetValue));                    
+                }                
             }
         }
 
@@ -348,156 +117,131 @@ namespace Wintellect.Sterling.Serialization
         {
             _logManager.Log(SterlingLogLevel.Verbose, string.Format("Sterling is serializing type {0}", type.FullName),
                             null);
-
+            
             // need to indicate to the stream whether or not this is null
-            var nullFlag = instance == null ? NULL : NOTNULL;
+            var nullFlag = instance == null;
 
-            bw.Write(nullFlag);
+            _SerializeNull(bw, nullFlag);
 
-            if (instance == null) return;
+            if (nullFlag) return;
 
             // build the cache for reflection
             if (!_propertyCache.ContainsKey(type))
             {
                 //_CacheProperties(type);
-                _CacheProperties(type, instance);
+                _CacheProperties(type);
             }
+
+            if (typeof(Array).IsAssignableFrom(type))
+            {
+                _SaveArray(bw, cache, instance as Array);
+            }
+            else if (typeof(IList).IsAssignableFrom(type))
+            {
+                _SaveList(instance as IList, bw, cache);
+            }
+            else if (typeof(IDictionary).IsAssignableFrom(type))
+            {
+                _SaveDictionary(instance as IDictionary, bw, cache);              
+            }           
 
             // now iterate the serializable properties
             foreach (var p in _propertyCache[type])
             {
-                if (p.SerializationType.Equals(PropertyType.Class))
-                {
-                    // foreign table - write if it is null or not, and if not null, write the key
-                    // then serialize it separately
-                    _SerializeClass(type, p.GetMethod(instance), bw, cache);
-                    continue;
-                }
-                
-                if (p.SerializationType.Equals(PropertyType.Property))
-                {
-                    _SerializeProperty(type, p.GetMethod(instance), bw, p.PropType);
-                    continue;
-                }
-                
-                if (p.SerializationType.Equals(PropertyType.List) || p.SerializationType.Equals(PropertyType.Array))
-                {
-                    _SerializeList(p.ListType, (IList)p.GetMethod(instance), bw, cache);
-                    continue;
-                }
-                
-                if (p.SerializationType.Equals(PropertyType.Dictionary))
-                {
-                    _SerializeDictionary(p.DictionaryKeyType, p.DictionaryValueType, (IDictionary)p.GetMethod(instance), bw, cache);
-                    continue;
-                }
-
-                if (!p.SerializationType.Equals(PropertyType.ComplexType)) continue;
-
-                // complex type only
-                var propertyValue = p.GetMethod(instance);
-                var propertyType = propertyValue == null ? p.PropType : propertyValue.GetType();
-                bw.Write(_typeResolver(propertyType.AssemblyQualifiedName));
-                Save(propertyType, propertyValue, bw, cache);
+                var value = p.GetMethod(instance);
+                _InnerSave(value == null ? p.PropType : value.GetType(), value, bw, cache);
             }
         }
 
-        /// <summary>
-        ///     Handles serialization of a list
-        /// </summary>
-        /// <param name="listType">The type of elements in the list</param>
-        /// <param name="instance">The list to serialize</param>
-        /// <param name="bw">The stream to serialize to</param>
-        /// <param name="cache">Cache</param>
-        private void _SerializeList(Type listType, IList instance, BinaryWriter bw, CycleCache cache)
+        private void _SaveList(IList list, BinaryWriter bw, CycleCache cache)
         {
-            var count = instance == null ? 0 : instance.Count;
+            _SerializeNull(bw, list == null);
 
-            // always pass the count (if it's null we'll just re-serialize an empty list)
-            bw.Write(count);
-
-            if (instance == null || count <= 0) return;
-
-            Action<object> serialize;
-
-            //serialize to database (as class) or as property?
-            if (_database.IsRegistered(listType) || !_serializer.CanSerialize(listType))
+            if (list == null)
             {
-                serialize = obj => _SerializeClass(listType, obj, bw, cache);
-            }
-            else
-            {
-                serialize = obj => _SerializeProperty(listType, obj, bw, listType);
-            }
-
-            // now iterate
-            foreach (var item in instance)
-            {
-                serialize(item);
-            }
-        }
-
-        /// <summary>
-        ///     Handles serialization of a dictionary
-        /// </summary>
-        /// <param name="keyType">The type of dictionary's Key </param>
-        /// <param name="valueType">The type of dictionary's Value</param>
-        /// <param name="instance">The dictionary to serialize</param>
-        /// <param name="bw">The stream to serialize to</param>
-        /// <param name="cache">Cycle cache</param>
-        private void _SerializeDictionary(Type keyType, Type valueType, IDictionary instance, BinaryWriter bw, CycleCache cache)
-        {
-            Type keyListType, valueListType;
-            var count = instance == null ? 0 : instance.Count;
-
-            // always pass the count (if it's null we'll just re-serialize an empty list)
-            bw.Write(count);
-
-            if (instance == null || count <= 0)
                 return;
-
-            Action<object> serializeKey, serializeValue;
-
-            if ((keyListType = _IsGenericList(keyType)) == null)
-            {
-                //serialize to database (as class) or as property?
-                if (_database.IsRegistered(keyType) || !_serializer.CanSerialize(keyType))
-                {
-                    serializeKey = obj => _SerializeClass(keyType, obj, bw, cache);
-                }
-                else
-                {
-                    serializeKey = obj => _SerializeProperty(keyType, obj, bw, keyType);
-                }
-            }
-            else
-            {
-                serializeKey = obj => _SerializeList(keyListType, (IList)obj, bw, cache);
             }
 
-            if ((valueListType = _IsGenericList(valueType)) == null)
+            bw.Write(list.Count);
+            foreach(var item in list)
             {
-                //serialize to database (as class) or as property?
-                if (_database.IsRegistered(valueType) || !_serializer.CanSerialize(valueType))
-                {
-                    serializeValue = obj => _SerializeClass(keyType, obj, bw, cache);
-                }
-                else
-                {
-                    serializeValue = obj => _SerializeProperty(valueType, obj, bw, valueType);
-                }
-            }
-            else
-            {
-                serializeValue = obj => _SerializeList(valueListType, (IList)obj, bw, cache);
-            }
-
-            foreach (var key in instance.Keys)
-            {
-                serializeKey(key);
-                serializeValue(instance[key]);
+                _InnerSave(item == null ? typeof(string) : item.GetType(), item, bw, cache);
             }
         }
+
+        private void _SaveDictionary(IDictionary dictionary, BinaryWriter bw, CycleCache cache)
+        {
+            _SerializeNull(bw, dictionary == null);
+
+            if (dictionary == null)
+            {
+                return;
+            }
+
+            bw.Write(dictionary.Count);
+            foreach (var item in dictionary.Keys)
+            {
+                _InnerSave(item.GetType(), item, bw, cache);
+                _InnerSave(dictionary[item] == null ? typeof(string) : dictionary[item].GetType(), dictionary[item], bw, cache);
+            }
+        }
+
+        private void _SaveArray(BinaryWriter bw, CycleCache cache, Array array)
+        {
+            _SerializeNull(bw, array == null);
+
+            if (array == null)
+            {
+                return;
+            }
+
+            bw.Write(array.Length);
+            foreach (var item in array)
+            {
+                _InnerSave(item == null ? typeof(string) : item.GetType(), item, bw, cache);
+            }
+        }
+
+        private void _InnerSave(Type type, object instance, BinaryWriter bw,  CycleCache cache)
+        {                                    
+            if (_database.IsRegistered(type))
+            {
+                // foreign table - write if it is null or not, and if not null, write the key
+                // then serialize it separately
+                _SerializeClass(type, instance, bw, cache);
+                return;
+            }
+            
+            if (_serializer.CanSerialize(type))
+            {
+                _SerializeProperty(type, instance, bw);
+                return;
+            }
+
+            if (instance is Array)
+            {
+                bw.Write(_typeResolver(type.AssemblyQualifiedName));
+                _SaveArray(bw, cache, instance as Array);
+                return;
+            }
+
+            if (typeof(IList).IsAssignableFrom(type))
+            {
+                bw.Write(_typeResolver(type.AssemblyQualifiedName));
+                _SaveList(instance as IList, bw, cache);                                
+                return;
+            }
+
+            if (typeof(IDictionary).IsAssignableFrom(type))
+            {
+                bw.Write(_typeResolver(type.AssemblyQualifiedName));
+                _SaveDictionary(instance as IDictionary, bw, cache);
+                return;
+            }           
+                       
+            bw.Write(_typeResolver(type.AssemblyQualifiedName));
+            Save(type, instance, bw, cache);
+        }       
 
         /// <summary>
         ///     Serializes a property
@@ -506,22 +250,18 @@ namespace Wintellect.Sterling.Serialization
         /// <param name="propertyValue">The property value</param>
         /// <param name="bw">The writer</param>
         /// <param name="p">The type of the property</param>
-        private void _SerializeProperty(Type type, object propertyValue, BinaryWriter bw, Type p)
+        private void _SerializeProperty(Type type, object propertyValue, BinaryWriter bw)
         {
-            if (propertyValue == null)
+            bw.Write(_typeResolver(type.AssemblyQualifiedName));
+
+            var isNull = propertyValue == null;
+            _SerializeNull(bw, isNull);
+
+            if (isNull)
             {
-                bw.Write(NULL);
-                _logManager.Log(SterlingLogLevel.Verbose,
-                            string.Format("Sterling is saving property of type {0} with value NULL for parent {1}",
-                                          p.FullName, type.FullName), null);
                 return;
             }
 
-            bw.Write(NOTNULL);
-
-            _logManager.Log(SterlingLogLevel.Verbose,
-                            string.Format("Sterling is saving property of type {0} with value {1} for parent {2}",
-                                          p.FullName, propertyValue, type.FullName), null);
             _serializer.Serialize(propertyValue, bw);
         }
 
@@ -534,14 +274,13 @@ namespace Wintellect.Sterling.Serialization
         /// <param name="cache">Cycle cache</param>
         private void _SerializeClass(Type type, object foreignTable, BinaryWriter bw, CycleCache cache)
         {
+            bw.Write(_typeResolver(type.AssemblyQualifiedName));
+
             // serialize to the stream if the foreign key is nulled
-            bw.Write(foreignTable == null ? NULL : NOTNULL);
+            _SerializeNull(bw, foreignTable == null);
 
             if (foreignTable == null) return;
-
-            // aggiungo il tipo dell'oggetto da serializzare            
-            bw.Write(_typeResolver(foreignTable.GetType().AssemblyQualifiedName));
-
+            
             // if not null, serialize the key value to look up when we load back
             var foreignKey = _database.GetKey(foreignTable);
 
@@ -574,240 +313,162 @@ namespace Wintellect.Sterling.Serialization
             _logManager.Log(SterlingLogLevel.Verbose,
                             string.Format("Sterling is de-serializing type {0}", type.FullName), null);
 
-            // are we de-serializing something that is null?
-            var nullFlag = br.ReadUInt16();
-
-            // that's it
-            if (nullFlag == NULL)
+            if (_DeserializeNull(br))
             {
-                _logManager.Log(SterlingLogLevel.Verbose, "De-serialized NULL value.", null);
                 return null;
             }
-
+            
             // make a template
             var instance = Activator.CreateInstance(type);
 
             // push to the stack
-            cache.Add(type, instance, key);            
+            cache.Add(type, instance, key);
 
             // build the reflection cache);
             if (!_propertyCache.ContainsKey(type))
             {
                 //_CacheProperties(type);
-                _CacheProperties(type, instance);
+                _CacheProperties(type);
             }
+
+            if (instance is Array)
+            {
+                var isNull = _DeserializeNull(br);
+
+                if (!isNull)
+                {
+                    var count = br.ReadInt32();
+                    for (var x = 0; x < count; x++)
+                    {
+                        ((Array) instance).SetValue(_Deserialize(br, cache), x);
+                    }
+                }
+            }
+            else if (instance is IList)
+            {
+                var isNull = _DeserializeNull(br);
+                if (!isNull)
+                {
+                    _LoadList(br, cache, instance as IList);
+                }
+            }
+
+            else if (instance is IDictionary)
+            {
+                var isNull = _DeserializeNull(br);
+                if (!isNull)
+                {
+                    _LoadDictionary(br, cache, instance as IDictionary);
+                }
+            }           
 
             // now iterate
             foreach (var p in _propertyCache[type])
             {
-                // recursive save? 
-                if (p.SerializationType.Equals(PropertyType.Class))
-                {
-                    p.SetMethod(instance, _DeserializeClass(type, p.PropType, br, cache));
-                    continue;
-                }
-                
-                if (p.SerializationType.Equals(PropertyType.Property))
-                {
-                    p.SetMethod(instance, _DeserializeProperty(type, br, p.PropType));
-                    continue;
-                }
-                
-                if (p.SerializationType.Equals(PropertyType.List))
-                {
-                    // We've to support interfaces (ie: IList<MyClass>)
-                    // build the base list (this will be List<T> for example because we know the exact type)
-                    var list = (IList)Activator.CreateInstance(p.PropType);
-                    if (instance.GetType().GetInterfaces().Contains(typeof(IList)))
-                    {
-                        _DeserializeList(type, p.ListType, (IList)instance, br, p.PropType, cache);
-                    }
-                    else
-                    {
-                        p.SetMethod(instance, list);
-                        _DeserializeList(type, p.ListType, list, br, p.PropType, cache);
-                    }
-                    continue;
-                }
-                
-                if (p.SerializationType.Equals(PropertyType.Array))
-                {
-                    Array array;
-                    _DeserializeArray(type, p.ListType, out array, br, p.PropType, cache);
-                    p.SetMethod(instance, array);
-                    continue;
-                }
-                
-                if (p.SerializationType.Equals(PropertyType.Dictionary))
-                {
-                    var dict = (IDictionary)Activator.CreateInstance(p.PropType);
-                    p.SetMethod(instance, dict);
-                    _DeserializeDictionary(type, p.DictionaryKeyType, p.DictionaryValueType, dict, br, p.PropType, cache);
-                    continue;
-                }
-
-                if (!p.SerializationType.Equals(PropertyType.ComplexType)) continue;
-
-                // case for complex type
-                var propertyTypeIndex = br.ReadInt32();
-                var propertyType = Type.GetType(_typeIndexer(propertyTypeIndex));
-                p.SetMethod(instance, Load(propertyType, Guid.NewGuid(), br, cache)); // dummy key for the cache
+                p.SetMethod(instance, _Deserialize(br, cache));
             }
 
             return instance;
         }
 
-        /// <summary>
-        ///     De-serialize an array
-        /// </summary>
-        /// <param name="parentType">The parent type ("owns the array")</param>
-        /// <param name="arrayType">The type of array elements</param>
-        /// <param name="instance">The array to build</param>
-        /// <param name="br">The reader</param>
-        /// <param name="p">The full type of the array (the array itself, not the elements)</param>
-        /// <param name="cache">Cycle cache</param>
-        private void _DeserializeArray(Type parentType, Type arrayType, out Array instance, BinaryReader br, Type p, CycleCache cache)
+        private object _Deserialize(BinaryReader br, CycleCache cache)
         {
-            var idx = br.ReadInt32();
-            instance = Array.CreateInstance(arrayType, idx);
+            var typeName = _typeIndexer(br.ReadInt32());
 
-            for (var i = 0; i < idx; i++)
+            if (_DeserializeNull(br))
             {
-                var obj = _database.IsRegistered(arrayType) || !_serializer.CanSerialize(arrayType)
-                                 ? _DeserializeClass(parentType, arrayType, br, cache)
-                                 : _DeserializeProperty(p, br, arrayType);
-
-                instance.SetValue(obj, i);
-            }
-        }
-
-        /// <summary>
-        ///     De-serialize a dictionary
-        /// </summary>
-        /// <param name="parentType">The parent type ("owns the dictionary")</param>
-        /// <param name="keyType">The type of dictionary's Key </param>
-        /// <param name="valueType">The type of dictionary's Value</param>
-        /// <param name="instance">The dictionary to build</param>
-        /// <param name="br">The reader</param>
-        /// <param name="p">The full type of the dictionary (the dictionary itself, not the elements)</param>
-        /// <param name="cache">Cycle cache</param>
-        private void _DeserializeDictionary(Type parentType, Type keyType, Type valueType,
-            IDictionary instance, BinaryReader br, Type p, CycleCache cache)
-        {
-            var idx = br.ReadInt32();
-
-            for (var i = 0; i < idx; i++)
-            {
-                Type listKeyType;
-                object key;
-                if ((listKeyType = _IsGenericList(keyType)) == null)
-                {
-                    key = _database.IsRegistered(keyType) || !_serializer.CanSerialize(keyType)
-                                     ? _DeserializeClass(parentType, keyType, br, cache)
-                                     : _DeserializeProperty(p, br, keyType);
-                }
-                else
-                {
-                    key = Activator.CreateInstance(keyType);
-                    _DeserializeList(parentType, listKeyType, (IList)key, br, p, cache);
-                }
-
-                Type listValueType;
-                object value;
-                if ((listValueType = _IsGenericList(valueType)) == null)
-                {
-                    value = _database.IsRegistered(valueType) || !_serializer.CanSerialize(valueType)
-                                 ? _DeserializeClass(parentType, valueType, br, cache)
-                                 : _DeserializeProperty(p, br, valueType);
-                }
-                else
-                {
-                    value = Activator.CreateInstance(valueType);
-                    _DeserializeList(parentType, listValueType, (IList)value, br, p, cache);
-                }
-
-                instance.Add(key, value);
-            }
-        }
-
-        /// <summary>
-        ///     De-serialize a list
-        /// </summary>
-        /// <param name="parentType">The parent type ("owns the list")</param>
-        /// <param name="listType">The type of elements in the list</param>
-        /// <param name="instance">The list to build</param>
-        /// <param name="br">The reader</param>
-        /// <param name="p">The full type of the list (the list itself, not the elements)</param>
-        /// <param name="cache">Cycle cache</param>
-        private void _DeserializeList(Type parentType, Type listType, IList instance, BinaryReader br, Type p, CycleCache cache)
-        {
-            var idx = br.ReadInt32();
-
-            for (var i = 0; i < idx; i++)
-            {
-                var obj = _database.IsRegistered(listType) || !_serializer.CanSerialize(listType)
-                                 ? _DeserializeClass(parentType, listType, br, cache)
-                                 : _DeserializeProperty(p, br, listType);
-                instance.Add(obj);
-            }
-        }
-
-        /// <summary>
-        ///     Deserialize a property
-        /// </summary>
-        /// <param name="type">The parent type</param>
-        /// <param name="br">The reader</param>
-        /// <param name="p">The property type</param>
-        /// <returns>The de-serialized property</returns>
-        private object _DeserializeProperty(Type type, BinaryReader br, Type p)
-        {
-            var isNull = _serializer.Deserialize(NULL.GetType(), br);
-
-            if (isNull.Equals(NULL))
-            {
-                _logManager.Log(SterlingLogLevel.Verbose,
-                            string.Format(
-                                "Sterling de-serialized property of type {0} with value NULL for parent {1}",
-                                p.FullName, type.FullName), null);
-
                 return null;
             }
+            
+            var typeResolved = Type.GetType(typeName);
 
-            var propertyValue = _serializer.Deserialize(p, br);
-            _logManager.Log(SterlingLogLevel.Verbose,
-                            string.Format(
-                                "Sterling de-serialized property of type {0} with value {1} for parent {2}",
-                                p.FullName, propertyValue, type.FullName), null);
-            return propertyValue;
-        }
-
-        /// <summary>
-        ///     De-serialize a class ("load a foreign table")
-        /// </summary>
-        /// <param name="type">The parent type</param>
-        /// <param name="targetType">The foreign type</param>
-        /// <param name="br">The reader</param>
-        /// <param name="cache">Cycle cache</param>
-        /// <returns>The de-serialized class</returns>
-        private object _DeserializeClass(Type type, Type targetType, BinaryReader br, CycleCache cache)
-        {
-            _logManager.Log(SterlingLogLevel.Verbose,
-                            string.Format("Sterling is de-serializing foreign key of type {0} for parent {1}",
-                                          targetType.FullName, type.FullName), null);
-
-            var foreignKeyIsNull = br.ReadInt16();
-
-            if (foreignKeyIsNull == NULL)
+            if (_database.IsRegistered(typeResolved))
             {
-                // set to null
-                return null;
+                var keyType = _database.GetKeyType(typeResolved);
+                var key = _serializer.Deserialize(keyType, br);
+                return _database.Load(typeResolved, key, cache);
             }
 
-            var typeIndex = br.ReadInt32();
-            targetType = Type.GetType(_typeIndexer(typeIndex));
+            if (_serializer.CanSerialize(typeResolved))
+            {
+                return _serializer.Deserialize(typeResolved, br);
+            }
 
-            var keyType = _database.GetKeyType(targetType);
-            return _database.Load(targetType, _serializer.Deserialize(keyType, br), cache);
+            
+            if (typeof(Array).IsAssignableFrom(typeResolved))
+            {                
+                var count = br.ReadInt32();
+                var array = Array.CreateInstance(typeResolved.GetElementType(), count);
+                for (var x = 0; x < count; x++)
+                {
+                    array.SetValue(_Deserialize(br, cache), x);
+                }
+
+                return array;
+            }
+
+            if (typeof (IList).IsAssignableFrom(typeResolved))
+            {
+                var list = Activator.CreateInstance(typeResolved) as IList;
+                return _LoadList(br, cache, list);               
+            }
+
+            if (typeof (IDictionary).IsAssignableFrom(typeResolved))
+            {
+                var dictionary = Activator.CreateInstance(typeResolved) as IDictionary;
+                return _LoadDictionary(br, cache, dictionary);
+            }            
+
+            var instance = Activator.CreateInstance(typeResolved);
+
+            // build the reflection cache);
+            if (!_propertyCache.ContainsKey(typeResolved))
+            {
+                //_CacheProperties(type);
+                _CacheProperties(typeResolved);
+            }
+
+            // now iterate
+            foreach (var p in _propertyCache[typeResolved])
+            {
+                p.SetMethod(instance, _Deserialize(br, cache));
+            }
+
+            return instance;
+        }
+        
+        private IDictionary _LoadDictionary(BinaryReader br, CycleCache cache, IDictionary dictionary)
+        {            
+            var count = br.ReadInt32();
+            for (var x = 0; x < count; x++)
+            {
+                dictionary.Add(_Deserialize(br, cache), _Deserialize(br, cache));
+            }
+            return dictionary;
+        }
+
+        private IList _LoadList(BinaryReader br, CycleCache cache, IList list)
+        {
+            var count = br.ReadInt32();
+            for (var x = 0; x < count; x++)
+            {
+                list.Add(_Deserialize(br, cache));
+            }
+            return list;
+        }
+
+        private void _SerializeNull(BinaryWriter bw, bool isNull)
+        {
+            bw.Write(isNull ? NULL : NOTNULL);
+            _logManager.Log(SterlingLogLevel.Verbose, string.Format("{0}", isNull ? NULL_DISPLAY : NOTNULL_DISPLAY), null);
+        }    
+
+        private bool _DeserializeNull(BinaryReader br)
+        {
+            var nullFlag = br.ReadUInt16();
+            var isNull = nullFlag == NULL;
+            _logManager.Log(SterlingLogLevel.Verbose, string.Format("{0}", isNull ? NULL_DISPLAY : NOTNULL_DISPLAY),null);
+            return isNull;
         }
     }
 }

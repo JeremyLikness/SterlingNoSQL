@@ -82,6 +82,9 @@ namespace Wintellect.Sterling.Test.Database
             // test saving and reloading
             var expected1 = TestModel.MakeTestModel();
             var expected2 = TestModel.MakeTestModel();
+
+            expected2.GuidNullable = null;
+
             var expectedComplex = new TestComplexModel
                                       {
                                           Id = 5,
@@ -114,18 +117,20 @@ namespace Wintellect.Sterling.Test.Database
 
             var actual1 = _databaseInstance.Load<TestModel>(expected1.Key);
             var actual2 = _databaseInstance.Load<TestModel>(expected2.Key);
-
+            
             Assert.IsNotNull(actual1, "Load failed for 1.");
             Assert.AreEqual(expected1.Key, actual1.Key, "Load failed (1): key mismatch.");
             Assert.AreEqual(expected1.Data, actual1.Data, "Load failed(1): data mismatch.");
             Assert.IsNotNull(actual1.SubClass, "Load failed (1): sub class is null.");
             Assert.AreEqual(expected1.SubClass.NestedText, actual1.SubClass.NestedText, "Load failed (1): sub class text mismtach.");
+            Assert.AreEqual(expected1.GuidNullable, actual1.GuidNullable, "Load failed (1): nullable Guid mismtach.");
 
             Assert.IsNotNull(actual2, "Load failed for 2.");
             Assert.AreEqual(expected2.Key, actual2.Key, "Load failed (2): key mismatch.");
             Assert.AreEqual(expected2.Data, actual2.Data, "Load failed (2): data mismatch.");
             Assert.IsNotNull(actual2.SubClass, "Load failed (2): sub class is null.");
-            Assert.AreEqual(expected2.SubClass.NestedText, actual2.SubClass.NestedText, "Load failed (2): sub class text mismtach.");
+            Assert.AreEqual(expected2.SubClass.NestedText, actual2.SubClass.NestedText, "Load failed (2): sub class text mismatch.");
+            Assert.IsNull(expected2.GuidNullable, "Load failed (2): nullable Guid was not loaded as null.");
 
             //insert a third 
             var expected3 = TestModel.MakeTestModel();
@@ -161,7 +166,7 @@ namespace Wintellect.Sterling.Test.Database
             foreach(var key in expectedComplex.Dict.Keys)
             {
                 var value = expectedComplex.Dict[key];
-                Assert.IsTrue(actualComplex.Dict.ContainsKey(key), "Load failed: dictionary is missing key.");
+                Assert.IsTrue(actualComplex.Dict.Contains(key), "Load failed: dictionary is missing key.");
                 Assert.AreEqual(value, actualComplex.Dict[key], "Load failed: dictionary has invalid value.");
             }
 

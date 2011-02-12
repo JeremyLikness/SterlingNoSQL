@@ -40,8 +40,7 @@ namespace Wintellect.Sterling.Test.Database
             var actual = _databaseInstance.Load<TestListModel>(key);
             Assert.IsNotNull(actual, "Save/load failed: model is null.");
             Assert.AreEqual(expected.ID, actual.ID, "Save/load failed: key mismatch.");
-            Assert.IsNotNull(actual.Children, "Save/load failed: list not initialized.");
-            Assert.AreEqual(0, actual.Children.Count, "Save/load failed: list size mismatch.");
+            Assert.IsNull(actual.Children, "Save/load failed: list should be null.");            
         }
 
         [TestMethod]
