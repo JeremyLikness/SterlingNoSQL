@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using SterlingExample.Database;
@@ -18,8 +19,7 @@ namespace SterlingExample
         public const long QUOTA = 100*MEGABYTE;
 
         private SterlingEngine _engine;
-        private Guid _loggerId;
-
+        
         private MainPage _mainPage;
 
         public UserControl MainVisual
@@ -29,6 +29,33 @@ namespace SterlingExample
         }
 
         public static SterlingService Current { get; private set; }
+
+        public static void RestoreDatabase(BinaryReader br)
+        {
+            Current._engine.SterlingDatabase.Restore<FoodDatabase>(br);
+        }
+
+        public static void ShutDownDatabase()
+        {
+            if (Debugger.IsAttached)
+            {
+                Current._logger.Detach();
+            }
+            
+            Current._engine.Dispose();                       
+        }
+
+        public static void StartUpDatabase()
+        {
+            if (Debugger.IsAttached)
+            {
+                Current._logger = new SterlingDefaultLogger(SterlingLogLevel.Verbose);
+            }
+
+            Current._engine = new SterlingEngine();
+            Current._engine.Activate();
+            Current.Database = Current._engine.SterlingDatabase.RegisterDatabase<FoodDatabase>();
+        }
 
         /// <summary>
         ///     Navigator
@@ -69,9 +96,7 @@ namespace SterlingExample
             {
                 _logger = new SterlingDefaultLogger(SterlingLogLevel.Verbose);
             }
-
-            _engine.SterlingDatabase.RegisterSerializer<FoodSerializer>();
-
+           
             _engine.Activate();
             Database = _engine.SterlingDatabase.RegisterDatabase<FoodDatabase>();
 
@@ -110,9 +135,7 @@ namespace SterlingExample
         public void Exiting()
         {
             if (DesignerProperties.IsInDesignTool) return;
-
-            _engine.SterlingDatabase.UnhookLogger(_loggerId);
-
+            
             if (Debugger.IsAttached && _logger != null)
             {
                 _logger.Detach();

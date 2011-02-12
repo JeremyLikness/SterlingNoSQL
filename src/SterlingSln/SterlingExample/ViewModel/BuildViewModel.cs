@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Threading;
-using SterlingExample.Model;
-using SterlingExample.RDA;
+using System.IO;
+using System.IO.IsolatedStorage;
+using System.Windows;
 
 namespace SterlingExample.ViewModel
 {
@@ -23,15 +22,11 @@ namespace SterlingExample.ViewModel
                     Tuple.Create<string, bool, Action<BackgroundWorker, DoWorkEventArgs>>
                         ("Purge the Database", true, _Step1Worker),
                     Tuple.Create<string, bool, Action<BackgroundWorker, DoWorkEventArgs>>
-                        ("Build Food Groups", false, _Step2Worker),
+                        ("Restore the Database (this may take several minutes)", true, _Step2Worker),
                     Tuple.Create<string, bool, Action<BackgroundWorker, DoWorkEventArgs>>
-                        ("Build Nutrient Definitions", false, _Step3Worker),
+                        ("Restore the Type Master", true, _Step3Worker),
                     Tuple.Create<string, bool, Action<BackgroundWorker, DoWorkEventArgs>>
-                        ("Load Nutrient Data", false, _Step4Worker),                    
-                     Tuple.Create<string, bool, Action<BackgroundWorker, DoWorkEventArgs>>(
-                        "Build Food Descriptions", false, _Step5Worker),
-                    Tuple.Create<string, bool, Action<BackgroundWorker, DoWorkEventArgs>>(
-                        "Flush Indexes", true, _Step6Worker)
+                        ("Restart the Database", true, _Step4Worker)                    
                 };
 
         private int _idx;
@@ -104,118 +99,66 @@ namespace SterlingExample.ViewModel
         }
 
         /// <summary>
-        ///     Step 2 - food groups
+        ///     Step 2 - database
         /// </summary>
         /// <param name="o"></param>
         /// <param name="e"></param>
         private static void _Step2Worker(BackgroundWorker o, DoWorkEventArgs e)
         {
-            var foodGroups = (from fg in Parsers.GetFoodGroups() select fg).ToList();
-            var progress = 0;
-            foreach (var foodGroup in foodGroups)
+            using (var stream =  Application.GetResourceStream(new Uri("DatabaseImage/database.sdb", UriKind.Relative)).Stream)
             {
-                SterlingService.Current.Database.Save(foodGroup);
-                o.ReportProgress((int) (++progress*100.0/foodGroups.Count));
-            }            
+                using (var br = new BinaryReader(stream))
+                {
+                    SterlingService.RestoreDatabase(br);
+                }
+            }      
+            SterlingService.ShutDownDatabase();
         }
 
         /// <summary>
-        ///     Step 3 - nutrient definitions
+        ///     Step 3 - types
         /// </summary>
         /// <param name="o"></param>
         /// <param name="e"></param>
         private static void _Step3Worker(BackgroundWorker o, DoWorkEventArgs e)
         {
-            var nutrDefs = (from nd in Parsers.GetNutrientDefinitions() select nd).ToList();
-            var progress = 0;
-            foreach (var nutrDef in nutrDefs)
+            const int BUF_SIZE = 4096;
+            using (var stream = Application.GetResourceStream(new Uri("DatabaseImage/types.dat", UriKind.Relative)).Stream)
             {
-                SterlingService.Current.Database.Save(nutrDef);
-                o.ReportProgress((int)(++progress * 100.0 / nutrDefs.Count), progress);
-            }
+                using (var br = new BinaryReader(stream))
+                {
+                    using (var bw = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("Sterling/types.dat", FileMode.Create, FileAccess.Write))
+                    {
+                        var buffer = new byte[BUF_SIZE];
+                        var done = false;
+                        while (!done)
+                        {
+                            var cnt = br.Read(buffer, 0, BUF_SIZE);
+                            if (cnt > 0)
+                            {
+                                bw.Write(buffer, 0, cnt);
+                            }
+                            if (cnt < BUF_SIZE)
+                            {
+                                done = true;
+                            }
+                        }
+                    }
+                }
+            }            
         }
 
+
         /// <summary>
-        ///     Step 4 - nutrient data
+        ///     Step 4 - reset
         /// </summary>
         /// <param name="o"></param>
         /// <param name="e"></param>
         private static void _Step4Worker(BackgroundWorker o, DoWorkEventArgs e)
         {
-            _nutrientData = new Dictionary<int, List<NutrientDataElement>>();
-
-            var progress = 0;
-
-            o.ReportProgress(50, 0);
-            var nutrientList = Parsers.GetNutrientData().ToList();            
-
-            foreach (var nutrientData in nutrientList)
-            {
-                var foodDescriptionId = nutrientData.Item1;
-                var nutrientRefId = nutrientData.Item2;
-                var amount = nutrientData.Item3; 
-                
-                if (!_nutrientData.ContainsKey(foodDescriptionId))
-                {
-                    _nutrientData.Add(foodDescriptionId,new List<NutrientDataElement>());
-                }
-
-                _nutrientData[foodDescriptionId].Add(new NutrientDataElement
-                                                         {
-                                                             NutrientDefinitionId = nutrientRefId,
-                                                             AmountPerHundredGrams = amount
-                                                         });
-                if (progress % 1000 == 0)
-                {
-                    o.ReportProgress((int) (++progress*50.0/nutrientList.Count) + 50, progress);
-                }                
-            }
-            nutrientList.Clear();
+            SterlingService.StartUpDatabase();
         }
-
-        private static Dictionary<int, List<NutrientDataElement>> _nutrientData;
-
-        /// <summary>
-        ///     Step 5 - food descriptions
-        /// </summary>
-        /// <param name="o"></param>
-        /// <param name="e"></param>
-        private static void _Step5Worker(BackgroundWorker o, DoWorkEventArgs e)
-        {            
-            // parse these bad boys
-            var size = 0;
-            var totalCount = 0;
-
-            var foodDescriptions = Parsers.GetFoodDescriptions().ToList();
-
-            foreach (var foodDescription in foodDescriptions)
-            {
-                if (_nutrientData.ContainsKey(foodDescription.Id))
-                {
-                    foodDescription.Nutrients = _nutrientData[foodDescription.Id];
-                    totalCount += foodDescription.Nutrients.Count;
-                }
-                else
-                {
-                    totalCount++;
-                }
-                SterlingService.Current.Database.Save(foodDescription);
-                o.ReportProgress((int) (++size*100.0/foodDescriptions.Count), totalCount);
-            }
-
-            _nutrientData.Clear();
-        }
-
-        /// <summary>
-        ///     Step 6 - flush indexes
-        /// </summary>
-        /// <param name="o"></param>
-        /// <param name="e"></param>
-        private static void _Step6Worker(BackgroundWorker o, DoWorkEventArgs e)
-        {            
-            SterlingService.Current.Database.Flush();            
-        }
-
+        
         /// <summary>
         ///     Make a worker
         /// </summary>
