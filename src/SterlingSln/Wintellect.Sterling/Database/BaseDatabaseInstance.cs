@@ -431,6 +431,11 @@ namespace Wintellect.Sterling.Database
                 throw new SterlingTableNotFoundException(instance.GetType(), Name);
             }
 
+            if (!_tableDefinitions[type].IsDirty(instance))
+            {
+                return _tableDefinitions[type].FetchKeyFromInstance(instance);
+            }
+
             // call any before save triggers 
             foreach (var trigger in _TriggerList(type).Where(trigger => !trigger.BeforeSave(type, instance)))
             {

@@ -15,9 +15,10 @@ namespace Wintellect.Sterling.Database
     {
         private readonly PathProvider _pathProvider;
         private readonly Func<TKey, T> _resolver;
+        private Predicate<T> _isDirty; 
         private readonly ISterlingSerializer _serializer;
         private readonly string _databaseName;
-   
+           
         /// <summary>
         ///     Construct 
         /// </summary>
@@ -33,6 +34,7 @@ namespace Wintellect.Sterling.Database
             _resolver = resolver;
             _serializer = serializer;
             _databaseName = databaseName;
+            _isDirty = obj => true;
             KeyList = new KeyCollection<T, TKey>(pathProvider, databaseName, serializer, resolver);
             Indexes = new Dictionary<string, IIndexCollection>();
         }
@@ -51,6 +53,11 @@ namespace Wintellect.Sterling.Database
         ///     The index list
         /// </summary>
         public Dictionary<string, IIndexCollection> Indexes { get; private set; }
+
+        public void RegisterDirtyFlag(Predicate<T> isDirty)
+        {
+            _isDirty = isDirty;
+        }
 
         /// <summary>
         ///     Registers an index with the table definition
@@ -133,6 +140,15 @@ namespace Wintellect.Sterling.Database
         public object FetchKeyFromInstance(object instance)
         {
             return FetchKey((T) instance);
+        }
+
+        /// <summary>
+        ///     Is the instance dirty?
+        /// </summary>
+        /// <returns>True if dirty</returns>
+        public bool IsDirty(object instance)
+        {
+            return _isDirty((T) instance);
         }
     }
 }

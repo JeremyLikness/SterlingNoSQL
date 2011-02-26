@@ -41,5 +41,11 @@ namespace Wintellect.Sterling.Database
         /// <param name="instance">The instance</param>
         /// <returns>The key</returns>
         object FetchKeyFromInstance(object instance);
+
+        /// <summary>
+        ///     Is the instance dirty?
+        /// </summary>
+        /// <returns>True if dirty</returns>
+        bool IsDirty(object instance);
     }
 }

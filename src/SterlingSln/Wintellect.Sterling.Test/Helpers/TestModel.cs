@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using Wintellect.Sterling.Serialization;
 
 namespace Wintellect.Sterling.Test.Helpers
-{
+{    
     /// <summary>
     ///     A sub class Sterling isn't explicitly aware of
     /// </summary>
@@ -37,6 +37,7 @@ namespace Wintellect.Sterling.Test.Helpers
         public TestModel()
         {
             SubClass = new TestSubclass();
+            Accessed = false;
         }        
 
         private static int _idx;
@@ -44,14 +45,35 @@ namespace Wintellect.Sterling.Test.Helpers
         public const int SAMPLE_CONSTANT = 2;
 
         /// <summary>
+        ///     Determines if the class was accessed
+        /// </summary>
+        public bool Accessed { get; private set; }
+
+        public void ResetAccess()
+        {
+            Accessed = false;
+        }
+
+        /// <summary>
         ///     The key
         /// </summary>
         public int Key { get; set; }
 
+        private string _data;
+
         /// <summary>
         ///     Data
         /// </summary>
-        public string Data { get; set; }
+        public string Data
+        {
+            get
+            {
+                Accessed = true;
+                return _data;
+            }
+
+            set { _data = value; }
+        }
 
         public Guid? GuidNullable { get; set; }
         

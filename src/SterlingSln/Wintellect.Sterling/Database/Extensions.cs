@@ -45,6 +45,20 @@ namespace Wintellect.Sterling.Database
         }
 
         /// <summary>
+        ///     Extension to register the dirty flag
+        /// </summary>
+        /// <typeparam name="T">The type of the table</typeparam>
+        /// <typeparam name="TKey">Key type</typeparam>
+        /// <returns>The table</returns>
+        public static ITableDefinition WithDirtyFlag<T,TKey>(this ITableDefinition table, Predicate<T> isDirty)
+            where T : class, new()
+        {
+            ((TableDefinition<T, TKey>)table).RegisterDirtyFlag(isDirty);
+            return table;
+        }
+
+
+        /// <summary>
         ///     Is a property ignored?
         /// </summary>
         /// <param name="p"></param>
