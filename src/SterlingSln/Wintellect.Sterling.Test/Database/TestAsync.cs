@@ -23,7 +23,11 @@ namespace Wintellect.Sterling.Test.Database
         private List<TestModel> _modelList;
         private DateTime _startTime;
 
+#if WINDOWS_PHONE
+        private const int MODELS = 100;
+#else
         private const int MODELS = 500;
+#endif
 
         [TestInitialize]
         public void TestInit()

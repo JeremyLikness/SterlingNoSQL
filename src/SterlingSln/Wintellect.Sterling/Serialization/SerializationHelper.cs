@@ -35,13 +35,12 @@ namespace Wintellect.Sterling.Serialization
         private readonly ISterlingSerializer _serializer;
         private readonly LogManager _logManager;
         private readonly Func<string, int> _typeResolver = s => 1;
-        private readonly Func<int, string> _typeIndexer = i => string.Empty;               
+        private readonly Func<int, string> _typeIndexer = i => string.Empty;
 
         /// <summary>
         ///     Cache the properties for a type so we don't reflect every time
         /// </summary>
         /// <param name="type">The type to manage</param>
-        /// <param name="instance"></param>
         private void _CacheProperties(Type type)
         {
             lock (((ICollection)_propertyCache).SyncRoot)
@@ -241,7 +240,7 @@ namespace Wintellect.Sterling.Serialization
                        
             bw.Write(_typeResolver(type.AssemblyQualifiedName));
             Save(type, instance, bw, cache);
-        }       
+        }
 
         /// <summary>
         ///     Serializes a property
@@ -249,7 +248,6 @@ namespace Wintellect.Sterling.Serialization
         /// <param name="type">The parent type</param>
         /// <param name="propertyValue">The property value</param>
         /// <param name="bw">The writer</param>
-        /// <param name="p">The type of the property</param>
         private void _SerializeProperty(Type type, object propertyValue, BinaryWriter bw)
         {
             bw.Write(_typeResolver(type.AssemblyQualifiedName));
@@ -280,10 +278,9 @@ namespace Wintellect.Sterling.Serialization
             _SerializeNull(bw, foreignTable == null);
 
             if (foreignTable == null) return;
-            
-            // if not null, serialize the key value to look up when we load back
-            var foreignKey = _database.GetKey(foreignTable);
 
+            var foreignKey = _database.Save(foreignTable.GetType(), foreignTable, cache);
+            
             // need to be able to serialize the key 
             if (!_serializer.CanSerialize(foreignKey.GetType()))
             {
@@ -297,8 +294,7 @@ namespace Wintellect.Sterling.Serialization
                                 "Sterling is saving foreign key of type {0} with value {1} for parent {2}",
                                 foreignKey.GetType().FullName, foreignKey, type.FullName), null);
 
-            _serializer.Serialize(foreignKey, bw);
-            _database.Save(foreignTable.GetType(), foreignTable, cache);
+            _serializer.Serialize(foreignKey, bw);            
         }
 
         /// <summary>

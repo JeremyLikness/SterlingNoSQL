@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Database;
 using Wintellect.Sterling.Exceptions;
 using Wintellect.Sterling.IsolatedStorage;
+using Wintellect.Sterling.Test.Helpers;
 
 namespace Wintellect.Sterling.Test.Database
 {    
@@ -54,6 +55,34 @@ namespace Wintellect.Sterling.Test.Database
         }
     }
 
+    public class TriggerListTestTrigger : BaseSterlingTrigger<TestModel, int>
+    {
+        private int _nextKey;
+
+        public TriggerListTestTrigger(int nextKey)
+        {
+            _nextKey = nextKey;
+        }
+
+        public override bool BeforeSave(TestModel instance)
+        {            
+            if (instance.Key > 0) return true;
+
+            instance.Key = _nextKey++;
+            return true;
+        }
+
+        public override void AfterSave(TestModel instance)
+        {
+            return;
+        }
+
+        public override bool BeforeDelete(int key)
+        {
+            return true;
+        }
+    }
+
     public class TriggerDatabase : BaseDatabaseInstance
     {       
 
@@ -73,7 +102,9 @@ namespace Wintellect.Sterling.Test.Database
         {
             return new List<ITableDefinition>
                            {
-                               CreateTableDefinition<TriggerClass, int>(e => e.Id)
+                               CreateTableDefinition<TriggerClass, int>(e => e.Id),
+                               CreateTableDefinition<TestListModel, int>(t=>t.ID),
+                               CreateTableDefinition<TestModel, int>(t=>t.Key)
                            };
         }
     }
@@ -145,6 +176,32 @@ namespace Wintellect.Sterling.Test.Database
             var actual = _databaseInstance.Load<TriggerClass>(TriggerClassTestTrigger.BADSAVE);
 
             Assert.IsNull(actual, "Trigger failed: instance was saved.");
+        }
+
+        [TestMethod]
+        public void TestTriggerOnChildren()
+        {
+            var trigger = new TriggerListTestTrigger(100);
+            _databaseInstance.RegisterTrigger(trigger);
+            var expected = TestListModel.MakeTestListModel();
+
+            // set all the keys to something negative so the trigger can generate the key
+            foreach(var subModel in expected.Children)
+            {
+                subModel.Key = -1*subModel.Key;
+            }
+
+            var key = _databaseInstance.Save(expected);
+
+            var actual = _databaseInstance.Load<TestListModel>(key);
+
+            Assert.IsNotNull(actual.Children, "Trigger failed: child list is null.");
+            Assert.AreEqual(expected.Children.Count, actual.Children.Count, "Trigger failed: actual child count different.");
+
+            var noKey = (from m in actual.Children where m == null || m.Key < 1 select m).Any();
+
+            Assert.IsFalse(noKey, "Trigger failed: children found without a key.");            
+            _databaseInstance.UnregisterTrigger(trigger);
         }
 
         [TestMethod]
