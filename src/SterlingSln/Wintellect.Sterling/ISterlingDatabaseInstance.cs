@@ -222,6 +222,11 @@ namespace Wintellect.Sterling
         void Purge();
 
         /// <summary>
+        ///     Refresh indexes and keys from disk
+        /// </summary>
+        void Refresh();
+
+        /// <summary>
         ///     Event for sterling changes
         /// </summary>
         event EventHandler<SterlingOperationArgs> SterlingOperationPerformed;

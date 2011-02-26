@@ -874,6 +874,17 @@ namespace Wintellect.Sterling.Database
         }
 
         /// <summary>
+        ///     Refresh indexes and keys from disk
+        /// </summary>
+        public void Refresh()
+        {
+            foreach(var table in _tableDefinitions)
+            {
+                table.Value.Refresh();
+            }
+        }
+
+        /// <summary>
         ///     Raise an operation
         /// </summary>
         /// <remarks>

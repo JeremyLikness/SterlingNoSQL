@@ -302,6 +302,15 @@ namespace Wintellect.Sterling.Test.Helpers
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        ///     Refresh indexes and keys from disk
+        /// </summary>
+        public void Refresh()
+        {
+            throw new NotImplementedException();
+        }
+
+#pragma warning disable 0067
         public event EventHandler<SterlingOperationArgs> SterlingOperationPerformed;
     }
 }
