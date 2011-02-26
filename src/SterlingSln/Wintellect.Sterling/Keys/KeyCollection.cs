@@ -58,13 +58,9 @@ namespace Wintellect.Sterling.Keys
         private readonly Dictionary<TKey,int> _keyMap = new Dictionary<TKey, int>();
 
         /// <summary>
-        ///     Query the keys
+        ///     Force to a new list so the internal one cannot be manipulated directly
         /// </summary>
-#if WINPHONE7
-        public IEnumerable<TableKey<T, TKey>> Query { get { return _keyList; } }
-#else
-        public IQueryable<TableKey<T, TKey>> Query { get { return _keyList.AsQueryable(); } }
-#endif
+        public List<TableKey<T, TKey>> Query { get { return new List<TableKey<T, TKey>>(_keyList); } }
 
         private void _DeserializeKeys()
         {
