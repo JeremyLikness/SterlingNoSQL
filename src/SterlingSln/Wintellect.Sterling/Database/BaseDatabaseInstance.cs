@@ -8,7 +8,6 @@ using System.Threading;
 using Wintellect.Sterling.Events;
 using Wintellect.Sterling.Exceptions;
 using Wintellect.Sterling.Indexes;
-using Wintellect.Sterling.IsolatedStorage;
 using Wintellect.Sterling.Keys;
 using Wintellect.Sterling.Serialization;
 
@@ -19,6 +18,8 @@ namespace Wintellect.Sterling.Database
     /// </summary>
     public abstract class BaseDatabaseInstance : ISterlingDatabaseInstance
     {
+        public ISterlingDriver Driver { get; private set; }
+
         /// <summary>
         ///     Master database locks
         /// </summary>
@@ -28,21 +29,17 @@ namespace Wintellect.Sterling.Database
         ///     Workers to track/flush
         /// </summary>
         private readonly List<BackgroundWorker> _workers = new List<BackgroundWorker>();
-        
+
         /// <summary>
         ///     List of triggers
         /// </summary>
-        private readonly Dictionary<Type,List<ISterlingTrigger>> _triggers = new Dictionary<Type, List<ISterlingTrigger>>();
-        
+        private readonly Dictionary<Type, List<ISterlingTrigger>> _triggers =
+            new Dictionary<Type, List<ISterlingTrigger>>();
+
         /// <summary>
         ///     The table definitions
         /// </summary>
-        private readonly Dictionary<Type, ITableDefinition> _tableDefinitions = new Dictionary<Type, ITableDefinition>();
-
-        /// <summary>
-        ///     Path provider
-        /// </summary>
-        private readonly PathProvider _pathProvider;
+        internal readonly Dictionary<Type, ITableDefinition> TableDefinitions = new Dictionary<Type, ITableDefinition>();
 
         /// <summary>
         ///     Serializer
@@ -56,8 +53,6 @@ namespace Wintellect.Sterling.Database
         {
             _locks.Clear();
         }
-
-        private readonly IsoStorageHelper _iso = new IsoStorageHelper();
 
         /// <summary>
         ///     The base database instance
@@ -82,13 +77,6 @@ namespace Wintellect.Sterling.Database
             {
                 throw new SterlingDuplicateDatabaseException(this);
             }
-
-            _pathProvider = SterlingFactory.GetPathProvider();
-        }
-
-        public string Path
-        {
-            get { return _pathProvider.GetDatabasePath(Name); }
         }
 
         public void Unload()
@@ -102,7 +90,7 @@ namespace Wintellect.Sterling.Database
         public object Lock
         {
             get { return _locks[GetType()]; }
-        }        
+        }
 
         /// <summary>
         ///     Register a trigger
@@ -110,46 +98,46 @@ namespace Wintellect.Sterling.Database
         /// <param name="trigger">The trigger</param>
         public void RegisterTrigger<T, TKey>(BaseSterlingTrigger<T, TKey> trigger) where T : class, new()
         {
-            if (!_triggers.ContainsKey(typeof(T)))
+            if (!_triggers.ContainsKey(typeof (T)))
             {
-                lock(((ICollection)_triggers).SyncRoot)
+                lock (((ICollection) _triggers).SyncRoot)
                 {
-                    if (!_triggers.ContainsKey(typeof(T)))
+                    if (!_triggers.ContainsKey(typeof (T)))
                     {
-                        _triggers.Add(typeof(T), new List<ISterlingTrigger>());
+                        _triggers.Add(typeof (T), new List<ISterlingTrigger>());
                     }
                 }
             }
 
-            _triggers[typeof(T)].Add(trigger);
+            _triggers[typeof (T)].Add(trigger);
         }
 
         /// <summary>
         /// The byte stream interceptor list. 
         /// </summary>
-        private readonly List<BaseSterlingByteInterceptor> _byteInterceptorList = new List<BaseSterlingByteInterceptor>();
+        private readonly List<BaseSterlingByteInterceptor> _byteInterceptorList =
+            new List<BaseSterlingByteInterceptor>();
 
         /// <summary>
         /// Registers the BaseSterlingByteInterceptor
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">The type of the interceptor</typeparam>
         public void RegisterInterceptor<T>() where T : BaseSterlingByteInterceptor, new()
-        {            
-            _byteInterceptorList.Add((T)Activator.CreateInstance(typeof(T)));
+        {
+            _byteInterceptorList.Add((T) Activator.CreateInstance(typeof (T)));
         }
 
-        public void UnRegisterInterceptor<T>() where T: BaseSterlingByteInterceptor, new()
+        public void UnRegisterInterceptor<T>() where T : BaseSterlingByteInterceptor, new()
         {
-            var interceptor = (from i 
-                                   in _byteInterceptorList 
-                               where i.GetType().Equals(typeof(T)) 
+            var interceptor = (from i
+                                   in _byteInterceptorList
+                               where i.GetType().Equals(typeof (T))
                                select i).FirstOrDefault();
 
             if (interceptor != null)
             {
                 _byteInterceptorList.Remove(interceptor);
             }
-
         }
 
         /// <summary>
@@ -172,11 +160,11 @@ namespace Wintellect.Sterling.Database
         {
             if (!_triggers.ContainsKey(typeof (T))) return;
 
-            if (_triggers[typeof(T)].Contains(trigger))
+            if (_triggers[typeof (T)].Contains(trigger))
             {
                 lock (((ICollection) _triggers).SyncRoot)
                 {
-                    if (_triggers[typeof(T)].Contains(trigger))
+                    if (_triggers[typeof (T)].Contains(trigger))
                     {
                         _triggers[typeof (T)].Remove(trigger);
                     }
@@ -193,13 +181,13 @@ namespace Wintellect.Sterling.Database
             if (_triggers.ContainsKey(type))
             {
                 List<ISterlingTrigger> triggers;
-                
+
                 lock (((ICollection) _triggers).SyncRoot)
                 {
                     triggers = new List<ISterlingTrigger>(_triggers[type]);
                 }
 
-                return triggers;                
+                return triggers;
             }
 
             return Enumerable.Empty<ISterlingTrigger>();
@@ -214,7 +202,7 @@ namespace Wintellect.Sterling.Database
         ///     Method called from the constructor to register tables
         /// </summary>
         /// <returns>The list of tables for the database</returns>
-        protected abstract List<ITableDefinition> _RegisterTables();
+        protected abstract List<ITableDefinition> RegisterTables();
 
         /// <summary>
         ///     Returns a table definition 
@@ -225,29 +213,29 @@ namespace Wintellect.Sterling.Database
         /// <returns>The table definition</returns>
         protected ITableDefinition CreateTableDefinition<T, TKey>(Func<T, TKey> keyFunction) where T : class, new()
         {
-            return new TableDefinition<T, TKey>(_pathProvider, Name, Serializer,
+            return new TableDefinition<T, TKey>(Driver,
                                                 Load<T, TKey>, keyFunction);
         }
 
         /// <summary>
         ///     Call to publish tables 
         /// </summary>
-        internal void PublishTables()
+        internal void PublishTables(ISterlingDriver driver)
         {
-            _iso.EnsureDirectory(_pathProvider.GetDatabasePath(Name));
+            Driver = driver;
 
-            lock (((ICollection) _tableDefinitions).SyncRoot)
+            lock (((ICollection) TableDefinitions).SyncRoot)
             {
-                foreach (var table in _RegisterTables())
+                foreach (var table in RegisterTables())
                 {
-                    _iso.EnsureDirectory(_pathProvider.GetTablePath(Name, table.TableType));
-                    if (_tableDefinitions.ContainsKey(table.TableType))
+                    if (TableDefinitions.ContainsKey(table.TableType))
                     {
                         throw new SterlingDuplicateTypeException(table.TableType, Name);
                     }
-                    _tableDefinitions.Add(table.TableType, table);
+                    TableDefinitions.Add(table.TableType, table);
                 }
             }
+            Driver.PublishTables(TableDefinitions);
         }
 
         /// <summary>
@@ -267,7 +255,7 @@ namespace Wintellect.Sterling.Database
         /// <returns>True if it is registered</returns>
         public bool IsRegistered(Type type)
         {
-            return _tableDefinitions.ContainsKey(type);
+            return TableDefinitions.ContainsKey(type);
         }
 
         /// <summary>
@@ -282,7 +270,7 @@ namespace Wintellect.Sterling.Database
                 throw new SterlingTableNotFoundException(instance.GetType(), Name);
             }
 
-            return _tableDefinitions[instance.GetType()].FetchKeyFromInstance(instance);
+            return TableDefinitions[instance.GetType()].FetchKeyFromInstance(instance);
         }
 
         /// <summary>
@@ -297,7 +285,7 @@ namespace Wintellect.Sterling.Database
                 throw new SterlingTableNotFoundException(table, Name);
             }
 
-            return _tableDefinitions[table].KeyType;
+            return TableDefinitions[table].KeyType;
         }
 
         /// <summary>
@@ -308,7 +296,7 @@ namespace Wintellect.Sterling.Database
         /// <param name="instance">The instance</param>
         public TKey Save<T, TKey>(T instance) where T : class, new()
         {
-            return (TKey) Save(typeof(T), instance);
+            return (TKey) Save(typeof (T), instance);
         }
 
         /// <summary>
@@ -317,8 +305,7 @@ namespace Wintellect.Sterling.Database
         /// <typeparam name="T">The type to query</typeparam>
         /// <typeparam name="TKey">The type of the key</typeparam>
         /// <returns>The list of keys to query</returns>
-
-        public List<TableKey<T, TKey>> Query<T, TKey>() where T: class, new()
+        public List<TableKey<T, TKey>> Query<T, TKey>() where T : class, new()
         {
             if (!IsRegistered(typeof (T)))
             {
@@ -327,7 +314,7 @@ namespace Wintellect.Sterling.Database
 
             return
                 new List<TableKey<T, TKey>>(
-                ((TableDefinition<T, TKey>)_tableDefinitions[typeof(T)]).KeyList.Query);
+                    ((TableDefinition<T, TKey>) TableDefinitions[typeof (T)]).KeyList.Query);
         }
 
         /// <summary>
@@ -350,7 +337,7 @@ namespace Wintellect.Sterling.Database
                 throw new SterlingTableNotFoundException(typeof (T), Name);
             }
 
-            var tableDef = (TableDefinition<T, TKey>) _tableDefinitions[typeof (T)];
+            var tableDef = (TableDefinition<T, TKey>) TableDefinitions[typeof (T)];
 
             if (!tableDef.Indexes.ContainsKey(indexName))
             {
@@ -389,7 +376,7 @@ namespace Wintellect.Sterling.Database
                 throw new SterlingTableNotFoundException(typeof (T), Name);
             }
 
-            var tableDef = (TableDefinition<T, TKey>) _tableDefinitions[typeof (T)];
+            var tableDef = (TableDefinition<T, TKey>) TableDefinitions[typeof (T)];
 
             if (!tableDef.Indexes.ContainsKey(indexName))
             {
@@ -426,35 +413,33 @@ namespace Wintellect.Sterling.Database
         /// <returns>The key</returns>
         public object Save(Type type, object instance, CycleCache cache)
         {
-            if (!_tableDefinitions.ContainsKey(type))
+            if (!TableDefinitions.ContainsKey(type))
             {
                 throw new SterlingTableNotFoundException(instance.GetType(), Name);
             }
 
-            if (!_tableDefinitions[type].IsDirty(instance))
+            if (!TableDefinitions[type].IsDirty(instance))
             {
-                return _tableDefinitions[type].FetchKeyFromInstance(instance);
+                return TableDefinitions[type].FetchKeyFromInstance(instance);
             }
 
             // call any before save triggers 
             foreach (var trigger in _TriggerList(type).Where(trigger => !trigger.BeforeSave(type, instance)))
             {
-                throw new SterlingTriggerException(Exceptions.Exceptions.BaseDatabaseInstance_Save_Save_suppressed_by_trigger, trigger.GetType());
+                throw new SterlingTriggerException(
+                    Exceptions.Exceptions.BaseDatabaseInstance_Save_Save_suppressed_by_trigger, trigger.GetType());
             }
 
-            var key = _tableDefinitions[type].FetchKeyFromInstance(instance);
+            var key = TableDefinitions[type].FetchKeyFromInstance(instance);
 
             if (cache.Check(instance))
             {
                 return key;
             }
-            
-            cache.Add(type, instance, key);           
 
-            var keyIndex = _tableDefinitions[type].Keys.AddKey(key);
-            
-            _iso.EnsureDirectory(_pathProvider.GetDatabasePath(Name));
-            _iso.EnsureDirectory(_pathProvider.GetTablePath(Name, type));
+            cache.Add(type, instance, key);
+
+            var keyIndex = TableDefinitions[type].Keys.AddKey(key);
 
             var memStream = new MemoryStream();
 
@@ -462,8 +447,9 @@ namespace Wintellect.Sterling.Database
             {
                 using (var bw = new BinaryWriter(memStream))
                 {
-                    var serializationHelper = new SerializationHelper(this, Serializer, SterlingFactory.GetLogger(), s => _pathProvider.GetTypeIndex(s),
-                        i => _pathProvider.GetTypeAtIndex(i));
+                    var serializationHelper = new SerializationHelper(this, Serializer, SterlingFactory.GetLogger(),
+                                                                      s => Driver.GetTypeIndex(s),
+                                                                      i => Driver.GetTypeAtIndex(i));
                     serializationHelper.Save(type, instance, bw, cache);
 
                     bw.Flush();
@@ -472,25 +458,15 @@ namespace Wintellect.Sterling.Database
                     {
                         var bytes = memStream.GetBuffer();
 
-                        bytes = _byteInterceptorList.Aggregate(bytes, (current, byteInterceptor) => byteInterceptor.Save(current));
+                        bytes = _byteInterceptorList.Aggregate(bytes,
+                                                               (current, byteInterceptor) =>
+                                                               byteInterceptor.Save(current));
 
                         memStream = new MemoryStream(bytes);
                     }
 
                     memStream.Seek(0, SeekOrigin.Begin);
-
-                    _iso.EnsureDirectory(_pathProvider.GetInstanceFolder(Name, type, keyIndex));
-
-                    var path = _pathProvider.GetInstancePath(Name, type, keyIndex);
-                    var pathLock = PathLock.GetLock(path);
-
-                    lock (pathLock)
-                    {
-                        using (var isoWriter = _iso.GetWriter(path))
-                        {
-                            isoWriter.Write(memStream.ToArray());
-                        }
-                    }
+                    Driver.Save(type, keyIndex, memStream.ToArray());
                 }
             }
             finally
@@ -498,16 +474,16 @@ namespace Wintellect.Sterling.Database
                 memStream.Flush();
                 memStream.Close();
             }
-            
+
 
             // update the indexes
-            foreach (var index in _tableDefinitions[type].Indexes.Values)
+            foreach (var index in TableDefinitions[type].Indexes.Values)
             {
                 index.AddIndex(instance, key);
             }
 
             // call post-save triggers
-            foreach(var trigger in _TriggerList(type))
+            foreach (var trigger in _TriggerList(type))
             {
                 trigger.AfterSave(type, instance);
             }
@@ -563,7 +539,7 @@ namespace Wintellect.Sterling.Database
 
             var bw = new BackgroundWorker();
 
-            lock (((ICollection)_workers).SyncRoot)
+            lock (((ICollection) _workers).SyncRoot)
             {
                 _workers.Add(bw);
             }
@@ -592,12 +568,11 @@ namespace Wintellect.Sterling.Database
                                  }
                                  finally
                                  {
-                                     lock (((ICollection)_workers).SyncRoot)
+                                     lock (((ICollection) _workers).SyncRoot)
                                      {
                                          _workers.Remove(bw);
                                      }
                                  }
-
                              };
 
             return bw;
@@ -607,12 +582,12 @@ namespace Wintellect.Sterling.Database
         ///     Flush all keys and indexes to storage
         /// </summary>
         public void Flush()
-        {            
+        {
             if (_locks == null || !_locks.ContainsKey(GetType())) return;
 
             lock (Lock)
             {
-                foreach (var def in _tableDefinitions.Values)
+                foreach (var def in TableDefinitions.Values)
                 {
                     def.Keys.Flush();
 
@@ -673,96 +648,86 @@ namespace Wintellect.Sterling.Database
             var assignable = false;
             var keyIndex = -1;
 
-            var iso = new IsoStorageHelper();
+            if (!TableDefinitions.ContainsKey(type))
             {
-                if (!_tableDefinitions.ContainsKey(type))
+                // check if type is a base type
+                foreach (var t in TableDefinitions.Keys.Where(type.IsAssignableFrom))
                 {
-                    // check if type is a base type
-                    foreach (var t in _tableDefinitions.Keys.Where(type.IsAssignableFrom))
-                    {
-                        assignable = true;
-                        keyIndex = _tableDefinitions[t].Keys.GetIndexForKey(key);
+                    assignable = true;
+                    keyIndex = TableDefinitions[t].Keys.GetIndexForKey(key);
 
-                        if (keyIndex < 0) continue;
+                    if (keyIndex < 0) continue;
 
-                        newType = t;
-                        break;
-                    }
+                    newType = t;
+                    break;
                 }
-                else
+            }
+            else
+            {
+                keyIndex = TableDefinitions[newType].Keys.GetIndexForKey(key);
+            }
+
+            if (!assignable)
+            {
+                if (!TableDefinitions.ContainsKey(type))
                 {
-                    keyIndex = _tableDefinitions[newType].Keys.GetIndexForKey(key);
+                    throw new SterlingTableNotFoundException(type, Name);
                 }
+            }
 
-                if (!assignable)
-                {
-                    if (!_tableDefinitions.ContainsKey(type))
-                    {
-                        throw new SterlingTableNotFoundException(type, Name);
-                    }
-                }
+            if (keyIndex < 0)
+            {
+                return null;
+            }
 
-                if (keyIndex < 0)
-                {
-                    return null;
-                }
+            var obj = cache.CheckKey(newType, key);
 
-                var obj = cache.CheckKey(newType, key);
-
-                if (obj != null)
-                {
-                    return obj;
-                }
-
-                var path = _pathProvider.GetInstancePath(Name, newType, keyIndex);
-                var pathLock = PathLock.GetLock(path);
-
-                lock (pathLock)
-                {
-                    BinaryReader br = null;
-                    MemoryStream memStream = null;
-
-                    try
-                    {
-                        br = iso.GetReader(path);
-
-                        var serializationHelper = new SerializationHelper(this, Serializer, SterlingFactory.GetLogger(),
-                                                                          s => _pathProvider.GetTypeIndex(s),
-                                                                          i => _pathProvider.GetTypeAtIndex(i));
-                        if (_byteInterceptorList.Count > 0)
-                        {
-
-                            byte[] bytes = br.ReadBytes((int)br.BaseStream.Length);
-                            
-                            bytes = _byteInterceptorList.ToArray().Reverse().Aggregate(bytes,
-                                                                                       (current, byteInterceptor) =>
-                                                                                       byteInterceptor.Load(current));
-                            
-                            memStream = new MemoryStream(bytes);
-
-                            br.Close();
-                            br = new BinaryReader(memStream);
-                        }
-                        obj = serializationHelper.Load(newType, key, br, cache);
-                    }
-                    finally
-                    {
-                        if (br != null)
-                        {
-                            br.Close();
-                        }
-                        
-                        if (memStream != null)
-                        {
-                            memStream.Flush();
-                            memStream.Close();                            
-                        }
-                    }
-                }
-
-                _RaiseOperation(SterlingOperation.Load, newType, key);
+            if (obj != null)
+            {
                 return obj;
             }
+
+            BinaryReader br = null;
+            MemoryStream memStream = null;
+
+            try
+            {
+                br = Driver.Load(newType, keyIndex);
+
+                var serializationHelper = new SerializationHelper(this, Serializer, SterlingFactory.GetLogger(),
+                                                                  s => Driver.GetTypeIndex(s),
+                                                                  i => Driver.GetTypeAtIndex(i));
+                if (_byteInterceptorList.Count > 0)
+                {
+                    var bytes = br.ReadBytes((int) br.BaseStream.Length);
+
+                    bytes = _byteInterceptorList.ToArray().Reverse().Aggregate(bytes,
+                                                                               (current, byteInterceptor) =>
+                                                                               byteInterceptor.Load(current));
+
+                    memStream = new MemoryStream(bytes);
+
+                    br.Close();
+                    br = new BinaryReader(memStream);
+                }
+                obj = serializationHelper.Load(newType, key, br, cache);
+            }
+            finally
+            {
+                if (br != null)
+                {
+                    br.Close();
+                }
+
+                if (memStream != null)
+                {
+                    memStream.Flush();
+                    memStream.Close();
+                }
+            }
+
+            _RaiseOperation(SterlingOperation.Load, newType, key);
+            return obj;
         }
 
         /// <summary>
@@ -772,7 +737,7 @@ namespace Wintellect.Sterling.Database
         /// <param name="instance">The instance</param>
         public void Delete<T>(T instance) where T : class
         {
-            Delete(typeof (T), _tableDefinitions[typeof (T)].FetchKeyFromInstance(instance));
+            Delete(typeof (T), TableDefinitions[typeof (T)].FetchKeyFromInstance(instance));
         }
 
         /// <summary>
@@ -782,7 +747,7 @@ namespace Wintellect.Sterling.Database
         /// <param name="key">The key</param>
         public void Delete(Type type, object key)
         {
-            if (!_tableDefinitions.ContainsKey(type))
+            if (!TableDefinitions.ContainsKey(type))
             {
                 throw new SterlingTableNotFoundException(type, Name);
             }
@@ -790,16 +755,17 @@ namespace Wintellect.Sterling.Database
             // call any before save triggers 
             foreach (var trigger in _TriggerList(type).Where(trigger => !trigger.BeforeDelete(type, key)))
             {
-                throw new SterlingTriggerException(string.Format(Exceptions.Exceptions.BaseDatabaseInstance_Delete_Delete_failed_for_type, type), trigger.GetType());
+                throw new SterlingTriggerException(
+                    string.Format(Exceptions.Exceptions.BaseDatabaseInstance_Delete_Delete_failed_for_type, type),
+                    trigger.GetType());
             }
 
-            var keyEntry = _tableDefinitions[type].Keys.GetIndexForKey(key);
+            var keyEntry = TableDefinitions[type].Keys.GetIndexForKey(key);
 
-            _iso.Delete(_pathProvider.GetInstancePath(Name, type, keyEntry));
+            Driver.Delete(type, keyEntry);
 
-
-            _tableDefinitions[type].Keys.RemoveKey(key);
-            foreach (var index in _tableDefinitions[type].Indexes.Values)
+            TableDefinitions[type].Keys.RemoveKey(key);
+            foreach (var index in TableDefinitions[type].Indexes.Values)
             {
                 index.RemoveIndex(key);
             }
@@ -815,17 +781,18 @@ namespace Wintellect.Sterling.Database
         {
             if (_workers.Count > 0)
             {
-                throw new SterlingException(Exceptions.Exceptions.BaseDatabaseInstance_Truncate_Cannot_truncate_when_background_operations);
+                throw new SterlingException(
+                    Exceptions.Exceptions.BaseDatabaseInstance_Truncate_Cannot_truncate_when_background_operations);
             }
 
             if (_locks == null || !_locks.ContainsKey(GetType())) return;
 
             lock (Lock)
             {
-                _iso.Purge(_pathProvider.GetTablePath(Name, type));
+                Driver.Truncate(type);
 
-                _tableDefinitions[type].Keys.Truncate();
-                foreach (var index in _tableDefinitions[type].Indexes.Values)
+                TableDefinitions[type].Keys.Truncate();
+                foreach (var index in TableDefinitions[type].Indexes.Values)
                 {
                     index.Truncate();
                 }
@@ -860,19 +827,17 @@ namespace Wintellect.Sterling.Database
                     Thread.Sleep(delay);
                 }
 
-                _iso.Purge(_pathProvider.GetDatabasePath(Name));
+                Driver.Purge();
 
                 // clear key lists from memory
-                foreach (var table in _tableDefinitions.Keys)
+                foreach (var table in TableDefinitions.Keys)
                 {
-                    _tableDefinitions[table].Keys.Truncate();
-                    foreach (var index in _tableDefinitions[table].Indexes.Values)
+                    TableDefinitions[table].Keys.Truncate();
+                    foreach (var index in TableDefinitions[table].Indexes.Values)
                     {
                         index.Truncate();
                     }
-                }
-
-                _pathProvider.SerializeTypes();
+                }                
             }
 
             _RaiseOperation(SterlingOperation.Purge, GetType(), Name);
@@ -883,7 +848,7 @@ namespace Wintellect.Sterling.Database
         /// </summary>
         public void Refresh()
         {
-            foreach(var table in _tableDefinitions)
+            foreach (var table in TableDefinitions)
             {
                 table.Value.Refresh();
             }

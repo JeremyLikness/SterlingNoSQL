@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,12 +19,7 @@ namespace Wintellect.Sterling.Database
         ///     Master list of databases
         /// </summary>
         private readonly Dictionary<string,Tuple<Type,ISterlingDatabaseInstance>> _databases = new Dictionary<string,Tuple<Type,ISterlingDatabaseInstance>>();
-
-        /// <summary>
-        ///     Backup manager
-        /// </summary>
-        private readonly BackupManager _backupManager = new BackupManager();        
-
+        
         /// <summary>
         ///     The main serializer
         /// </summary>
@@ -69,6 +65,8 @@ namespace Wintellect.Sterling.Database
             _logManager.Log(level, message, exception);
         }
 
+        private static readonly Guid _databaseVersion = new Guid("da202921-e258-4de5-b9d7-5b71ac83ff72");
+
         /// <summary>
         ///     Back up the database
         /// </summary>
@@ -85,8 +83,57 @@ namespace Wintellect.Sterling.Database
             }
             var database = databaseQuery.First();
             database.Flush();
-            var path = ((BaseDatabaseInstance) database).Path;
-            _backupManager.Backup(writer, path);
+
+            // first write the version
+            _serializer.Serialize(_databaseVersion, writer);
+
+            var typeMaster = database.Driver.GetTypes();
+
+            // now the type master
+            writer.Write(typeMaster.Count);
+            foreach(var type in typeMaster)
+            {
+                writer.Write(type);
+            }
+            
+            // template for making a method to get a typed key dictionary
+            var deserializeKeys = database.Driver.GetType().GetMethod("DeserializeKeys").GetGenericMethodDefinition();
+
+            // now iterate tables
+            foreach(var table in ((BaseDatabaseInstance)database).TableDefinitions)
+            {
+                // make the key metod for this table 
+                var tableMethod = deserializeKeys.MakeGenericMethod(new[] {table.Value.KeyType});
+                
+                // get the key list
+                var keys = tableMethod.Invoke(database.Driver, new[] {table.Key}) as IDictionary;
+                
+                // reality check
+                if (keys == null)
+                {
+                    writer.Write(0);
+                }
+                else
+                {
+                    // write the count for the keys
+                    writer.Write(keys.Count);
+
+                    // for each key, serialize it out along with the object - indexes  can be rebuilt on the flipside
+                    foreach (var key in keys.Keys)
+                    {
+                        _serializer.Serialize(key, writer);
+                        writer.Write((int) keys[key]);
+
+                        // get the instance 
+                        using (var instance = database.Driver.Load(table.Key, (int) keys[key]))
+                        {
+                            var bytes = instance.ReadBytes((int) instance.BaseStream.Length);
+                            writer.Write(bytes.Length);
+                            writer.Write(bytes);
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -98,22 +145,115 @@ namespace Wintellect.Sterling.Database
         {
             _RequiresActivation();
 
-            var databaseQuery = from d in _databases where d.Value.Item1.Equals(typeof(T)) select d.Value.Item2;
+            var databaseQuery = from d in _databases where d.Value.Item1.Equals(typeof (T)) select d.Value.Item2;
             if (!databaseQuery.Any())
             {
-                throw new SterlingDatabaseNotFoundException(typeof(T).FullName);
+                throw new SterlingDatabaseNotFoundException(typeof (T).FullName);
             }
             var database = databaseQuery.First();
-            var path = ((BaseDatabaseInstance)database).Path;
             database.Purge();
-            _backupManager.Restore(reader, path);
+
+            // read the version
+            var version = _serializer.Deserialize<Guid>(reader);
+
+            if (!version.Equals(_databaseVersion))
+            {
+                throw new SterlingException(string.Format("Unexpected database version."));
+            }
+
+            var typeMaster = new List<string>();
+
+            var count = reader.ReadInt32();
+
+            for (var x = 0; x < count; x++)
+            {
+                typeMaster.Add(reader.ReadString());
+            }
+
+            database.Driver.DeserializeTypes(typeMaster);
+
+            // a method to set the keys
+            var serializeKeys = database.Driver.GetType().GetMethod("SerializeKeys").GetGenericMethodDefinition();
+
+            // template for the key dictionary
+            var baseDictionary = typeof (Dictionary<,>);
+
+            foreach (var table in ((BaseDatabaseInstance) database).TableDefinitions)
+            {
+                var tableMethod = serializeKeys.MakeGenericMethod(new[] {table.Value.KeyType});
+
+                // make the dictionary 
+                var keyDictionaryType = baseDictionary.MakeGenericType(new[] {table.Value.KeyType, typeof (int)});
+                var keyDictionary = Activator.CreateInstance(keyDictionaryType) as IDictionary;
+
+                if (keyDictionary == null)
+                {
+                    throw new SterlingException(string.Format("Unable to make dictionary for key type {0}",
+                                                              table.Value.KeyType));
+                }
+
+                var keyCount = reader.ReadInt32();
+                for (var record = 0; record < keyCount; record++)
+                {
+                    var key = _serializer.Deserialize(table.Value.KeyType, reader);
+                    var keyIndex = reader.ReadInt32();
+                    keyDictionary.Add(key, keyIndex);
+
+                    var size = reader.ReadInt32();
+                    var bytes = reader.ReadBytes(size);
+                    database.Driver.Save(table.Key, keyIndex, bytes);
+                }
+
+                // give the driver the key list
+                tableMethod.Invoke(database.Driver, new object[] { table.Key, keyDictionary });
+
+                // now refresh the table
+                table.Value.Refresh();
+
+                // now save all objects a second time to generate the indexes 
+                if (table.Value.Indexes.Count <= 0) continue;
+
+                var table1 = table;
+                foreach (var instance in from object key in keyDictionary.Keys select database.Load(table1.Key, key))
+                {
+                    database.Save(table.Key, instance);
+                }
+            }
+        }
+
+        public ISterlingDatabaseInstance RegisterDatabase<T>() where T : BaseDatabaseInstance
+        {
+            return RegisterDatabase<T>(null);
         }
 
         /// <summary>
         ///     Register a database type with the system
         /// </summary>
         /// <typeparam name="T">The type of the database to register</typeparam>
-        public ISterlingDatabaseInstance RegisterDatabase<T>() where T : BaseDatabaseInstance
+        /// <typeparam name="TDriver">Register with a driver</typeparam>
+        public ISterlingDatabaseInstance RegisterDatabase<T, TDriver>() where T : BaseDatabaseInstance where TDriver : ISterlingDriver
+        {
+            var driver = (TDriver) Activator.CreateInstance(typeof (TDriver));
+            return RegisterDatabase<T>(driver);
+        }
+
+        /// <summary>
+        ///     Register a database type with the system
+        /// </summary>
+        /// <typeparam name="T">The type of the database to register</typeparam>
+        /// <typeparam name="TDriver">Register with a driver</typeparam>
+        public ISterlingDatabaseInstance RegisterDatabase<T, TDriver>(TDriver driver)
+            where T : BaseDatabaseInstance
+            where TDriver : ISterlingDriver
+        {
+            return RegisterDatabase<T>(driver);
+        }
+
+        /// <summary>
+        ///     Register a database type with the system
+        /// </summary>
+        /// <typeparam name="T">The type of the database to register</typeparam>
+        public ISterlingDatabaseInstance RegisterDatabase<T>(ISterlingDriver driver) where T : BaseDatabaseInstance
         {
             _RequiresActivation();
             _logManager.Log(SterlingLogLevel.Information, 
@@ -126,10 +266,21 @@ namespace Wintellect.Sterling.Database
             }
             
             var database = (ISterlingDatabaseInstance)Activator.CreateInstance(typeof (T));
+
+            if (driver == null)
+            {
+                driver = new MemoryDriver(database.Name, _serializer, _logManager.Log);
+            }
+            else
+            {
+                driver.DatabaseName = database.Name;
+                driver.DatabaseSerializer = _serializer;
+                driver.Log = _logManager.Log;
+            }
             
             ((BaseDatabaseInstance) database).Serializer = _serializer;          
             
-            ((BaseDatabaseInstance)database).PublishTables();
+            ((BaseDatabaseInstance)database).PublishTables(driver);
             _databases.Add(database.Name, new Tuple<Type, ISterlingDatabaseInstance>(typeof(T),database));
             return database;
         }
@@ -213,8 +364,7 @@ namespace Wintellect.Sterling.Database
         {
             lock(Lock)
             {
-                _activated = false;
-                SterlingFactory.GetPathProvider().Serialize();
+                _activated = false;                
                 _Unload();
                 _databases.Clear();
                 BaseDatabaseInstance.Deactivate();

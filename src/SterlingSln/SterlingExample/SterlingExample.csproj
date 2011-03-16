@@ -138,7 +138,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="DatabaseImage\database.sdb" />
-    <Content Include="DatabaseImage\types.dat" />
     <None Include="Properties\AppManifest.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -149,6 +148,10 @@
     <ProjectReference Include="..\SterlingExample.Model\SterlingExample.Model.csproj">
       <Project>{39671F0A-671C-4FED-BCB5-A1703C743F7D}</Project>
       <Name>SterlingExample.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Wintellect.Sterling.IsolatedStorage\Wintellect.Sterling.IsolatedStorage.csproj">
+      <Project>{A74165EA-9D13-49CE-84AC-155468B90071}</Project>
+      <Name>Wintellect.Sterling.IsolatedStorage</Name>
     </ProjectReference>
     <ProjectReference Include="..\Wintellect.Sterling\Wintellect.Sterling.csproj">
       <Project>{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}</Project>

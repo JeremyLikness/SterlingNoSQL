@@ -1,7 +1,6 @@
 using System.IO;
 using Microsoft.Silverlight.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Wintellect.Sterling.IsolatedStorage;
 using Wintellect.Sterling.Test.Helpers;
 
 namespace Wintellect.Sterling.Test.Database
@@ -13,25 +12,28 @@ namespace Wintellect.Sterling.Test.Database
     {
         private SterlingEngine _engine;
         private ISterlingDatabaseInstance _databaseInstance;
+        private MemoryDriver _driver;
 
         [TestCleanup]
         public void TestCleanup()
         {
+            _databaseInstance.Purge();
             _engine.Dispose();
-            _databaseInstance = null;
-            var iso = new IsoStorageHelper();
-            {
-                iso.Purge(PathProvider.BASE);
-            }
+            _databaseInstance = null;            
         }
 
         [TestMethod]
         public void TestBackupAndRestore()
         {
+            if (_driver == null)
+            {
+                _driver = new MemoryDriver();
+            }
+
             // activate the engine and store the data
             _engine = new SterlingEngine();
             _engine.Activate();
-            _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestDatabaseInstance>();
+            _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestDatabaseInstance>(_driver);
 
             // test saving and reloading
             var expected = TestModel.MakeTestModel();
@@ -69,7 +71,7 @@ namespace Wintellect.Sterling.Test.Database
             
             // activate it and grab the database again
             _engine.Activate();
-            _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestDatabaseInstance>();
+            _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestDatabaseInstance>(_driver);
 
             // restore it
             _engine.SterlingDatabase.Restore<TestDatabaseInstance>(new BinaryReader(new MemoryStream(databaseBuffer)));
@@ -82,7 +84,7 @@ namespace Wintellect.Sterling.Test.Database
 
             // activate it and grab the database again
             _engine.Activate();
-            _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestDatabaseInstance>();            
+            _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestDatabaseInstance>(_driver);            
 
             actual = _databaseInstance.Load<TestModel>(expected.Key);
 

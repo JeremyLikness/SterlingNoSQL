@@ -1,9 +1,6 @@
-﻿using System;
-using System.Net;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Silverlight.Testing;
 using Wintellect.Sterling.Test.Helpers;
-using Wintellect.Sterling.IsolatedStorage;
 
 namespace Wintellect.Sterling.Test.Database
 {
@@ -25,12 +22,9 @@ namespace Wintellect.Sterling.Test.Database
         [TestCleanup]
         public void TestCleanup()
         {
+            _databaseInstance.Purge();
             _engine.Dispose();
-            _databaseInstance = null;
-            var iso = new IsoStorageHelper();
-            {
-                iso.Purge(PathProvider.BASE);
-            }
+            _databaseInstance = null;            
         }
 
         [TestMethod]
@@ -62,7 +56,7 @@ namespace Wintellect.Sterling.Test.Database
         public void TestList()
         {
             var expected = TestAggregateListModel.MakeTestAggregateListModel();
-            var key = _databaseInstance.Save(expected);
+            _databaseInstance.Save(expected);
             var actual = _databaseInstance.Load<TestAggregateListModel>(expected.ID);
             Assert.IsNotNull(actual, "Save/load failed: model is null.");
             Assert.AreEqual(expected.ID, actual.ID, "Save/load failed: key mismatch.");

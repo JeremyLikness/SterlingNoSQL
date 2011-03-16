@@ -2,14 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Silverlight.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Wintellect.Sterling.IsolatedStorage;
 using Wintellect.Sterling.Test.Helpers;
 
 namespace Wintellect.Sterling.Test.Database
@@ -21,7 +19,7 @@ namespace Wintellect.Sterling.Test.Database
         private SterlingEngine _engine;
         private ISterlingDatabaseInstance _databaseInstance;
         private List<TestModel> _modelList;
-        private DateTime _startTime;
+        //private DateTime _startTime;
 
 #if WINDOWS_PHONE
         private const int MODELS = 100;
@@ -32,7 +30,7 @@ namespace Wintellect.Sterling.Test.Database
         [TestInitialize]
         public void TestInit()
         {
-            _startTime = DateTime.Now;
+            //_startTime = DateTime.Now;
             _engine = new SterlingEngine();
             _engine.Activate();
             _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestDatabaseInstance>();
@@ -66,14 +64,11 @@ namespace Wintellect.Sterling.Test.Database
             //    dispatcher.BeginInvoke(action);
             //}
 
-            _databaseInstance.Purge();
 
+            _databaseInstance.Purge();
             _engine.Dispose();
             _databaseInstance = null;
-            var iso = new IsoStorageHelper();
-            {
-                iso.Purge(PathProvider.BASE);
-            }
+            
         }
 
         [Asynchronous]
@@ -226,7 +221,7 @@ namespace Wintellect.Sterling.Test.Database
                                    {
                                        var query = from key in _databaseInstance.Query<TestModel, int>()
                                                    select key.LazyValue.Value;
-                                       var cnt = query.Count();
+                                       query.Count();
 
                                        var list = new List<TestModel>(query);
 

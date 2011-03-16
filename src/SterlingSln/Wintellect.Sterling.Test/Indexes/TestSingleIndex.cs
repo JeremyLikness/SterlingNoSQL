@@ -2,7 +2,6 @@
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Indexes;
-using Wintellect.Sterling.IsolatedStorage;
 using Wintellect.Sterling.Serialization;
 using Wintellect.Sterling.Test.Helpers;
 
@@ -11,6 +10,8 @@ namespace Wintellect.Sterling.Test.Indexes
     [TestClass]
     public class TestSingleIndex
     {
+        private MemoryDriver _driver;
+
         private IndexCollection<TestModel, string, int> _target;
 
         private List<TestModel> _testModels;
@@ -33,33 +34,24 @@ namespace Wintellect.Sterling.Test.Indexes
         [TestInitialize]
         public void Init()
         {
+            if (_driver == null)
+            {
+                _driver = new MemoryDriver(_testDatabase.Name, new DefaultSerializer(), SterlingFactory.GetLogger().Log);
+            }
             _testModels = new List<TestModel>(3);
             for(var x = 0; x < 3; x++)
             {
                 _testModels.Add(TestModel.MakeTestModel());
             }
-
-            var iso = new IsoStorageHelper();
-            {
-                iso.Purge(PathProvider.BASE);
-            }
             
-            _testAccessCount = 0;
-            
-            SterlingFactory.GetPathProvider().GetDatabasePath(_testDatabase.Name); // set this up in the indices
-            SterlingFactory.GetPathProvider().GetTablePath<TestModel>(_testDatabase.Name); // set up the table path
-            
-            _target = new IndexCollection<TestModel, string, int>("TestIndex",SterlingFactory.GetPathProvider(), _testDatabase.Name, new DefaultSerializer(),
+            _testAccessCount = 0;                        
+            _target = new IndexCollection<TestModel, string, int>("TestIndex",_driver,
                                                       tm => tm.Data , _GetTestModelByKey);
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            var iso = new IsoStorageHelper();
-            {
-                iso.Purge(PathProvider.BASE);
-            }
         }
 
         [TestMethod]
@@ -118,8 +110,7 @@ namespace Wintellect.Sterling.Test.Indexes
             _target.Flush();
             Assert.IsFalse(_target.IsDirty, "Dirty flag not reset on flush.");
 
-            var secondTarget = new IndexCollection<TestModel, string, int>("TestIndex",SterlingFactory.GetPathProvider(), _testDatabase.Name,
-                                                                 new DefaultSerializer(),
+            var secondTarget = new IndexCollection<TestModel, string, int>("TestIndex", _driver,
                                                                  tm => tm.Data,
                                                                  _GetTestModelByKey);
 

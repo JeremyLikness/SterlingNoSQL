@@ -1,7 +1,6 @@
 using System.Linq;
 using Microsoft.Silverlight.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Wintellect.Sterling.IsolatedStorage;
 using Wintellect.Sterling.Test.Helpers;
 
 namespace Wintellect.Sterling.Test.Database
@@ -24,12 +23,9 @@ namespace Wintellect.Sterling.Test.Database
         [TestCleanup]
         public void TestCleanup()
         {
+            _databaseInstance.Purge();
             _engine.Dispose();
-            _databaseInstance = null;
-            var iso = new IsoStorageHelper();
-            {
-                iso.Purge(PathProvider.BASE);
-            }
+            _databaseInstance = null;            
         }
 
         [TestMethod]

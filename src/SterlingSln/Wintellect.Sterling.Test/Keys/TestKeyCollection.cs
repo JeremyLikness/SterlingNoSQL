@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using Microsoft.Silverlight.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Wintellect.Sterling.IsolatedStorage;
 using Wintellect.Sterling.Keys;
 using Wintellect.Sterling.Serialization;
 using Wintellect.Sterling.Test.Helpers;
@@ -18,6 +17,7 @@ namespace Wintellect.Sterling.Test.Keys
                                               TestModel.MakeTestModel()
                                           };
 
+        private MemoryDriver _driver;
         private KeyCollection<TestModel, int> _target;
         private readonly ISterlingDatabaseInstance _testDatabase = new TestDatabaseInterfaceInstance();
         private int _testAccessCount;
@@ -36,25 +36,11 @@ namespace Wintellect.Sterling.Test.Keys
         [TestInitialize]
         public void TestInit()
         {
-            var iso = new IsoStorageHelper();
-            {
-                iso.Purge(PathProvider.BASE);
-            }  
-            _testAccessCount = 0;
-            SterlingFactory.GetPathProvider().GetDatabasePath(_testDatabase.Name); // set this up in the indices
-            SterlingFactory.GetPathProvider().GetTablePath<TestModel>(_testDatabase.Name); // set up the table path
-            _target = new KeyCollection<TestModel, int>(SterlingFactory.GetPathProvider(), _testDatabase.Name, new DefaultSerializer(),
+            _driver = new MemoryDriver(_testDatabase.Name, new DefaultSerializer(), SterlingFactory.GetLogger().Log);
+            _testAccessCount = 0;            
+            _target = new KeyCollection<TestModel, int>(_driver,
                                                         _GetTestModelByKey);
-        }
-
-        [TestCleanup]
-        public void TestDone()
-        {
-            var iso = new IsoStorageHelper();
-            {
-                iso.Purge(PathProvider.BASE);
-            }            
-        }
+        }       
 
         [TestMethod]
         public void TestAddKey()
@@ -108,7 +94,7 @@ namespace Wintellect.Sterling.Test.Keys
             Assert.AreEqual(1, _testAccessCount, "Lazy loader access count is incorrect.");
             
         }
-
+         
         [TestMethod]
         public void TestSerialization()
         {
@@ -118,8 +104,7 @@ namespace Wintellect.Sterling.Test.Keys
             _target.Flush();
             Assert.IsFalse(_target.IsDirty, "Dirty flag not reset on flush.");
 
-            var secondTarget = new KeyCollection<TestModel, int>(SterlingFactory.GetPathProvider(), _testDatabase.Name,
-                                                                 new DefaultSerializer(),
+            var secondTarget = new KeyCollection<TestModel, int>(_driver,
                                                                  _GetTestModelByKey);
 
             // are we able to grab things?

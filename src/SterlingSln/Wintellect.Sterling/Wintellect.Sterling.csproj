@@ -61,6 +61,7 @@
   <ItemGroup>
     <Compile Include="Database\BackupManager.cs" />
     <Compile Include="Database\BaseDatabaseInstance.cs" />
+    <Compile Include="Database\BaseDriver.cs" />
     <Compile Include="Database\BaseSterlingByteInterceptor.cs" />
     <Compile Include="Database\BaseSterlingTrigger.cs" />
     <Compile Include="Database\CycleCache.cs" />
@@ -69,7 +70,6 @@
     <Compile Include="ISterlingByteInterceptor.cs" />
     <Compile Include="Database\ITableDefinition.cs" />
     <Compile Include="Database\LogManager.cs" />
-    <Compile Include="Database\PathLock.cs" />
     <Compile Include="Database\TableDefinition.cs" />
     <Compile Include="Events\SterlingOperationArgs.cs" />
     <Compile Include="Exceptions\Exceptions.Designer.cs">
@@ -97,16 +97,16 @@
     <Compile Include="Indexes\IndexCollection2.cs" />
     <Compile Include="Indexes\TableIndex.cs" />
     <Compile Include="Indexes\TableIndex2.cs" />
-    <Compile Include="IsolatedStorage\IsoStorageHelper.cs" />
-    <Compile Include="IsolatedStorage\PathProvider.cs" />
     <Compile Include="ISterlingDatabase.cs" />
     <Compile Include="Database\SterlingDatabase.cs" />
     <Compile Include="ISterlingDatabaseInstance.cs" />
+    <Compile Include="ISterlingDriver.cs" />
     <Compile Include="ISterlingLock.cs" />
     <Compile Include="ISterlingTrigger.cs" />
     <Compile Include="Keys\IKeyCollection.cs" />
     <Compile Include="Keys\KeyCollection.cs" />
     <Compile Include="Keys\TableKey.cs" />
+    <Compile Include="MemoryDriver.cs" />
     <Compile Include="Serialization\AggregateSerializer.cs" />
     <Compile Include="Serialization\BaseSerializer.cs" />
     <Compile Include="Serialization\DefaultSerializer.cs" />

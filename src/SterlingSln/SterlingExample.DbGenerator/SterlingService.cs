@@ -19,8 +19,7 @@ namespace SterlingExample.DbGenerator
         public const long QUOTA = 100*MEGABYTE;
 
         private SterlingEngine _engine;
-        private Guid _loggerId;
-
+        
         private MainPage _mainPage;
 
         public UserControl MainVisual
@@ -116,9 +115,7 @@ namespace SterlingExample.DbGenerator
         public void Exiting()
         {
             if (DesignerProperties.IsInDesignTool) return;
-
-            _engine.SterlingDatabase.UnhookLogger(_loggerId);
-
+            
             if (Debugger.IsAttached && _logger != null)
             {
                 _logger.Detach();

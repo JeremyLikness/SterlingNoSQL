@@ -9,7 +9,7 @@ namespace Wintellect.Sterling.Keys
     /// <typeparam name="TKey">The type of the key</typeparam>
     public class TableKey<T,TKey> where T: class, new()
     {
-        private Func<TKey, T> _getter;
+        private readonly Func<TKey, T> _getter;
 
         /// <summary>
         ///     Construct with how to get the key

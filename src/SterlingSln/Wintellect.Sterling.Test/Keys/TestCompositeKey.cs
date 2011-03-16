@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using Microsoft.Silverlight.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Wintellect.Sterling.IsolatedStorage;
 using Wintellect.Sterling.Test.Helpers;
 
 namespace Wintellect.Sterling.Test.Keys
@@ -16,25 +14,19 @@ namespace Wintellect.Sterling.Test.Keys
 
         [TestInitialize]
         public void TestInit()
-        {
-            var iso = new IsoStorageHelper();
-            {
-                iso.Purge(PathProvider.BASE);
-            }
+        {            
             _engine = new SterlingEngine();
             _engine.Activate();
-            _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestDatabaseInstance>();            
+            _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestDatabaseInstance>();    
+            _databaseInstance.Purge();
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
+            _databaseInstance.Purge();
             _engine.Dispose();
-            _databaseInstance = null;
-            var iso = new IsoStorageHelper();
-            {
-                iso.Purge(PathProvider.BASE);
-            }
+            _databaseInstance = null;            
         }
        
 

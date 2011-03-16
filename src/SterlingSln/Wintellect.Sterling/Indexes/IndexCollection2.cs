@@ -1,7 +1,6 @@
 ﻿using System;
-using Wintellect.Sterling.Exceptions;
-using Wintellect.Sterling.IsolatedStorage;
-using Wintellect.Sterling.Serialization;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Wintellect.Sterling.Indexes
 {
@@ -15,31 +14,36 @@ namespace Wintellect.Sterling.Indexes
         ///     Initialize the key collection
         /// </summary>
         /// <param name="name">Index name</param>
-        /// <param name="pathProvider">Path provider</param>
-        /// <param name="databaseName">Name of the database</param>
-        /// <param name="serializer">The serializer it can use to write/restore keys</param>
+        /// <param name="driver">Sterling driver</param>
         /// <param name="indexer">How to resolve the index</param>
         /// <param name="resolver">The resolver for loading the object</param>
-        public IndexCollection(string name, PathProvider pathProvider, string databaseName, ISterlingSerializer serializer,
-                               Func<T, Tuple<TIndex1, TIndex2>> indexer, Func<TKey, T> resolver)
-            : base(name, pathProvider, databaseName, serializer, indexer, resolver,
-                   (tuple, bw, localSerializer) =>
-                       {
-                           localSerializer.Serialize(tuple.Item1, bw);
-                           localSerializer.Serialize(tuple.Item2, bw);
-                       },
-                   (localSerializer, br) => Tuple.Create(localSerializer.Deserialize<TIndex1>(br),
-                                                         localSerializer.Deserialize<TIndex2>(br)))
-
+        public IndexCollection(string name, ISterlingDriver driver,
+                               Func<T, Tuple<TIndex1, TIndex2>> indexer, Func<TKey, T> resolver) 
+            : base(name, driver, indexer, resolver)
         {
-            if (!serializer.CanSerialize<TIndex1>())
+            IsTuple = true;
+        }
+
+        /// <summary>
+        ///     Deserialize the indexes
+        /// </summary>
+        protected override void DeserializeIndexes()
+        {
+            IndexList.Clear();
+
+            foreach (var index in Driver.DeserializeIndex<TKey, TIndex1, TIndex2>(typeof(T), Name) ?? new Dictionary<TKey, Tuple<TIndex1, TIndex2>>())
             {
-                throw new SterlingSerializerException(serializer, typeof (TIndex1));
+                IndexList.Add(new TableIndex<T, TIndex1, TIndex2, TKey>(index.Value.Item1, index.Value.Item2, index.Key, Resolver));
             }
-            if (!serializer.CanSerialize<TIndex2>())
-            {
-                throw new SterlingSerializerException(serializer, typeof (TIndex2));
-            }
+        }
+
+        /// <summary>
+        ///     Serializes the key list
+        /// </summary>
+        protected override void SerializeIndexes()
+        {
+            var dictionary = IndexList.ToDictionary(item => item.Key, item => Tuple.Create(item.Index.Item1, item.Index.Item2));
+            Driver.SerializeIndex(typeof(T), Name, dictionary);
         }
         
 

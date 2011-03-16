@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.Silverlight.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Database;
-using Wintellect.Sterling.IsolatedStorage;
 using Wintellect.Sterling.Test.Helpers;
 
 namespace Wintellect.Sterling.Test.Database
@@ -24,7 +23,7 @@ namespace Wintellect.Sterling.Test.Database
         ///     Method called from the constructor to register tables
         /// </summary>
         /// <returns>The list of tables for the database</returns>
-        protected override List<ITableDefinition> _RegisterTables()
+        protected override List<ITableDefinition> RegisterTables()
         {
             return new List<ITableDefinition>
                            {
@@ -48,13 +47,10 @@ namespace Wintellect.Sterling.Test.Database
         [TestInitialize]
         public void TestInit()
         {
-            var iso = new IsoStorageHelper();
-            {
-                iso.Purge(PathProvider.BASE);
-            }
             _engine = new SterlingEngine();
             _engine.Activate();
             _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<DirtyDatabase>();
+            _databaseInstance.Purge();
         }
 
         [TestCleanup]
@@ -62,11 +58,7 @@ namespace Wintellect.Sterling.Test.Database
         {
             _databaseInstance.Purge();
             _engine.Dispose();
-            _databaseInstance = null;
-            var iso = new IsoStorageHelper();
-            {
-                iso.Purge(PathProvider.BASE);
-            }
+            _databaseInstance = null;            
         }
 
         [TestMethod]

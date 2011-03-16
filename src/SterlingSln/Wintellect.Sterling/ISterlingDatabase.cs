@@ -15,7 +15,7 @@ namespace Wintellect.Sterling
         /// </summary>
         /// <param name="log">The call for logging</param>
         /// <returns>A unique identifier for the logger</returns>
-        Guid RegisterLogger(Action<SterlingLogLevel, string, Exception> log);
+        Guid RegisterLogger(Action<SterlingLogLevel, string, Exception> log);        
 
         /// <summary>
         ///     Unhooks a logging mechanism
@@ -50,6 +50,23 @@ namespace Wintellect.Sterling
         /// </summary>
         /// <typeparam name="T">The type of the database to register</typeparam>
         ISterlingDatabaseInstance RegisterDatabase<T>() where T : BaseDatabaseInstance;
+
+        /// <summary>
+        ///     Register a database type with the system
+        /// </summary>
+        /// <typeparam name="T">The type of the database to register</typeparam>
+        /// <typeparam name="TDriver">Register with a driver</typeparam>
+        ISterlingDatabaseInstance RegisterDatabase<T, TDriver>()
+            where T : BaseDatabaseInstance
+            where TDriver : ISterlingDriver;
+
+        /// <summary>
+        ///     Register a database type with the system
+        /// </summary>
+        /// <typeparam name="T">The type of the database to register</typeparam>
+        ISterlingDatabaseInstance RegisterDatabase<T>(ISterlingDriver driver)
+            where T : BaseDatabaseInstance;           
+
 
         /// <summary>
         ///     Retrieve the database with the name

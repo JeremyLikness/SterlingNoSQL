@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using Wintellect.Sterling.Exceptions;
 using Wintellect.Sterling.Indexes;
-using Wintellect.Sterling.IsolatedStorage;
 using Wintellect.Sterling.Keys;
-using Wintellect.Sterling.Serialization;
 
 namespace Wintellect.Sterling.Database
 {
@@ -13,29 +11,23 @@ namespace Wintellect.Sterling.Database
     /// </summary>
     internal class TableDefinition<T,TKey> : ITableDefinition where T: class, new()
     {
-        private readonly PathProvider _pathProvider;
         private readonly Func<TKey, T> _resolver;
-        private Predicate<T> _isDirty; 
-        private readonly ISterlingSerializer _serializer;
-        private readonly string _databaseName;
-           
+        private Predicate<T> _isDirty;
+        private readonly ISterlingDriver _driver;
+
         /// <summary>
         ///     Construct 
         /// </summary>
-        /// <param name="pathProvider">Path provider</param>
-        /// <param name="databaseName">The name of the database</param>
-        /// <param name="serializer">The serializer provider</param>
+        /// <param name="driver">Sterling driver</param>
         /// <param name="resolver">The resolver for the instance</param>
         /// <param name="key">The resolver for the key</param>
-        public TableDefinition(PathProvider pathProvider, string databaseName, ISterlingSerializer serializer, Func<TKey,T> resolver, Func<T,TKey> key)
+        public TableDefinition(ISterlingDriver driver, Func<TKey,T> resolver, Func<T,TKey> key)
         {
+            _driver = driver;
             FetchKey = key;
-            _pathProvider = pathProvider;
             _resolver = resolver;
-            _serializer = serializer;
-            _databaseName = databaseName;
             _isDirty = obj => true;
-            KeyList = new KeyCollection<T, TKey>(pathProvider, databaseName, serializer, resolver);
+            KeyList = new KeyCollection<T, TKey>(driver, resolver);
             Indexes = new Dictionary<string, IIndexCollection>();
         }
 
@@ -69,11 +61,10 @@ namespace Wintellect.Sterling.Database
         {
             if (Indexes.ContainsKey(name))
             {
-                throw new SterlingDuplicateIndexException(name, typeof(T), _databaseName);
+                throw new SterlingDuplicateIndexException(name, typeof(T), _driver.DatabaseName);
             }
 
-            var indexCollection = new IndexCollection<T, TIndex, TKey>(name, _pathProvider,
-                _databaseName, _serializer, indexer, _resolver);
+            var indexCollection = new IndexCollection<T, TIndex, TKey>(name, _driver, indexer, _resolver);
             
             Indexes.Add(name, indexCollection);
         }
@@ -89,11 +80,10 @@ namespace Wintellect.Sterling.Database
         {
             if (Indexes.ContainsKey(name))
             {
-                throw new SterlingDuplicateIndexException(name, typeof(T), _databaseName);
+                throw new SterlingDuplicateIndexException(name, typeof(T), _driver.DatabaseName);
             }
 
-            var indexCollection = new IndexCollection<T, TIndex1, TIndex2, TKey>(name, _pathProvider,
-                _databaseName, _serializer, indexer, _resolver);
+            var indexCollection = new IndexCollection<T, TIndex1, TIndex2, TKey>(name, _driver, indexer, _resolver);
 
             Indexes.Add(name, indexCollection);
         }

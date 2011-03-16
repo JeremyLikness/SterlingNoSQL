@@ -2,7 +2,6 @@
 using Microsoft.Silverlight.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Database;
-using Wintellect.Sterling.IsolatedStorage;
 using Wintellect.Sterling.Serialization;
 using Wintellect.Sterling.Test.Helpers;
 
@@ -36,21 +35,13 @@ namespace Wintellect.Sterling.Test.Database
         [TestInitialize]
         public void TestInit()
         {
+            var serializer = new AggregateSerializer();
+            serializer.AddSerializer(new DefaultSerializer());
+            serializer.AddSerializer(new ExtendedSerializer());
             _testAccessCount = 0;
-            SterlingFactory.GetPathProvider().GetDatabasePath(_testDatabase.Name); // set this up in the indices
-            SterlingFactory.GetPathProvider().GetTablePath<TestModel>(_testDatabase.Name); // set up the table path
-            _target = new TableDefinition<TestModel, int>(SterlingFactory.GetPathProvider(), _testDatabase.Name, new DefaultSerializer(),
+            _target = new TableDefinition<TestModel, int>(new MemoryDriver(_testDatabase.Name, serializer, SterlingFactory.GetLogger().Log),
                                                         _GetTestModelByKey, t => t.Key);
-        }
-
-        [TestCleanup]
-        public void TestDone()
-        {
-            var iso = new IsoStorageHelper();
-            {
-                iso.Purge(PathProvider.BASE);
-            }
-        }
+        }        
 
         [TestMethod]
         public void TestConstruction()
@@ -58,7 +49,7 @@ namespace Wintellect.Sterling.Test.Database
             Assert.AreEqual(typeof(TestModel), _target.TableType, "Table type mismatch.");
             Assert.AreEqual(typeof(int), _target.KeyType, "Key type mismatch.");
             var key = _target.FetchKey(_models[1]);
-            Assert.AreEqual(_models[1].Key, key, "Key mismatch after fetch key invoked.");            
+            Assert.AreEqual(_models[1].Key, key, "Key mismatch after fetch key invoked.");
         }
     }
 }

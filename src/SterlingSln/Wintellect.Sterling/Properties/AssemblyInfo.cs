@@ -35,3 +35,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
 [assembly: InternalsVisibleTo("Wintellect.Sterling.Test")]
+[assembly: InternalsVisibleTo("Wintellect.Sterling.Test.Helpers")]
+[assembly: InternalsVisibleTo("Wintellect.Sterling.IsolatedStorage.Test")]

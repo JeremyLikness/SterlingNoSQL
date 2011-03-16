@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using SterlingExample.Database;
 using Wintellect.Sterling;
+using Wintellect.Sterling.IsolatedStorage;
 
 namespace SterlingExample
 {
@@ -19,7 +20,9 @@ namespace SterlingExample
         public const long QUOTA = 100*MEGABYTE;
 
         private SterlingEngine _engine;
-        
+        private static readonly ISterlingDriver _driver = new IsolatedStorageDriver(); // could use this: new MemoryDriver(); 
+
+
         private MainPage _mainPage;
 
         public UserControl MainVisual
@@ -54,7 +57,7 @@ namespace SterlingExample
 
             Current._engine = new SterlingEngine();
             Current._engine.Activate();
-            Current.Database = Current._engine.SterlingDatabase.RegisterDatabase<FoodDatabase>();
+            Current.Database = Current._engine.SterlingDatabase.RegisterDatabase<FoodDatabase>(_driver);
         }
 
         /// <summary>
@@ -98,7 +101,7 @@ namespace SterlingExample
             }
            
             _engine.Activate();
-            Database = _engine.SterlingDatabase.RegisterDatabase<FoodDatabase>();
+            Database = _engine.SterlingDatabase.RegisterDatabase<FoodDatabase>(_driver);
 
             _mainPage = new MainPage();
             Application.Current.RootVisual = _mainPage;

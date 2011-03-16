@@ -24,7 +24,7 @@ namespace SterlingExample.Database
         ///     Method called from the constructor to register tables
         /// </summary>
         /// <returns>The list of tables for the database</returns>
-        protected override List<ITableDefinition> _RegisterTables()
+        protected override List<ITableDefinition> RegisterTables()
         {
             return new List<ITableDefinition>
                        {

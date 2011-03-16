@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Wintellect.Sterling.Exceptions;
-using Wintellect.Sterling.IsolatedStorage;
-using Wintellect.Sterling.Serialization;
 
 namespace Wintellect.Sterling.Keys
 {
@@ -13,10 +9,8 @@ namespace Wintellect.Sterling.Keys
     /// </summary>
     internal class KeyCollection<T,TKey> : IKeyCollection where T: class, new()
     {
-        private readonly PathProvider _pathProvider;
-        private readonly string _databaseName;
         private readonly Func<TKey, T> _resolver;
-        private readonly ISterlingSerializer _serializer;
+        private readonly ISterlingDriver _driver;
         
         /// <summary>
         ///     Set when keys change
@@ -26,24 +20,13 @@ namespace Wintellect.Sterling.Keys
         /// <summary>
         ///     Initialize the key collection
         /// </summary>
-        /// <param name="pathProvider">Path provider</param>
-        /// <param name="databaseName">Name of the database</param>
-        /// <param name="serializer">The serializer it can use to write/restore keys</param>
+        /// <param name="driver">Driver</param>
         /// <param name="resolver">The resolver for loading the object</param>
-        public KeyCollection(PathProvider pathProvider, string databaseName, ISterlingSerializer serializer, Func<TKey,T> resolver)
+        public KeyCollection(ISterlingDriver driver, Func<TKey,T> resolver)
         {
-            _pathProvider = pathProvider;
-            _resolver = resolver;
-            _databaseName = databaseName;
-            _serializer = serializer;
-
-            if (!serializer.CanSerialize<TKey>())
-            {
-                throw new SterlingSerializerException(serializer,typeof(TKey));
-            }
-
+            _driver = driver;
+            _resolver = resolver;                       
             _DeserializeKeys();
-
             IsDirty = false;        
         }        
 
@@ -67,32 +50,25 @@ namespace Wintellect.Sterling.Keys
             _keyList.Clear();
             _keyMap.Clear();
 
-            var path = _pathProvider.GetKeysPath<T>(_databaseName);
-            var iso = new IsoStorageHelper();
+            var keyMap = _driver.DeserializeKeys<TKey>(typeof (T)) ?? new Dictionary<TKey, int>();
+
+            if (keyMap.Count > 0)
             {
-                if (iso.FileExists(path))
+                foreach (var key in keyMap.Keys)
                 {
-                    using (var br = iso.GetReader(path))
+                    var idx = keyMap[key];
+                    if (idx >= NextKey)
                     {
-                        var count = br.ReadInt32();
-                        for(var i = 0; i < count; i++)
-                        {
-                            var key = _serializer.Deserialize<TKey>(br);
-                            var idx = br.ReadInt32();
-                            if (idx >= NextKey)
-                            {
-                                NextKey = idx + 1;
-                            }
-                            _keyMap.Add(key, idx);
-                            _keyList.Add(new TableKey<T, TKey>(key, _resolver));
-                        }
+                        NextKey = idx + 1;
                     }
-                }
-                else
-                {
-                    NextKey = 0;
+                    _keyMap.Add(key, idx);
+                    _keyList.Add(new TableKey<T, TKey>(key, _resolver));
                 }
             }
+            else
+            {
+                NextKey = 0;
+            }            
         }
 
         /// <summary>
@@ -100,20 +76,7 @@ namespace Wintellect.Sterling.Keys
         /// </summary>
         private void _SerializeKeys()
         {
-            var iso = new IsoStorageHelper();
-            {
-                iso.EnsureDirectory(_pathProvider.GetDatabasePath(_databaseName));
-                iso.EnsureDirectory(_pathProvider.GetTablePath<T>(_databaseName));
-                using (var bw = iso.GetWriter(_pathProvider.GetKeysPath<T>(_databaseName)))
-                {
-                    bw.Write(_keyMap.Count);
-                    foreach(var key in _keyMap.Keys)
-                    {
-                        _serializer.Serialize(key, bw);
-                        bw.Write(_keyMap[key]);
-                    }
-                }
-            }
+            _driver.SerializeKeys(typeof(T), _keyMap);            
         }
 
         /// <summary>

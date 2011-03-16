@@ -16,6 +16,11 @@ namespace Wintellect.Sterling
     public interface ISterlingDatabaseInstance : ISterlingLock 
     {
         /// <summary>
+        ///     The driver
+        /// </summary>
+        ISterlingDriver Driver { get; }
+
+        /// <summary>
         ///     Register a trigger
         /// </summary>
         /// <param name="trigger">The trigger</param>

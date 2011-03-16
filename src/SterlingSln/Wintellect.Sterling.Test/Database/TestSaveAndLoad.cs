@@ -5,7 +5,6 @@ using System.Linq;
 using Microsoft.Silverlight.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Exceptions;
-using Wintellect.Sterling.IsolatedStorage;
 using Wintellect.Sterling.Test.Helpers;
 
 namespace Wintellect.Sterling.Test.Database
@@ -16,24 +15,23 @@ namespace Wintellect.Sterling.Test.Database
     {
         private SterlingEngine _engine;
         private ISterlingDatabaseInstance _databaseInstance;
+        private readonly ISterlingDriver _driver = new MemoryDriver();
 
         [TestInitialize]
         public void TestInit()
         {
             _engine = new SterlingEngine();
             _engine.Activate();
-            _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestDatabaseInstance>();
+            _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestDatabaseInstance>(_driver);
+            _databaseInstance.Purge();
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
             _engine.Dispose();
-            _databaseInstance = null;
-            var iso = new IsoStorageHelper();
-            {
-                iso.Purge(PathProvider.BASE);
-            }
+            _databaseInstance.Purge();
+            _databaseInstance = null;            
         }
 
         [TestMethod]
@@ -106,6 +104,7 @@ namespace Wintellect.Sterling.Test.Database
             // shut it down
 
             _engine.Dispose();
+            var driver = _databaseInstance.Driver; 
             _databaseInstance = null;
 
             SterlingFactory.Initialize(); // simulate an application restart
@@ -113,7 +112,7 @@ namespace Wintellect.Sterling.Test.Database
             // bring it back up
             _engine = new SterlingEngine();
             _engine.Activate();
-            _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestDatabaseInstance>();
+            _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestDatabaseInstance>(driver);
 
             var actual1 = _databaseInstance.Load<TestModel>(expected1.Key);
             var actual2 = _databaseInstance.Load<TestModel>(expected2.Key);

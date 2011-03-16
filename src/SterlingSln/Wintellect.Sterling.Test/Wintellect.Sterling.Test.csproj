@@ -94,7 +94,6 @@
     <Compile Include="Database\TestInterfaceProperty.cs" />
     <Compile Include="Database\TestLists.cs" />
     <Compile Include="Database\TestNullable.cs" />
-    <Compile Include="Database\TestPathProvider.cs" />
     <Compile Include="Database\TestPurge.cs" />
     <Compile Include="Database\TestQuery.cs" />
     <Compile Include="Database\TestRegistration.cs" />
@@ -103,31 +102,8 @@
     <Compile Include="Database\TestTriggers.cs" />
     <Compile Include="Database\TestTruncate.cs" />
     <Compile Include="Database\TestWriteableBitmap.cs" />
-    <Compile Include="Helpers\BadDatabaseInstance.cs" />
-    <Compile Include="Helpers\DupDatabaseInstance.cs" />
-    <Compile Include="Helpers\ExceptionHelper.cs" />
-    <Compile Include="Helpers\TestAggregateListModel.cs" />
-    <Compile Include="Helpers\TestAggregateModel.cs" />
-    <Compile Include="Helpers\TestBaseClassModel.cs" />
-    <Compile Include="Helpers\TestClassWithArray.cs" />
-    <Compile Include="Helpers\TestClassWithDictionary.cs" />
-    <Compile Include="Helpers\TestClassWithStruct.cs" />
-    <Compile Include="Helpers\TestCompositeClass.cs" />
-    <Compile Include="Helpers\TestCompositeKeyClass.cs" />
-    <Compile Include="Helpers\TestCompositeSerializer.cs" />
-    <Compile Include="Helpers\TestDatabaseInstance.cs" />
     <Compile Include="Database\TestTableDefinition.cs" />
-    <Compile Include="Helpers\TestDatabaseInstanceComposite.cs" />
-    <Compile Include="Helpers\TestDatabaseInterfaceInstance.cs" />
-    <Compile Include="Helpers\TestDerivedClassAModel.cs" />
-    <Compile Include="Helpers\TestDerivedClassBModel.cs" />
-    <Compile Include="Helpers\TestForeignModel.cs" />
-    <Compile Include="Helpers\TestListModel.cs" />
-    <Compile Include="Helpers\TestModel.cs" />
-    <Compile Include="Helpers\TestModelAsList.cs" />
-    <Compile Include="Helpers\TestSerializer.cs" />
     <Compile Include="Indexes\TestSingleIndex.cs" />
-    <Compile Include="IsolatedStorage\TestIsoHelper.cs" />
     <Compile Include="Keys\TestCompositeKey.cs" />
     <Compile Include="Keys\TestCompositeKeyWithKeyClass.cs" />
     <Compile Include="Keys\TestKeyCollection.cs" />
@@ -150,9 +126,12 @@
   <ItemGroup>
     <Content Include="Binaries\Microsoft.Silverlight.Testing.dll" />
     <Content Include="Binaries\Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight.dll" />
-    <Resource Include="Helpers\Sterling-Final-Small.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Wintellect.Sterling.Test.Helpers\Wintellect.Sterling.Test.Helpers.csproj">
+      <Project>{43ADDFBF-5B60-4B82-B25D-3B72E08A5BA0}</Project>
+      <Name>Wintellect.Sterling.Test.Helpers</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Wintellect.Sterling\Wintellect.Sterling.csproj">
       <Project>{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}</Project>
       <Name>Wintellect.Sterling</Name>

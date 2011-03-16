@@ -1,5 +1,4 @@
 ﻿using Wintellect.Sterling.Database;
-using Wintellect.Sterling.IsolatedStorage;
 
 namespace Wintellect.Sterling
 {
@@ -16,12 +15,7 @@ namespace Wintellect.Sterling
         /// <summary>
         ///     The log manager
         /// </summary>
-        private static LogManager _logManager;
-
-        /// <summary>
-        ///     Path provider
-        /// </summary>
-        private static PathProvider _pathProvider;
+        private static LogManager _logManager;     
 
         static SterlingFactory()
         {
@@ -30,8 +24,7 @@ namespace Wintellect.Sterling
 
         internal static void Initialize()
         {
-            _logManager = new LogManager();
-            _pathProvider = new PathProvider(_logManager);
+            _logManager = new LogManager();          
             _database = new SterlingDatabase(_logManager);
         }
 
@@ -51,15 +44,6 @@ namespace Wintellect.Sterling
         internal static LogManager GetLogger()
         {
             return _logManager;
-        }
-
-        /// <summary>
-        ///     Path provider
-        /// </summary>
-        /// <returns>The path provider</returns>
-        internal static PathProvider GetPathProvider()
-        {
-            return _pathProvider;
-        }
+        }        
     }
 }

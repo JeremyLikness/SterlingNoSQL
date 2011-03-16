@@ -13,21 +13,23 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SterlingExample.Model", "St
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SterlingExample.DbGenerator", "SterlingExample.DbGenerator\SterlingExample.DbGenerator.csproj", "{63382B93-CFE9-4F82-A3F1-9D1381012022}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.IsolatedStorage", "Wintellect.Sterling.IsolatedStorage\Wintellect.Sterling.IsolatedStorage.csproj", "{A74165EA-9D13-49CE-84AC-155468B90071}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 7
+		SccNumberOfProjects = 8
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
-		SccProjectUniqueName0 = SterlingExample.Web\\SterlingExample.Web.csproj
-		SccProjectName0 = SterlingExample.Web
-		SccLocalPath0 = SterlingExample.Web
-		SccProjectUniqueName1 = Wintellect.Sterling\\Wintellect.Sterling.csproj
-		SccProjectName1 = Wintellect.Sterling
-		SccLocalPath1 = Wintellect.Sterling
-		SccProjectUniqueName2 = SterlingExample\\SterlingExample.csproj
-		SccProjectName2 = SterlingExample
-		SccLocalPath2 = SterlingExample
-		SccLocalPath3 = .
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = SterlingExample.Web\\SterlingExample.Web.csproj
+		SccProjectName1 = SterlingExample.Web
+		SccLocalPath1 = SterlingExample.Web
+		SccProjectUniqueName2 = Wintellect.Sterling\\Wintellect.Sterling.csproj
+		SccProjectName2 = Wintellect.Sterling
+		SccLocalPath2 = Wintellect.Sterling
+		SccProjectUniqueName3 = SterlingExample\\SterlingExample.csproj
+		SccProjectName3 = SterlingExample
+		SccLocalPath3 = SterlingExample
 		SccProjectUniqueName4 = SterlingExample.Database\\SterlingExample.Database.csproj
 		SccProjectName4 = SterlingExample.Database
 		SccLocalPath4 = SterlingExample.Database
@@ -37,6 +39,9 @@ Global
 		SccProjectUniqueName6 = SterlingExample.DbGenerator\\SterlingExample.DbGenerator.csproj
 		SccProjectName6 = SterlingExample.DbGenerator
 		SccLocalPath6 = SterlingExample.DbGenerator
+		SccProjectUniqueName7 = Wintellect.Sterling.IsolatedStorage\\Wintellect.Sterling.IsolatedStorage.csproj
+		SccProjectName7 = Wintellect.Sterling.IsolatedStorage
+		SccLocalPath7 = Wintellect.Sterling.IsolatedStorage
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +72,10 @@ Global
 		{63382B93-CFE9-4F82-A3F1-9D1381012022}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{63382B93-CFE9-4F82-A3F1-9D1381012022}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63382B93-CFE9-4F82-A3F1-9D1381012022}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A74165EA-9D13-49CE-84AC-155468B90071}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A74165EA-9D13-49CE-84AC-155468B90071}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A74165EA-9D13-49CE-84AC-155468B90071}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A74165EA-9D13-49CE-84AC-155468B90071}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

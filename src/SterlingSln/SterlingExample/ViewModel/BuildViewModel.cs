@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.IO.IsolatedStorage;
 using System.Windows;
 
 namespace SterlingExample.ViewModel
@@ -24,9 +23,7 @@ namespace SterlingExample.ViewModel
                     Tuple.Create<string, bool, Action<BackgroundWorker, DoWorkEventArgs>>
                         ("Restore the Database (this may take several minutes)", true, _Step2Worker),
                     Tuple.Create<string, bool, Action<BackgroundWorker, DoWorkEventArgs>>
-                        ("Restore the Type Master", true, _Step3Worker),
-                    Tuple.Create<string, bool, Action<BackgroundWorker, DoWorkEventArgs>>
-                        ("Restart the Database", true, _Step4Worker)                    
+                        ("Restart the Database", true, _Step3Worker)                    
                 };
 
         private int _idx;
@@ -113,40 +110,7 @@ namespace SterlingExample.ViewModel
                 }
             }      
             SterlingService.ShutDownDatabase();
-        }
-
-        /// <summary>
-        ///     Step 3 - types
-        /// </summary>
-        /// <param name="o"></param>
-        /// <param name="e"></param>
-        private static void _Step3Worker(BackgroundWorker o, DoWorkEventArgs e)
-        {
-            const int BUF_SIZE = 4096;
-            using (var stream = Application.GetResourceStream(new Uri("DatabaseImage/types.dat", UriKind.Relative)).Stream)
-            {
-                using (var br = new BinaryReader(stream))
-                {
-                    using (var bw = IsolatedStorageFile.GetUserStoreForApplication().OpenFile("Sterling/types.dat", FileMode.Create, FileAccess.Write))
-                    {
-                        var buffer = new byte[BUF_SIZE];
-                        var done = false;
-                        while (!done)
-                        {
-                            var cnt = br.Read(buffer, 0, BUF_SIZE);
-                            if (cnt > 0)
-                            {
-                                bw.Write(buffer, 0, cnt);
-                            }
-                            if (cnt < BUF_SIZE)
-                            {
-                                done = true;
-                            }
-                        }
-                    }
-                }
-            }            
-        }
+        }        
 
 
         /// <summary>
@@ -154,7 +118,7 @@ namespace SterlingExample.ViewModel
         /// </summary>
         /// <param name="o"></param>
         /// <param name="e"></param>
-        private static void _Step4Worker(BackgroundWorker o, DoWorkEventArgs e)
+        private static void _Step3Worker(BackgroundWorker o, DoWorkEventArgs e)
         {
             SterlingService.StartUpDatabase();
         }
