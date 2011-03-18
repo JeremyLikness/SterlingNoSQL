@@ -36,7 +36,12 @@ namespace Wintellect.Sterling.IsolatedStorage
         {
             if (_iso != null) return;
 
-            _iso = siteWide ? IsolatedStorageFile.GetUserStoreForSite() : IsolatedStorageFile.GetUserStoreForApplication();
+            _iso = 
+#if WINDOWS_PHONE
+#else
+                siteWide ? IsolatedStorageFile.GetUserStoreForSite() :
+#endif
+                IsolatedStorageFile.GetUserStoreForApplication();
         }
 
         /// <summary>
@@ -199,7 +204,7 @@ namespace Wintellect.Sterling.IsolatedStorage
                 }
 
                 var dirPath = path.TrimEnd('\\', '/');
-                if (_iso.DirectoryExists(dirPath))
+                if (!string.IsNullOrEmpty(dirPath) && _iso.DirectoryExists(dirPath))
                 {
                     _iso.DeleteDirectory(dirPath);                   
                 }

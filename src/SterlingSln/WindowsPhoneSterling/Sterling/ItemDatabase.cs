@@ -50,7 +50,7 @@ namespace WindowsPhoneSterling.Sterling
             get { return "ItemDatabase"; }
         }
 
-        protected override System.Collections.Generic.List<ITableDefinition> _RegisterTables()
+        protected override System.Collections.Generic.List<ITableDefinition> RegisterTables()
         {
             return new System.Collections.Generic.List<ITableDefinition>
             {

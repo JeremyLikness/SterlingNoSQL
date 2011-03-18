@@ -1,0 +1,123 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SterlingBuild", "SterlingBuild\SterlingBuild.csproj", "{BF8338C3-A3BE-42C3-BA6B-669DC584A6E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling", "..\Wintellect.Sterling\Wintellect.Sterling.csproj", "{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.IsolatedStorage", "..\Wintellect.Sterling.IsolatedStorage\Wintellect.Sterling.IsolatedStorage.csproj", "{A74165EA-9D13-49CE-84AC-155468B90071}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.Test", "..\Wintellect.Sterling.Test\Wintellect.Sterling.Test.csproj", "{AD90F146-A1D9-4925-9301-FE864CAEC7C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.Test.Helpers", "..\Wintellect.Sterling.Test.Helpers\Wintellect.Sterling.Test.Helpers.csproj", "{43ADDFBF-5B60-4B82-B25D-3B72E08A5BA0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.WindowsPhone", "..\Wintellect.Sterling.WindowsPhone\Wintellect.Sterling.WindowsPhone.csproj", "{7842BE18-DAE7-408A-8863-7C0DE2FFB9D8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.WindowsPhone.Test", "..\Wintellect.Sterling.WindowsPhone.Test\Wintellect.Sterling.WindowsPhone.Test.csproj", "{D6DBEA81-0DF4-4B60-8D5E-3212AB9F0B5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.WindowsPhone.Test.Helpers", "..\Wintellect.Sterling.WindowsPhone.Test.Helpers\Wintellect.Sterling.WindowsPhone.Test.Helpers.csproj", "{EE8F8C13-3C64-4E87-8A55-17DAD6B31485}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.IsolatedStorage.Test", "..\Wintellect.Sterling.IsolatedStorage.Test\Wintellect.Sterling.IsolatedStorage.Test.csproj", "{ACDEF80B-2D6D-4B90-A766-6B636F14257E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.WindowsPhone.IsolatedStorage.Test", "..\Wintellect.Sterling.WindowsPhone.IsolatedStorage.Test\Wintellect.Sterling.WindowsPhone.IsolatedStorage.Test.csproj", "{4D69AB6D-1B8C-473D-B382-F7FEC9ACC0F9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.WindowsPhone.IsolatedStorage", "..\Wintellect.Sterling.WindowsPhone.IsolatedStorage\Wintellect.Sterling.WindowsPhone.IsolatedStorage.csproj", "{E4E978F2-3A8B-45D3-8157-4002A9BECF2B}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 12
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = ..\\Wintellect.Sterling\\Wintellect.Sterling.csproj
+		SccProjectName1 = ../Wintellect.Sterling
+		SccLocalPath1 = ..\\Wintellect.Sterling
+		SccProjectUniqueName2 = ..\\Wintellect.Sterling.IsolatedStorage\\Wintellect.Sterling.IsolatedStorage.csproj
+		SccProjectName2 = ../Wintellect.Sterling.IsolatedStorage
+		SccLocalPath2 = ..\\Wintellect.Sterling.IsolatedStorage
+		SccProjectUniqueName3 = ..\\Wintellect.Sterling.Test\\Wintellect.Sterling.Test.csproj
+		SccProjectName3 = ../Wintellect.Sterling.Test
+		SccLocalPath3 = ..\\Wintellect.Sterling.Test
+		SccProjectUniqueName4 = ..\\Wintellect.Sterling.Test.Helpers\\Wintellect.Sterling.Test.Helpers.csproj
+		SccProjectName4 = ../Wintellect.Sterling.Test.Helpers
+		SccLocalPath4 = ..\\Wintellect.Sterling.Test.Helpers
+		SccProjectUniqueName5 = ..\\Wintellect.Sterling.WindowsPhone\\Wintellect.Sterling.WindowsPhone.csproj
+		SccProjectName5 = ../Wintellect.Sterling.WindowsPhone
+		SccLocalPath5 = ..\\Wintellect.Sterling.WindowsPhone
+		SccProjectUniqueName6 = ..\\Wintellect.Sterling.WindowsPhone.Test\\Wintellect.Sterling.WindowsPhone.Test.csproj
+		SccProjectName6 = ../Wintellect.Sterling.WindowsPhone.Test
+		SccLocalPath6 = ..\\Wintellect.Sterling.WindowsPhone.Test
+		SccProjectUniqueName7 = SterlingBuild\\SterlingBuild.csproj
+		SccProjectName7 = SterlingBuild
+		SccLocalPath7 = SterlingBuild
+		SccProjectUniqueName8 = ..\\Wintellect.Sterling.WindowsPhone.Test.Helpers\\Wintellect.Sterling.WindowsPhone.Test.Helpers.csproj
+		SccProjectName8 = ../Wintellect.Sterling.WindowsPhone.Test.Helpers
+		SccLocalPath8 = ..\\Wintellect.Sterling.WindowsPhone.Test.Helpers
+		SccProjectUniqueName9 = ..\\Wintellect.Sterling.IsolatedStorage.Test\\Wintellect.Sterling.IsolatedStorage.Test.csproj
+		SccProjectName9 = ../Wintellect.Sterling.IsolatedStorage.Test
+		SccLocalPath9 = ..\\Wintellect.Sterling.IsolatedStorage.Test
+		SccProjectUniqueName10 = ..\\Wintellect.Sterling.WindowsPhone.IsolatedStorage.Test\\Wintellect.Sterling.WindowsPhone.IsolatedStorage.Test.csproj
+		SccProjectName10 = ../Wintellect.Sterling.WindowsPhone.IsolatedStorage.Test
+		SccLocalPath10 = ..\\Wintellect.Sterling.WindowsPhone.IsolatedStorage.Test
+		SccProjectUniqueName11 = ..\\Wintellect.Sterling.WindowsPhone.IsolatedStorage\\Wintellect.Sterling.WindowsPhone.IsolatedStorage.csproj
+		SccProjectName11 = ../Wintellect.Sterling.WindowsPhone.IsolatedStorage
+		SccLocalPath11 = ..\\Wintellect.Sterling.WindowsPhone.IsolatedStorage
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BF8338C3-A3BE-42C3-BA6B-669DC584A6E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF8338C3-A3BE-42C3-BA6B-669DC584A6E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF8338C3-A3BE-42C3-BA6B-669DC584A6E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF8338C3-A3BE-42C3-BA6B-669DC584A6E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A74165EA-9D13-49CE-84AC-155468B90071}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A74165EA-9D13-49CE-84AC-155468B90071}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A74165EA-9D13-49CE-84AC-155468B90071}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A74165EA-9D13-49CE-84AC-155468B90071}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD90F146-A1D9-4925-9301-FE864CAEC7C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD90F146-A1D9-4925-9301-FE864CAEC7C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD90F146-A1D9-4925-9301-FE864CAEC7C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD90F146-A1D9-4925-9301-FE864CAEC7C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43ADDFBF-5B60-4B82-B25D-3B72E08A5BA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43ADDFBF-5B60-4B82-B25D-3B72E08A5BA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43ADDFBF-5B60-4B82-B25D-3B72E08A5BA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43ADDFBF-5B60-4B82-B25D-3B72E08A5BA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7842BE18-DAE7-408A-8863-7C0DE2FFB9D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7842BE18-DAE7-408A-8863-7C0DE2FFB9D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7842BE18-DAE7-408A-8863-7C0DE2FFB9D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7842BE18-DAE7-408A-8863-7C0DE2FFB9D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6DBEA81-0DF4-4B60-8D5E-3212AB9F0B5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6DBEA81-0DF4-4B60-8D5E-3212AB9F0B5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6DBEA81-0DF4-4B60-8D5E-3212AB9F0B5B}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{D6DBEA81-0DF4-4B60-8D5E-3212AB9F0B5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6DBEA81-0DF4-4B60-8D5E-3212AB9F0B5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6DBEA81-0DF4-4B60-8D5E-3212AB9F0B5B}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{EE8F8C13-3C64-4E87-8A55-17DAD6B31485}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE8F8C13-3C64-4E87-8A55-17DAD6B31485}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE8F8C13-3C64-4E87-8A55-17DAD6B31485}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE8F8C13-3C64-4E87-8A55-17DAD6B31485}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACDEF80B-2D6D-4B90-A766-6B636F14257E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACDEF80B-2D6D-4B90-A766-6B636F14257E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACDEF80B-2D6D-4B90-A766-6B636F14257E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACDEF80B-2D6D-4B90-A766-6B636F14257E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D69AB6D-1B8C-473D-B382-F7FEC9ACC0F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D69AB6D-1B8C-473D-B382-F7FEC9ACC0F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D69AB6D-1B8C-473D-B382-F7FEC9ACC0F9}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{4D69AB6D-1B8C-473D-B382-F7FEC9ACC0F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D69AB6D-1B8C-473D-B382-F7FEC9ACC0F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D69AB6D-1B8C-473D-B382-F7FEC9ACC0F9}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{E4E978F2-3A8B-45D3-8157-4002A9BECF2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4E978F2-3A8B-45D3-8157-4002A9BECF2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4E978F2-3A8B-45D3-8157-4002A9BECF2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4E978F2-3A8B-45D3-8157-4002A9BECF2B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

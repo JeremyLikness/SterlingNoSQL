@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Wintellect.Sterling.Database;
@@ -26,18 +27,19 @@ namespace Wintellect.Sterling
         /// <summary>
         ///     Serialize the keys
         /// </summary>
-        /// <typeparam name="TKey">Type of the key</typeparam>
         /// <param name="type">Type of the parent table</param>
+        /// <param name="keyType">Type of the key</param>
         /// <param name="keyMap">Key map</param>
-        void SerializeKeys<TKey>(Type type, Dictionary<TKey, int> keyMap);
+        void SerializeKeys(Type type, Type keyType, IDictionary keyMap);
 
         /// <summary>
-        ///     Deserialize the keys
+        ///     Deserialize keys without generics
         /// </summary>
-        /// <typeparam name="TKey">Type of the key</typeparam>
-        /// <param name="type">Type of the parent table</param>
-        /// <returns>The key list</returns>
-        Dictionary<TKey, int> DeserializeKeys<TKey>(Type type);
+        /// <param name="type">The type</param>
+        /// <param name="keyType">Type of the key</param>
+        /// <param name="template">The template</param>
+        /// <returns>The keys without the template</returns>
+        IDictionary DeserializeKeys(Type type, Type keyType, IDictionary template);
 
         /// <summary>
         ///     Serialize a single index 

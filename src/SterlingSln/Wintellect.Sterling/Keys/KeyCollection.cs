@@ -50,19 +50,19 @@ namespace Wintellect.Sterling.Keys
             _keyList.Clear();
             _keyMap.Clear();
 
-            var keyMap = _driver.DeserializeKeys<TKey>(typeof (T)) ?? new Dictionary<TKey, int>();
+            var keyMap = _driver.DeserializeKeys(typeof (T), typeof(TKey), new Dictionary<TKey, int>()) ?? new Dictionary<TKey, int>();
 
             if (keyMap.Count > 0)
             {
                 foreach (var key in keyMap.Keys)
                 {
-                    var idx = keyMap[key];
+                    var idx = (int)keyMap[key];
                     if (idx >= NextKey)
                     {
                         NextKey = idx + 1;
                     }
-                    _keyMap.Add(key, idx);
-                    _keyList.Add(new TableKey<T, TKey>(key, _resolver));
+                    _keyMap.Add((TKey)key, idx);
+                    _keyList.Add(new TableKey<T, TKey>((TKey)key, _resolver));
                 }
             }
             else
@@ -76,7 +76,7 @@ namespace Wintellect.Sterling.Keys
         /// </summary>
         private void _SerializeKeys()
         {
-            _driver.SerializeKeys(typeof(T), _keyMap);            
+            _driver.SerializeKeys(typeof(T), typeof(TKey), _keyMap);            
         }
 
         /// <summary>

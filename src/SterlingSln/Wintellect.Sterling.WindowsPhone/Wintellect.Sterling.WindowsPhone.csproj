@@ -59,6 +59,9 @@
     <Compile Include="..\Wintellect.Sterling\Database\BaseDatabaseInstance.cs">
       <Link>Database\BaseDatabaseInstance.cs</Link>
     </Compile>
+    <Compile Include="..\Wintellect.Sterling\Database\BaseDriver.cs">
+      <Link>Database\BaseDriver.cs</Link>
+    </Compile>
     <Compile Include="..\Wintellect.Sterling\Database\BaseSterlingByteInterceptor.cs">
       <Link>Database\BaseSterlingByteInterceptor.cs</Link>
     </Compile>
@@ -79,9 +82,6 @@
     </Compile>
     <Compile Include="..\Wintellect.Sterling\Database\LogManager.cs">
       <Link>Database\LogManager.cs</Link>
-    </Compile>
-    <Compile Include="..\Wintellect.Sterling\Database\PathLock.cs">
-      <Link>Database\PathLock.cs</Link>
     </Compile>
     <Compile Include="..\Wintellect.Sterling\Database\SterlingDatabase.cs">
       <Link>Database\SterlingDatabase.cs</Link>
@@ -158,12 +158,6 @@
     <Compile Include="..\Wintellect.Sterling\Indexes\TableIndex2.cs">
       <Link>Indexes\TableIndex2.cs</Link>
     </Compile>
-    <Compile Include="..\Wintellect.Sterling\IsolatedStorage\IsoStorageHelper.cs">
-      <Link>IsolatedStorage\IsoStorageHelper.cs</Link>
-    </Compile>
-    <Compile Include="..\Wintellect.Sterling\IsolatedStorage\PathProvider.cs">
-      <Link>IsolatedStorage\PathProvider.cs</Link>
-    </Compile>
     <Compile Include="..\Wintellect.Sterling\ISterlingByteInterceptor.cs">
       <Link>ISterlingByteInterceptor.cs</Link>
     </Compile>
@@ -172,6 +166,9 @@
     </Compile>
     <Compile Include="..\Wintellect.Sterling\ISterlingDatabaseInstance.cs">
       <Link>ISterlingDatabaseInstance.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\ISterlingDriver.cs">
+      <Link>ISterlingDriver.cs</Link>
     </Compile>
     <Compile Include="..\Wintellect.Sterling\ISterlingLock.cs">
       <Link>ISterlingLock.cs</Link>
@@ -187,6 +184,9 @@
     </Compile>
     <Compile Include="..\Wintellect.Sterling\Keys\TableKey.cs">
       <Link>Keys\TableKey.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\MemoryDriver.cs">
+      <Link>MemoryDriver.cs</Link>
     </Compile>
     <Compile Include="..\Wintellect.Sterling\Serialization\AggregateSerializer.cs">
       <Link>Serialization\AggregateSerializer.cs</Link>
@@ -242,6 +242,9 @@
     <Content Include="..\Wintellect.Sterling\SterlingLicense.txt">
       <Link>SterlingLicense.txt</Link>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="IsolatedStorage\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />

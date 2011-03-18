@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -95,18 +94,13 @@ namespace Wintellect.Sterling.Database
             {
                 writer.Write(type);
             }
-            
-            // template for making a method to get a typed key dictionary
-            var deserializeKeys = database.Driver.GetType().GetMethod("DeserializeKeys").GetGenericMethodDefinition();
-
+                        
             // now iterate tables
             foreach(var table in ((BaseDatabaseInstance)database).TableDefinitions)
-            {
-                // make the key metod for this table 
-                var tableMethod = deserializeKeys.MakeGenericMethod(new[] {table.Value.KeyType});
-                
+            {                
                 // get the key list
-                var keys = tableMethod.Invoke(database.Driver, new[] {table.Key}) as IDictionary;
+                var keys = database.Driver.DeserializeKeys(table.Key, table.Value.KeyType,
+                                                           table.Value.GetNewDictionary());                                        
                 
                 // reality check
                 if (keys == null)
@@ -171,20 +165,11 @@ namespace Wintellect.Sterling.Database
             }
 
             database.Driver.DeserializeTypes(typeMaster);
-
-            // a method to set the keys
-            var serializeKeys = database.Driver.GetType().GetMethod("SerializeKeys").GetGenericMethodDefinition();
-
-            // template for the key dictionary
-            var baseDictionary = typeof (Dictionary<,>);
-
+            
             foreach (var table in ((BaseDatabaseInstance) database).TableDefinitions)
             {
-                var tableMethod = serializeKeys.MakeGenericMethod(new[] {table.Value.KeyType});
-
                 // make the dictionary 
-                var keyDictionaryType = baseDictionary.MakeGenericType(new[] {table.Value.KeyType, typeof (int)});
-                var keyDictionary = Activator.CreateInstance(keyDictionaryType) as IDictionary;
+                var keyDictionary = table.Value.GetNewDictionary();
 
                 if (keyDictionary == null)
                 {
@@ -204,9 +189,8 @@ namespace Wintellect.Sterling.Database
                     database.Driver.Save(table.Key, keyIndex, bytes);
                 }
 
-                // give the driver the key list
-                tableMethod.Invoke(database.Driver, new object[] { table.Key, keyDictionary });
-
+                database.Driver.SerializeKeys(table.Key, table.Value.KeyType, keyDictionary);
+               
                 // now refresh the table
                 table.Value.Refresh();
 

@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using Wintellect.Sterling.Database;
 using Wintellect.Sterling.Serialization;
 
@@ -54,14 +53,14 @@ namespace Wintellect.Sterling.IsolatedStorage
             _iso = new IsoStorageHelper(siteWide);            
             _basePath = basePath; 
         }
-        
+
         /// <summary>
         ///     Serialize the keys
         /// </summary>
-        /// <typeparam name="TKey">Type of the key</typeparam>
         /// <param name="type">Type of the parent table</param>
+        /// <param name="keyType">Type of the key</param>
         /// <param name="keyMap">Key map</param>
-        public override void SerializeKeys<TKey>(Type type, Dictionary<TKey, int> keyMap)
+        public override void SerializeKeys(Type type, Type keyType, IDictionary keyMap)
         {
             _iso.EnsureDirectory(_pathProvider.GetTablePath(_basePath, DatabaseName, type, this));
             var pathLock = PathLock.GetLock(type.FullName);
@@ -74,7 +73,7 @@ namespace Wintellect.Sterling.IsolatedStorage
                     foreach(var key in keyMap.Keys)
                     {
                         DatabaseSerializer.Serialize(key, keyFile);
-                        keyFile.Write(keyMap[key]);
+                        keyFile.Write((int)keyMap[key]);
                     }
                 }
             }
@@ -84,13 +83,13 @@ namespace Wintellect.Sterling.IsolatedStorage
         /// <summary>
         ///     Deserialize the keys
         /// </summary>
-        /// <typeparam name="TKey">Type of the key</typeparam>
         /// <param name="type">Type of the parent table</param>
+        /// <param name="keyType">Type of the key</param>
+        /// <param name="dictionary">Empty dictionary</param>
         /// <returns>The key list</returns>
-        public override Dictionary<TKey, int> DeserializeKeys<TKey>(Type type)
+        public override IDictionary DeserializeKeys(Type type, Type keyType, IDictionary dictionary)
         {
             var keyPath = _pathProvider.GetKeysPath(_basePath, DatabaseName, type, this);
-            var dictionary = new Dictionary<TKey, int>();
             if (_iso.FileExists(keyPath))
             {
                 var pathLock = PathLock.GetLock(type.FullName);
@@ -101,7 +100,7 @@ namespace Wintellect.Sterling.IsolatedStorage
                         var count = keyFile.ReadInt32();
                         for (var x = 0; x < count; x++)
                         {
-                            dictionary.Add((TKey) DatabaseSerializer.Deserialize(typeof (TKey), keyFile),
+                            dictionary.Add(DatabaseSerializer.Deserialize(keyType, keyFile),
                                            keyFile.ReadInt32());
                         }
                     }

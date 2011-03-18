@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Wintellect.Sterling.Exceptions;
 using Wintellect.Sterling.Indexes;
@@ -40,6 +41,15 @@ namespace Wintellect.Sterling.Database
         ///     The key list
         /// </summary>
         public KeyCollection<T, TKey> KeyList { get; private set; }
+
+        /// <summary>
+        ///     Get a new dictionary (creates the generic)
+        /// </summary>
+        /// <returns>The new dictionary instance</returns>
+        public IDictionary GetNewDictionary()
+        {
+            return new Dictionary<TKey, int>();
+        }
 
         /// <summary>
         ///     The index list

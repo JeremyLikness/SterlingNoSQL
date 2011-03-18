@@ -35,14 +35,14 @@ namespace Wintellect.Sterling
         ///     Objects
         /// </summary>
         private readonly Dictionary<Tuple<string,int>, byte[]> _objectCache = new Dictionary<Tuple<string,int>, byte[]>();
-       
+
         /// <summary>
         ///     Serialize the keys
         /// </summary>
-        /// <typeparam name="TKey">Type of the key</typeparam>
         /// <param name="type">Type of the parent table</param>
+        /// <param name="keyType">Type of the key</param>
         /// <param name="keyMap">Key map</param>
-        public override void SerializeKeys<TKey>(Type type, Dictionary<TKey, int> keyMap)
+        public override void SerializeKeys(Type type, Type keyType, IDictionary keyMap)
         {
             lock (((ICollection)_keyCache).SyncRoot)
             {
@@ -51,16 +51,17 @@ namespace Wintellect.Sterling
         }
 
         /// <summary>
-        ///     Deserialize the keys
+        ///     Deserialize keys without generics
         /// </summary>
-        /// <typeparam name="TKey">Type of the key</typeparam>
-        /// <param name="type">Type of the parent table</param>
-        /// <returns>The key list</returns>
-        public override Dictionary<TKey, int> DeserializeKeys<TKey>(Type type)
+        /// <param name="type">The type</param>
+        /// <param name="keyType">Type of the key</param>
+        /// <param name="template">The template</param>
+        /// <returns>The keys without the template</returns>
+        public override IDictionary DeserializeKeys(Type type, Type keyType, IDictionary template)
         {
             lock (((ICollection)_keyCache).SyncRoot)
             {
-                return _keyCache.ContainsKey(type) ? _keyCache[type] as Dictionary<TKey, int> : null;
+                return _keyCache.ContainsKey(type) ? _keyCache[type] as IDictionary : template;
             }
         }
 

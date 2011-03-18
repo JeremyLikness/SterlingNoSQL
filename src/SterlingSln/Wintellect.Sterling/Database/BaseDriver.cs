@@ -49,18 +49,19 @@ namespace Wintellect.Sterling.Database
         /// <summary>
         ///     Serialize the keys
         /// </summary>
-        /// <typeparam name="TKey">Type of the key</typeparam>
         /// <param name="type">Type of the parent table</param>
+        /// <param name="keyType">Type of the key</param>
         /// <param name="keyMap">Key map</param>
-        public abstract void SerializeKeys<TKey>(Type type, Dictionary<TKey, int> keyMap);
+        public abstract void SerializeKeys(Type type, Type keyType, IDictionary keyMap);
 
         /// <summary>
-        ///     Deserialize the keys
+        ///     Deserialize keys without generics
         /// </summary>
-        /// <typeparam name="TKey">Type of the key</typeparam>
-        /// <param name="type">Type of the parent table</param>
-        /// <returns>The key list</returns>
-        public abstract Dictionary<TKey, int> DeserializeKeys<TKey>(Type type);
+        /// <param name="type">The type</param>
+        /// <param name="keyType">Type of the key</param>
+        /// <param name="template">The template</param>
+        /// <returns>The keys without the template</returns>
+        public abstract IDictionary DeserializeKeys(Type type, Type keyType, IDictionary template);        
 
         /// <summary>
         ///     Serialize a single index 

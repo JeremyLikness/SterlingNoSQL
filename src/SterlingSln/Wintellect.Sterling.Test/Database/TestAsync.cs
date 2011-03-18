@@ -21,11 +21,7 @@ namespace Wintellect.Sterling.Test.Database
         private List<TestModel> _modelList;
         //private DateTime _startTime;
 
-#if WINDOWS_PHONE
-        private const int MODELS = 100;
-#else
         private const int MODELS = 500;
-#endif
 
         [TestInitialize]
         public void TestInit()
@@ -151,7 +147,7 @@ namespace Wintellect.Sterling.Test.Database
                                    bw.ProgressChanged += (o, e) =>
                                                              {
                                                                  textBlock.Text = string.Format("{0}%",
-                                                                                                e.ProgressPercentage);
+                                                                                                e.ProgressPercentage);                                                                 
                                                                  progress.Value = e.ProgressPercentage;
                                                                  if (e.ProgressPercentage > 50)
                                                                  {

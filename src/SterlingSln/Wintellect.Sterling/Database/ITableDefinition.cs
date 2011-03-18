@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Wintellect.Sterling.Indexes;
 using Wintellect.Sterling.Keys;
@@ -14,6 +15,12 @@ namespace Wintellect.Sterling.Database
         ///     Key list
         /// </summary>
         IKeyCollection Keys { get; }
+
+        /// <summary>
+        ///     Get a new dictionary (creates the generic)
+        /// </summary>
+        /// <returns>The new dictionary instance</returns>
+        IDictionary GetNewDictionary();
 
         /// <summary>
         ///     Indexes
