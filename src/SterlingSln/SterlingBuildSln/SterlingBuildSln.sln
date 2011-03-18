@@ -23,9 +23,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.Windows
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.WindowsPhone.IsolatedStorage", "..\Wintellect.Sterling.WindowsPhone.IsolatedStorage\Wintellect.Sterling.WindowsPhone.IsolatedStorage.csproj", "{E4E978F2-3A8B-45D3-8157-4002A9BECF2B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.ElevatedTrust", "Wintellect.Sterling.ElevatedTrust\Wintellect.Sterling.ElevatedTrust.csproj", "{BB0149B8-D2E7-420C-A6CC-FBB6E596D362}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.ElevatedTrust.Test", "..\Wintellect.Sterling.ElevatedTrust.Test\Wintellect.Sterling.ElevatedTrust.Test.csproj", "{0CF97598-7726-4FB0-BB50-4D268B12DC90}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.ElevatedTrust.Test.Web", "..\Wintellect.Sterling.ElevatedTrust.Test.Web\Wintellect.Sterling.ElevatedTrust.Test.Web.csproj", "{6F564EB8-8B0E-4456-83C4-2991B2DA789F}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 12
+		SccNumberOfProjects = 15
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -62,6 +68,15 @@ Global
 		SccProjectUniqueName11 = ..\\Wintellect.Sterling.WindowsPhone.IsolatedStorage\\Wintellect.Sterling.WindowsPhone.IsolatedStorage.csproj
 		SccProjectName11 = ../Wintellect.Sterling.WindowsPhone.IsolatedStorage
 		SccLocalPath11 = ..\\Wintellect.Sterling.WindowsPhone.IsolatedStorage
+		SccProjectUniqueName12 = Wintellect.Sterling.ElevatedTrust\\Wintellect.Sterling.ElevatedTrust.csproj
+		SccProjectName12 = Wintellect.Sterling.ElevatedTrust
+		SccLocalPath12 = Wintellect.Sterling.ElevatedTrust
+		SccProjectUniqueName13 = ..\\Wintellect.Sterling.ElevatedTrust.Test\\Wintellect.Sterling.ElevatedTrust.Test.csproj
+		SccProjectName13 = ../Wintellect.Sterling.ElevatedTrust.Test
+		SccLocalPath13 = ..\\Wintellect.Sterling.ElevatedTrust.Test
+		SccProjectUniqueName14 = ..\\Wintellect.Sterling.ElevatedTrust.Test.Web\\Wintellect.Sterling.ElevatedTrust.Test.Web.csproj
+		SccProjectName14 = ../Wintellect.Sterling.ElevatedTrust.Test.Web
+		SccLocalPath14 = ..\\Wintellect.Sterling.ElevatedTrust.Test.Web
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -116,6 +131,18 @@ Global
 		{E4E978F2-3A8B-45D3-8157-4002A9BECF2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4E978F2-3A8B-45D3-8157-4002A9BECF2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4E978F2-3A8B-45D3-8157-4002A9BECF2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB0149B8-D2E7-420C-A6CC-FBB6E596D362}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB0149B8-D2E7-420C-A6CC-FBB6E596D362}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB0149B8-D2E7-420C-A6CC-FBB6E596D362}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB0149B8-D2E7-420C-A6CC-FBB6E596D362}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CF97598-7726-4FB0-BB50-4D268B12DC90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CF97598-7726-4FB0-BB50-4D268B12DC90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CF97598-7726-4FB0-BB50-4D268B12DC90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CF97598-7726-4FB0-BB50-4D268B12DC90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F564EB8-8B0E-4456-83C4-2991B2DA789F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F564EB8-8B0E-4456-83C4-2991B2DA789F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F564EB8-8B0E-4456-83C4-2991B2DA789F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F564EB8-8B0E-4456-83C4-2991B2DA789F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
