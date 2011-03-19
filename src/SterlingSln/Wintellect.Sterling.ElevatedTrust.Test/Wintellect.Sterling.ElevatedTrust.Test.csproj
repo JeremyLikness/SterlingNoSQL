@@ -136,7 +136,7 @@
     <None Include="Properties\AppManifest.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SterlingBuildSln\Wintellect.Sterling.ElevatedTrust\Wintellect.Sterling.ElevatedTrust.csproj">
+    <ProjectReference Include="..\Wintellect.Sterling.ElevatedTrust\Wintellect.Sterling.ElevatedTrust.csproj">
       <Project>{BB0149B8-D2E7-420C-A6CC-FBB6E596D362}</Project>
       <Name>Wintellect.Sterling.ElevatedTrust</Name>
     </ProjectReference>
