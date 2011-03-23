@@ -15,7 +15,7 @@ namespace Wintellect.Sterling.IsolatedStorage.Test.Database
     {
         private SterlingEngine _engine;
         private ISterlingDatabaseInstance _databaseInstance;
-        private readonly ISterlingDriver _driver = new IsolatedStorageDriver();
+        private ISterlingDriver _driver = new IsolatedStorageDriver();
 
         [TestInitialize]
         public void TestInit()
@@ -103,7 +103,10 @@ namespace Wintellect.Sterling.IsolatedStorage.Test.Database
             // shut it down
 
             _engine.Dispose();
-            var driver = _databaseInstance.Driver;
+            
+            // make a new driver
+            _driver = new IsolatedStorageDriver();
+
             _databaseInstance = null;
 
             SterlingFactory.Initialize(); // simulate an application restart
@@ -111,7 +114,7 @@ namespace Wintellect.Sterling.IsolatedStorage.Test.Database
             // bring it back up
             _engine = new SterlingEngine();
             _engine.Activate();
-            _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestDatabaseInstance>(driver);
+            _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestDatabaseInstance>(_driver);
 
             var actual1 = _databaseInstance.Load<TestModel>(expected1.Key);
             var actual2 = _databaseInstance.Load<TestModel>(expected2.Key);
