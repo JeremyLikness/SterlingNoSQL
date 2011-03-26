@@ -200,7 +200,6 @@ namespace Wintellect.Sterling
         /// <returns>The instance</returns>
         object Load(Type type, object key);
 
-
         /// <summary>
         ///     Delete it 
         /// </summary>
@@ -235,5 +234,26 @@ namespace Wintellect.Sterling
         ///     Event for sterling changes
         /// </summary>
         event EventHandler<SterlingOperationArgs> SterlingOperationPerformed;
+
+        /// <summary>
+        ///     Create a table definition
+        /// </summary>
+        /// <typeparam name="T">The type of the table</typeparam>
+        /// <typeparam name="TKey">The type of the key</typeparam>
+        /// <param name="keyFunction">Function to return the key</param>
+        /// <returns>The table definition</returns>
+        ITableDefinition CreateTableDefinition<T, TKey>(Func<T, TKey> keyFunction) where T : class, new();
+
+        /// <summary>
+        ///     Get the list of table definitions
+        /// </summary>
+        /// <returns>The list of table definitions</returns>
+        IEnumerable<ITableDefinition> GetTableDefinitions();
+
+        /// <summary>
+        ///     Register a new table definition
+        /// </summary>
+        /// <param name="tableDefinition">The new table definition</param>
+        void RegisterTableDefinition(ITableDefinition tableDefinition);
     }
 }

@@ -320,5 +320,35 @@ namespace Wintellect.Sterling.Test.Helpers
 
 #pragma warning disable 0067
         public event EventHandler<SterlingOperationArgs> SterlingOperationPerformed;
+
+        /// <summary>
+        ///     Create a table definition
+        /// </summary>
+        /// <typeparam name="T">The type of the table</typeparam>
+        /// <typeparam name="TKey">The type of the key</typeparam>
+        /// <param name="keyFunction">Function to return the key</param>
+        /// <returns>The table definition</returns>
+        public ITableDefinition CreateTableDefinition<T, TKey>(Func<T, TKey> keyFunction) where T : class, new()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        ///     Get the list of table definitions
+        /// </summary>
+        /// <returns>The list of table definitions</returns>
+        public IEnumerable<ITableDefinition> GetTableDefinitions()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        ///     Register a new table definition
+        /// </summary>
+        /// <param name="tableDefinition">The new table definition</param>
+        public void RegisterTableDefinition(ITableDefinition tableDefinition)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

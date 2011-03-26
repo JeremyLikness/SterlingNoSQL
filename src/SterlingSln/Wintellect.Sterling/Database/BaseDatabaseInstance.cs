@@ -211,10 +211,34 @@ namespace Wintellect.Sterling.Database
         /// <typeparam name="TKey">The type of the key</typeparam>
         /// <param name="keyFunction">The key mapping function</param>
         /// <returns>The table definition</returns>
-        protected ITableDefinition CreateTableDefinition<T, TKey>(Func<T, TKey> keyFunction) where T : class, new()
+        public ITableDefinition CreateTableDefinition<T, TKey>(Func<T, TKey> keyFunction) where T : class, new()
         {
             return new TableDefinition<T, TKey>(Driver,
                                                 Load<T, TKey>, keyFunction);
+        }
+
+        /// <summary>
+        ///     Get the list of table definitions
+        /// </summary>
+        /// <returns>The list of table definitions</returns>
+        public IEnumerable<ITableDefinition> GetTableDefinitions()
+        {
+            return new List<ITableDefinition>(TableDefinitions.Values);
+        }
+
+        /// <summary>
+        ///     Register a new table definition
+        /// </summary>
+        /// <param name="tableDefinition">The new table definition</param>
+        public void RegisterTableDefinition(ITableDefinition tableDefinition)
+        {
+            lock(((ICollection)TableDefinitions).SyncRoot)
+            {
+                if (!TableDefinitions.ContainsKey(tableDefinition.TableType))
+                {
+                    TableDefinitions.Add(tableDefinition.TableType, tableDefinition);
+                }
+            }
         }
 
         /// <summary>
@@ -236,7 +260,7 @@ namespace Wintellect.Sterling.Database
                 }
             }
             Driver.PublishTables(TableDefinitions);
-        }
+        }        
 
         /// <summary>
         ///     True if it is registered with the sterling engine

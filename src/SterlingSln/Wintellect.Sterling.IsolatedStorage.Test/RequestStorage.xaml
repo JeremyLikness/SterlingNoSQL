@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="Wintellect.Sterling.IsolatedStorage.Test.RequestStorage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="400" d:DesignWidth="400">
+    
+    <Grid x:Name="LayoutRoot" Background="White" Width="400" Height="400" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10">
+            <TextBlock Text="These tests need additional storage to run. Please approve by clicking the button below." TextWrapping="Wrap"/>
+            <Button Content="Increase Storage" Click="_ButtonClick" HorizontalAlignment="Center" Margin="5"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

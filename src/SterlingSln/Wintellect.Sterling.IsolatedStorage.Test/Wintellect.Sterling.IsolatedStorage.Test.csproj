@@ -124,6 +124,9 @@
     <Compile Include="Keys\TestCompositeKeyWithKeyClass.cs" />
     <Compile Include="Keys\TestKeyCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RequestStorage.xaml.cs">
+      <DependentUpon>RequestStorage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TestIsoHelper.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -148,6 +151,12 @@
       <Project>{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}</Project>
       <Name>Wintellect.Sterling</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="RequestStorage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <Import Condition="$(SilverlightVersion)=='v3.0'" Project="$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\SilverlightToolkit\Tools\v3.0)Microsoft.Silverlight.Toolkit.Build.targets" />

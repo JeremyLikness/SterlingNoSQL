@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO.IsolatedStorage;
 using System.Windows;
+using System.Windows.Controls;
 using Microsoft.Silverlight.Testing;
 
 namespace Wintellect.Sterling.IsolatedStorage.Test
@@ -18,7 +20,23 @@ namespace Wintellect.Sterling.IsolatedStorage.Test
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            RootVisual = UnitTestSystem.CreateTestPage();
+            using (var iso = IsolatedStorageFile.GetUserStoreForApplication())
+            {
+                if (iso.Quota < RequestStorage.QUOTA)
+                {
+                    var grid = new Grid();
+                    RootVisual = grid;
+                    var request = new RequestStorage();
+                    grid.Children.Add(request);
+                    request.Completed = () =>
+                                            {
+                                                grid.Children.Clear();
+                                                grid.Children.Add(UnitTestSystem.CreateTestPage());
+                                            };
+                    return;
+                }
+            }
+            RootVisual = UnitTestSystem.CreateTestPage();            
         }
 
         private void Application_Exit(object sender, EventArgs e)

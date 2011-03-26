@@ -17,6 +17,16 @@ namespace Wintellect.Sterling.ElevatedTrust.Test.Database
         private ISterlingDatabaseInstance _databaseInstance;
         private ISterlingDriver _driver = new ElevatedTrustDriver();
 
+        public class TestLateBoundTable
+        {
+            public int Id { get; set; }
+            public string Data { get; set; }
+        }
+
+        public class TestSecondLateBoundTable : TestLateBoundTable
+        {
+        }
+
         [TestInitialize]
         public void TestInit()
         {
@@ -71,6 +81,49 @@ namespace Wintellect.Sterling.ElevatedTrust.Test.Database
             Assert.AreEqual(expected.SubClass.NestedText, actual.SubClass.NestedText, "Load failed: sub class text mismtach.");
             Assert.AreEqual(expected.SubStruct.NestedId, actual.SubStruct.NestedId, "Load failed: sub struct id mismtach.");
             Assert.AreEqual(expected.SubStruct.NestedString, actual.SubStruct.NestedString, "Load failed: sub class string mismtach.");
+        }
+
+        [TestMethod]
+        public void TestSaveLateBoundTable()
+        {
+            // test saving and reloading
+            var expected = new TestLateBoundTable { Id = 1, Data = Guid.NewGuid().ToString() };
+
+            _databaseInstance.RegisterTableDefinition(_databaseInstance.CreateTableDefinition<TestLateBoundTable, int>(t => t.Id));
+
+            _databaseInstance.Save(expected);
+
+            var actual = _databaseInstance.Load<TestLateBoundTable>(expected.Id);
+
+            Assert.IsNotNull(actual, "Load failed.");
+
+            Assert.AreEqual(expected.Id, actual.Id, "Load failed: key mismatch.");
+            Assert.AreEqual(expected.Data, actual.Data, "Load failed: data mismatch.");
+
+            _databaseInstance.Flush();
+
+            _engine.Dispose();
+            var driver = _databaseInstance.Driver;
+            _databaseInstance = null;
+
+            SterlingFactory.Initialize(); // simulate an application restart
+
+            // bring it back up
+            _engine = new SterlingEngine();
+            _engine.Activate();
+            _databaseInstance = _engine.SterlingDatabase.RegisterDatabase<TestDatabaseInstance>(driver);
+
+            // do this in a different order
+            _databaseInstance.RegisterTableDefinition(_databaseInstance.CreateTableDefinition<TestSecondLateBoundTable, int>(t => t.Id));
+
+            _databaseInstance.RegisterTableDefinition(_databaseInstance.CreateTableDefinition<TestLateBoundTable, int>(t => t.Id));
+
+            actual = _databaseInstance.Load<TestLateBoundTable>(expected.Id);
+
+            Assert.IsNotNull(actual, "Load failed after restart.");
+
+            Assert.AreEqual(expected.Id, actual.Id, "Load failed: key mismatch after restart.");
+            Assert.AreEqual(expected.Data, actual.Data, "Load failed: data mismatch after restart.");
         }
 
         [TestMethod]
