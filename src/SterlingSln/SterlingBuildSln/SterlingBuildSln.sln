@@ -29,9 +29,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.Elevate
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.ElevatedTrust", "..\Wintellect.Sterling.ElevatedTrust\Wintellect.Sterling.ElevatedTrust.csproj", "{BB0149B8-D2E7-420C-A6CC-FBB6E596D362}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.IsolatedStorageUpgrade", "..\Wintellect.Sterling.IsolatedStorageUpgrade\Wintellect.Sterling.IsolatedStorageUpgrade.csproj", "{51E2367B-779B-4AFF-A803-7A0A548941EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling.WindowsPhone.IsolatedStorageUpgrade", "..\Wintellect.Sterling.WindowsPhone.IsolatedStorageUpgrade\Wintellect.Sterling.WindowsPhone.IsolatedStorageUpgrade.csproj", "{7D26066A-8A63-4AE2-A9D0-679E455E71C1}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 15
+		SccNumberOfProjects = 17
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -77,6 +81,12 @@ Global
 		SccProjectUniqueName14 = ..\\Wintellect.Sterling.ElevatedTrust\\Wintellect.Sterling.ElevatedTrust.csproj
 		SccProjectName14 = ../Wintellect.Sterling.ElevatedTrust
 		SccLocalPath14 = ..\\Wintellect.Sterling.ElevatedTrust
+		SccProjectUniqueName15 = ..\\Wintellect.Sterling.IsolatedStorageUpgrade\\Wintellect.Sterling.IsolatedStorageUpgrade.csproj
+		SccProjectName15 = ../Wintellect.Sterling.IsolatedStorageUpgrade
+		SccLocalPath15 = ..\\Wintellect.Sterling.IsolatedStorageUpgrade
+		SccProjectUniqueName16 = ..\\Wintellect.Sterling.WindowsPhone.IsolatedStorageUpgrade\\Wintellect.Sterling.WindowsPhone.IsolatedStorageUpgrade.csproj
+		SccProjectName16 = ../Wintellect.Sterling.WindowsPhone.IsolatedStorageUpgrade
+		SccLocalPath16 = ..\\Wintellect.Sterling.WindowsPhone.IsolatedStorageUpgrade
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -143,6 +153,14 @@ Global
 		{BB0149B8-D2E7-420C-A6CC-FBB6E596D362}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB0149B8-D2E7-420C-A6CC-FBB6E596D362}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB0149B8-D2E7-420C-A6CC-FBB6E596D362}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51E2367B-779B-4AFF-A803-7A0A548941EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51E2367B-779B-4AFF-A803-7A0A548941EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51E2367B-779B-4AFF-A803-7A0A548941EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51E2367B-779B-4AFF-A803-7A0A548941EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D26066A-8A63-4AE2-A9D0-679E455E71C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D26066A-8A63-4AE2-A9D0-679E455E71C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D26066A-8A63-4AE2-A9D0-679E455E71C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D26066A-8A63-4AE2-A9D0-679E455E71C1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -128,8 +128,8 @@ namespace Wintellect.Sterling.IsolatedStorage
                     indexFile.Write(indexMap.Count);
                     foreach(var index in indexMap)
                     {
-                        DatabaseSerializer.Serialize(index.Key, indexFile);
                         DatabaseSerializer.Serialize(index.Value, indexFile);
+                        DatabaseSerializer.Serialize(index.Key, indexFile);                        
                     }
                 }
             }
@@ -155,9 +155,9 @@ namespace Wintellect.Sterling.IsolatedStorage
                     indexFile.Write(indexMap.Count);
                     foreach (var index in indexMap)
                     {
-                        DatabaseSerializer.Serialize(index.Key, indexFile);
                         DatabaseSerializer.Serialize(index.Value.Item1, indexFile);
                         DatabaseSerializer.Serialize(index.Value.Item2, indexFile);
+                        DatabaseSerializer.Serialize(index.Key, indexFile);                        
                     }
                 }
             }
@@ -185,8 +185,9 @@ namespace Wintellect.Sterling.IsolatedStorage
                         var count = indexFile.ReadInt32();
                         for (var x = 0; x < count; x++)
                         {
-                            dictionary.Add((TKey)DatabaseSerializer.Deserialize(typeof(TKey), indexFile),
-                                           (TIndex)DatabaseSerializer.Deserialize(typeof(TIndex), indexFile));
+                            var index = (TIndex) DatabaseSerializer.Deserialize(typeof (TIndex), indexFile);
+                            var key = (TKey) DatabaseSerializer.Deserialize(typeof (TKey), indexFile);
+                            dictionary.Add(key, index);
                         }
                     }
                 }
@@ -217,10 +218,11 @@ namespace Wintellect.Sterling.IsolatedStorage
                         var count = indexFile.ReadInt32();
                         for (var x = 0; x < count; x++)
                         {
-                            dictionary.Add((TKey)DatabaseSerializer.Deserialize(typeof(TKey), indexFile),
-                                Tuple.Create(           
-                                (TIndex1)DatabaseSerializer.Deserialize(typeof(TIndex1), indexFile),
-                                (TIndex2)DatabaseSerializer.Deserialize(typeof(TIndex2), indexFile)));
+                            var index = Tuple.Create(
+                                (TIndex1) DatabaseSerializer.Deserialize(typeof (TIndex1), indexFile),
+                                (TIndex2) DatabaseSerializer.Deserialize(typeof (TIndex2), indexFile));
+                            var key = (TKey) DatabaseSerializer.Deserialize(typeof (TKey), indexFile);
+                            dictionary.Add(key, index);
                         }
                     }
                 }
