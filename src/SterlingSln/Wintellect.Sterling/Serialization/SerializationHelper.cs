@@ -45,7 +45,7 @@ namespace Wintellect.Sterling.Serialization
         {
             lock (((ICollection)_propertyCache).SyncRoot)
             {
-                // fast "out" if already exits
+                // fast "out" if already exists
                 if (_propertyCache.ContainsKey(type)) return;
 
                 _propertyCache.Add(type,
@@ -144,8 +144,8 @@ namespace Wintellect.Sterling.Serialization
                 _SaveDictionary(instance as IDictionary, bw, cache);              
             }           
 
-            // now iterate the serializable properties
-            foreach (var p in _propertyCache[type])
+            // now iterate the serializable properties - create a copy to avoid multi-threaded conflicts
+            foreach (var p in new List<SerializationCache>(_propertyCache[type]))
             {
                 var value = p.GetMethod(instance);
                 _InnerSave(value == null ? p.PropType : value.GetType(), value, bw, cache);
@@ -359,7 +359,7 @@ namespace Wintellect.Sterling.Serialization
             }           
 
             // now iterate
-            foreach (var p in _propertyCache[type])
+            foreach (var p in new List<SerializationCache>(_propertyCache[type]))
             {
                 p.SetMethod(instance, _Deserialize(br, cache));
             }
