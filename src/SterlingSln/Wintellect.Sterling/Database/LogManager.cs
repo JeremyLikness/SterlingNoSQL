@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows;
 using Wintellect.Sterling.Exceptions;
 
 namespace Wintellect.Sterling.Database
@@ -58,22 +57,11 @@ namespace Wintellect.Sterling.Database
         /// <param name="exception">The exception</param>
         public void Log(SterlingLogLevel level, string message, Exception exception)
         {
-            var dispatcher = Deployment.Current.Dispatcher;
-            
             lock(Lock)
             {
                 foreach (var key in _loggers.Keys)
                 {
-                    var key1 = key;
-                    Action action = () => _loggers[key1](level, message, exception);
-                    if (dispatcher.CheckAccess())
-                    {
-                        action();
-                    }
-                    else
-                    {
-                        dispatcher.BeginInvoke(action);
-                    }
+                    _loggers[key](level, message, exception);                    
                 }
             }
         }
