@@ -10,6 +10,7 @@ namespace Wintellect.Sterling.Keys
     public class TableKey<T,TKey> where T: class, new()
     {
         private readonly Func<TKey, T> _getter;
+        private readonly int _hashCode;
 
         /// <summary>
         ///     Construct with how to get the key
@@ -19,6 +20,7 @@ namespace Wintellect.Sterling.Keys
         public TableKey(TKey key, Func<TKey,T> getter)
         {
             Key = key;
+            _hashCode = key.GetHashCode();
             _getter = getter;
             LazyValue = new Lazy<T>( () => _getter(Key) );
         }
@@ -48,7 +50,7 @@ namespace Wintellect.Sterling.Keys
         /// <returns>True if equal</returns>
         public override bool Equals(object obj)
         {
-            return obj is TableKey<T, TKey> && ((TableKey<T, TKey>) obj).Key.Equals(Key);
+            return obj.GetHashCode() == _hashCode && ((TableKey<T, TKey>) obj).Key.Equals(Key);
         }
 
         /// <summary>
@@ -56,8 +58,8 @@ namespace Wintellect.Sterling.Keys
         /// </summary>
         /// <returns>The has code of the key</returns>
         public override int GetHashCode()
-        {            
-            return Key.GetHashCode();
+        {
+            return _hashCode;
         }
 
         /// <summary>

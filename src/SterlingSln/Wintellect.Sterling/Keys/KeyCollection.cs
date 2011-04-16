@@ -132,7 +132,7 @@ namespace Wintellect.Sterling.Keys
         {
             IsDirty = false;
             Refresh();
-        }
+        }       
 
         /// <summary>
         ///     Add a key to the list

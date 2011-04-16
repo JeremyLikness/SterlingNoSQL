@@ -10,7 +10,8 @@ namespace Wintellect.Sterling.Indexes
     /// <typeparam name="TKey">The type of the key</typeparam>
     public class TableIndex<T, TIndex, TKey> where T : class, new() 
     {
-        private Func<TKey, T> _getter;
+        private readonly Func<TKey, T> _getter;
+        private readonly int _hashCode;
 
         public TKey Key { get; private set; }
 
@@ -30,6 +31,7 @@ namespace Wintellect.Sterling.Indexes
         {
             Index = index;
             Key = key;
+            _hashCode = key.GetHashCode();
             _getter = getter;
             LazyValue = new Lazy<T>(() => _getter(Key));
         }
@@ -54,7 +56,7 @@ namespace Wintellect.Sterling.Indexes
         /// <returns>True if equal</returns>
         public override bool Equals(object obj)
         {
-            return obj is TableIndex<T, TIndex, TKey> && ((TableIndex<T, TIndex, TKey>)obj).Key.Equals(Key);
+            return obj.GetHashCode() == _hashCode && ((TableIndex<T, TIndex, TKey>)obj).Key.Equals(Key);
         }
 
         /// <summary>
@@ -63,7 +65,7 @@ namespace Wintellect.Sterling.Indexes
         /// <returns>The has code of the key</returns>
         public override int GetHashCode()
         {
-            return Key.GetHashCode();
+            return _hashCode;
         }
 
         /// <summary>

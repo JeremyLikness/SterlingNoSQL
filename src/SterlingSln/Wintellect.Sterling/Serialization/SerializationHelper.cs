@@ -31,6 +31,8 @@ namespace Wintellect.Sterling.Serialization
                 new Dictionary
                     <Type, List<SerializationCache>>();
 
+        private static readonly Dictionary<string,Type> _typeRef = new Dictionary<string, Type>();
+
         private readonly ISterlingDatabaseInstance _database;
         private readonly ISterlingSerializer _serializer;
         private readonly LogManager _logManager;
@@ -375,8 +377,21 @@ namespace Wintellect.Sterling.Serialization
             {
                 return null;
             }
-            
-            var typeResolved = Type.GetType(typeName);
+
+            Type typeResolved = null;
+
+            if (!_typeRef.TryGetValue(typeName, out typeResolved))
+            {
+                typeResolved = Type.GetType(typeName);
+
+                lock(((ICollection)_typeRef).SyncRoot)
+                {
+                    if (!_typeRef.ContainsKey(typeName))
+                    {
+                        _typeRef.Add(typeName, typeResolved);
+                    }
+                }
+            }            
 
             if (_database.IsRegistered(typeResolved))
             {

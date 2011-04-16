@@ -126,7 +126,7 @@ namespace Wintellect.Sterling.Indexes
             IsDirty = false;
             Refresh();
         }
-
+      
         /// <summary>
         ///     Add an index to the list
         /// </summary>
@@ -136,7 +136,7 @@ namespace Wintellect.Sterling.Indexes
         {
             var newIndex = new TableIndex<T, TIndex, TKey>(_indexer((T)instance), (TKey)key, Resolver);
             lock(((ICollection)IndexList).SyncRoot)
-            {
+            {               
                 if (!IndexList.Contains(newIndex))
                 {
                     IndexList.Add(newIndex);
