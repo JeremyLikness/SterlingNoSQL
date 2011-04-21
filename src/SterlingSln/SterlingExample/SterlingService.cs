@@ -48,7 +48,7 @@ namespace SterlingExample
             Current._engine.Dispose();                       
         }
 
-        public static void StartUpDatabase()
+        public static void StartUpEngine()
         {
             if (Debugger.IsAttached)
             {
@@ -56,7 +56,12 @@ namespace SterlingExample
             }
 
             Current._engine = new SterlingEngine();
-            Current._engine.Activate();
+            Current._engine.Activate();            
+        }
+
+
+        public static void StartUpDatabase()
+        {
             Current.Database = Current._engine.SterlingDatabase.RegisterDatabase<FoodDatabase>(_driver);
         }
 

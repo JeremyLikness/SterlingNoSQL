@@ -194,14 +194,24 @@ namespace Wintellect.Sterling.Database
                 // now refresh the table
                 table.Value.Refresh();
 
-                // now save all objects a second time to generate the indexes 
+                // now generate the indexes 
                 if (table.Value.Indexes.Count <= 0) continue;
 
                 var table1 = table;
-                foreach (var instance in from object key in keyDictionary.Keys select database.Load(table1.Key, key))
+
+                foreach (var instance in from object key in keyDictionary.Keys select Tuple.Create(key, database.Load(table1.Key, key)))
                 {
-                    database.Save(table.Key, instance);
+                    foreach(var index in table.Value.Indexes)
+                    {
+                        index.Value.AddIndex(instance.Item2, instance.Item1);                        
+                    }
                 }
+
+                foreach (var index in table.Value.Indexes)
+                {
+                    index.Value.Flush();
+                }
+                
             }
         }
 

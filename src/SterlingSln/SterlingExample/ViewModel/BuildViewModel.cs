@@ -92,7 +92,10 @@ namespace SterlingExample.ViewModel
         /// <param name="e"></param>
         private static void _Step1Worker(BackgroundWorker o, DoWorkEventArgs e)
         {
-            SterlingService.Current.Database.Purge();          
+            SterlingService.Current.Database.Flush();
+            SterlingService.Current.Database.Purge();  
+            SterlingService.ShutDownDatabase();
+            SterlingService.StartUpEngine();            
         }
 
         /// <summary>
@@ -106,6 +109,7 @@ namespace SterlingExample.ViewModel
             {
                 using (var br = new BinaryReader(stream))
                 {
+                    SterlingService.StartUpDatabase();
                     SterlingService.RestoreDatabase(br);
                 }
             }      
@@ -120,6 +124,7 @@ namespace SterlingExample.ViewModel
         /// <param name="e"></param>
         private static void _Step3Worker(BackgroundWorker o, DoWorkEventArgs e)
         {
+            SterlingService.StartUpEngine();
             SterlingService.StartUpDatabase();
         }
         

@@ -59,7 +59,6 @@
     <Reference Include="System.Windows.Browser" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Database\BackupManager.cs" />
     <Compile Include="Database\BaseDatabaseInstance.cs" />
     <Compile Include="Database\BaseDriver.cs" />
     <Compile Include="Database\BaseSterlingByteInterceptor.cs" />

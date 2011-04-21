@@ -115,7 +115,8 @@ namespace SterlingExample.DbGenerator.ViewModel
             {
                 SterlingService.Current.Database.Save(foodGroup);
                 o.ReportProgress((int) (++progress*100.0/foodGroups.Count));
-            }            
+            }
+            SterlingService.Current.Database.Flush();            
         }
 
         /// <summary>
@@ -132,6 +133,7 @@ namespace SterlingExample.DbGenerator.ViewModel
                 SterlingService.Current.Database.Save(nutrDef);
                 o.ReportProgress((int)(++progress * 100.0 / nutrDefs.Count), progress);
             }
+            SterlingService.Current.Database.Flush();            
         }
 
         /// <summary>
@@ -202,7 +204,7 @@ namespace SterlingExample.DbGenerator.ViewModel
                 o.ReportProgress((int) (++size*100.0/foodDescriptions.Count), totalCount);
             }
 
-            _nutrientData.Clear();
+            _nutrientData.Clear();            
         }
 
         /// <summary>
