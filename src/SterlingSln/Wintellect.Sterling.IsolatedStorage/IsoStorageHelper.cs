@@ -4,7 +4,6 @@ using System.IO;
 using System.IO.IsolatedStorage;
 using System.Linq;
 using Wintellect.Sterling.Exceptions;
-using Wintellect.Sterling.Database;
 
 namespace Wintellect.Sterling.IsolatedStorage
 {
@@ -83,15 +82,22 @@ namespace Wintellect.Sterling.IsolatedStorage
         /// </summary>
         /// <param name="path">The path</param>
         public void Delete(string path)
-        {            
+        {              
             try
-            {
+            {                
                 if (_iso.FileExists(path))
                 {
-                    _iso.DeleteFile(path);
-                    if (_files.Contains(path))
+                    var pathLock = PathLock.GetLock(path);
+                    lock (pathLock)
                     {
-                        _paths.Remove(path);
+                        if (_iso.FileExists(path))
+                        {
+                            _iso.DeleteFile(path);
+                            if (_files.Contains(path))
+                            {
+                                _files.Remove(path);
+                            }
+                        }
                     }
                 }
             }
@@ -116,11 +122,15 @@ namespace Wintellect.Sterling.IsolatedStorage
             {
                 if (!_paths.Contains(path))
                 {
-                    if (!_iso.DirectoryExists(path))
+                    var pathLock = PathLock.GetLock(path);
+                    lock (pathLock)
                     {
-                        _iso.CreateDirectory(path);
+                        if (!_iso.DirectoryExists(path))
+                        {
+                            _iso.CreateDirectory(path);
+                            _paths.Add(path);
+                        }                        
                     }
-                    _paths.Add(path);
                 }
             }
             catch(Exception ex)
@@ -138,15 +148,21 @@ namespace Wintellect.Sterling.IsolatedStorage
         {
             try
             {
-                if (_files.Contains(path))
-                    return true; 
+                var pathLock = PathLock.GetLock(path);
 
-                if (_iso.FileExists(path))
+                lock (pathLock)
                 {
-                    _files.Add(path);
-                    return true;
+                    if (_files.Contains(path))
+                        return true;
+
+                    if (_iso.FileExists(path))
+                    {
+                        _files.Add(path);
+                        return true;
+                    }
+
+                    return false;
                 }
-                return false;
             }
             catch (Exception ex)
             {
@@ -171,13 +187,13 @@ namespace Wintellect.Sterling.IsolatedStorage
         private static void _Purge(string path, bool clear)
         {
             if (clear)
-            {
+            {                
                 _paths.Clear();
                 _files.Clear();
             }
 
             try
-            {
+            {                
                 // already purged!
                 if (!_iso.DirectoryExists(path))
                 {
@@ -199,14 +215,24 @@ namespace Wintellect.Sterling.IsolatedStorage
                     var pathLock = PathLock.GetLock(filePath.Replace("\\", "/"));
                     lock (pathLock)
                     {
-                        _iso.DeleteFile(filePath);
+                        if (_iso.FileExists(filePath))
+                        {
+                            _iso.DeleteFile(filePath);
+                        }
                     }
                 }
 
                 var dirPath = path.TrimEnd('\\', '/');
                 if (!string.IsNullOrEmpty(dirPath) && _iso.DirectoryExists(dirPath))
                 {
-                    _iso.DeleteDirectory(dirPath);                   
+                    var pathLock = PathLock.GetLock(dirPath);
+                    lock (pathLock)
+                    {
+                        if (_iso.DirectoryExists(dirPath))
+                        {
+                            _iso.DeleteDirectory(dirPath);
+                        }
+                    }
                 }
             }
             catch (Exception ex)

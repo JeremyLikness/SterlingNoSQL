@@ -53,9 +53,6 @@
     <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Wintellect.Sterling\Database\BackupManager.cs">
-      <Link>Database\BackupManager.cs</Link>
-    </Compile>
     <Compile Include="..\Wintellect.Sterling\Database\BaseDatabaseInstance.cs">
       <Link>Database\BaseDatabaseInstance.cs</Link>
     </Compile>
