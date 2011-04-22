@@ -14,6 +14,7 @@ namespace Wintellect.Sterling.IsolatedStorage
     {
         private const string BASE = "Sterling/";
         private readonly List<Type> _tables = new List<Type>();
+        private bool _dirtyType;
         private readonly Dictionary<string,byte[]> _saveCache = new Dictionary<string, byte[]>();
         
         public IsolatedStorageDriver() : this(BASE, false)
@@ -293,7 +294,10 @@ namespace Wintellect.Sterling.IsolatedStorage
             lock(pathLock)
             {
                 if (!TypeIndex.Contains(type))
+                {
                     TypeIndex.Add(type);
+                    _dirtyType = true;
+                }
             }
             return TypeIndex.IndexOf(type);
         }
@@ -343,7 +347,12 @@ namespace Wintellect.Sterling.IsolatedStorage
                         _saveCache.Remove(instancePath);
                     }
                 }
-            }            
+            }
+
+            if (!_dirtyType) return;
+            
+            _dirtyType = false;
+            SerializeTypes();            
         }   
             
         /// <summary>

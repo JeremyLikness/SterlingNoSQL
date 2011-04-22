@@ -115,6 +115,9 @@
     <Compile Include="..\Wintellect.Sterling.IsolatedStorage.Test\Database\TestNullable.cs">
       <Link>Database\TestNullable.cs</Link>
     </Compile>
+    <Compile Include="..\Wintellect.Sterling.IsolatedStorage.Test\Database\TestPersonBill.cs">
+      <Link>Database\TestPersonBill.cs</Link>
+    </Compile>
     <Compile Include="..\Wintellect.Sterling.IsolatedStorage.Test\Database\TestPurge.cs">
       <Link>Database\TestPurge.cs</Link>
     </Compile>

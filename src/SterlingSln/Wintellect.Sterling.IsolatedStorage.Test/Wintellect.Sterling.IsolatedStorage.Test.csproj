@@ -111,6 +111,7 @@
     <Compile Include="Database\TestInterfaceProperty.cs" />
     <Compile Include="Database\TestLists.cs" />
     <Compile Include="Database\TestNullable.cs" />
+    <Compile Include="Database\TestPersonBill.cs" />
     <Compile Include="Database\TestPurge.cs" />
     <Compile Include="Database\TestQuery.cs" />
     <Compile Include="Database\TestRegistration.cs" />

@@ -608,19 +608,19 @@ namespace Wintellect.Sterling.Database
         public void Flush()
         {
             if (_locks == null || !_locks.ContainsKey(GetType())) return;
-
+            
             lock (Lock)
             {
                 foreach (var def in TableDefinitions.Values)
                 {
                     def.Keys.Flush();
-
+                    
                     foreach (var idx in def.Indexes.Values)
                     {
                         idx.Flush();
                     }
-                }
-            }
+                }                                
+            }            
 
             _RaiseOperation(SterlingOperation.Flush, GetType(), Name);
         }
