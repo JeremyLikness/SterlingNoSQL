@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+#if SILVERLIGHT
 using Microsoft.Silverlight.Testing;
+#endif
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Database;
 using Wintellect.Sterling.Exceptions;
@@ -108,8 +110,10 @@ namespace Wintellect.Sterling.Test.Database
         }
     }
 
+#if SILVERLIGHT
     [Tag("Trigger")]
     [Tag("Database")]
+#endif
     [TestClass]
     public class TestTriggers
     {

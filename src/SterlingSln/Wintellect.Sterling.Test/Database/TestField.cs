@@ -1,4 +1,6 @@
+#if SILVERLIGHT
 using Microsoft.Silverlight.Testing;
+#endif 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Database;
 
@@ -26,8 +28,10 @@ namespace Wintellect.Sterling.Test.Database
         }
     }
 
+#if SILVERLIGHT 
     [Tag("Field")]
     [Tag("Database")]
+#endif
     [TestClass]
     public class TestField
     {

@@ -1,10 +1,14 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+#if SILVERLIGHT
 using Microsoft.Silverlight.Testing;
+#endif
 using Wintellect.Sterling.Test.Helpers;
 
 namespace Wintellect.Sterling.Test.Database
 {
+#if SILVERLIGHT
     [Tag("AggregateList")]
+#endif
     [TestClass]
     public class TestAggregateList
     {

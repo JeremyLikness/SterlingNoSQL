@@ -1,11 +1,15 @@
-﻿using Microsoft.Silverlight.Testing;
+﻿#if SILVERLIGHT
+using Microsoft.Silverlight.Testing;
+#endif
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Exceptions;
 using Wintellect.Sterling.Test.Helpers;
 
 namespace Wintellect.Sterling.Test.Database
 {
+#if SILVERLIGHT
     [Tag("DatabaseRegistration")]
+#endif
     [TestClass]
     public class TestRegistration
     {        

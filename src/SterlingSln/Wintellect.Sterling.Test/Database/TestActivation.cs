@@ -1,4 +1,6 @@
-﻿using Microsoft.Silverlight.Testing;
+﻿#if SILVERLIGHT
+using Microsoft.Silverlight.Testing;
+#endif 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Database;
 using Wintellect.Sterling.Exceptions;
@@ -9,8 +11,10 @@ namespace Wintellect.Sterling.Test.Database
     /// <summary>
     ///     Test activation-related database steps
     /// </summary>
+#if SILVERLIGHT 
     [Tag("Database")]
     [Tag("Activation")]
+#endif
     [TestClass]
     public class TestActivation
     {        

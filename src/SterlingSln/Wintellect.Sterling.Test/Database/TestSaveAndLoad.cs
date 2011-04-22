@@ -2,14 +2,18 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+#if SILVERLIGHT
 using Microsoft.Silverlight.Testing;
+#endif
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Exceptions;
 using Wintellect.Sterling.Test.Helpers;
 
 namespace Wintellect.Sterling.Test.Database
 {    
+#if SILVERLIGHT
     [Tag("SaveAndLoad")]
+#endif
     [TestClass]
     public class TestSaveAndLoad
     {

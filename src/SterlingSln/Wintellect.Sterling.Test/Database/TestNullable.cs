@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+#if SILVERLIGHT
 using Microsoft.Silverlight.Testing;
+#endif
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Database;
 
@@ -34,8 +36,10 @@ namespace Wintellect.Sterling.Test.Database
         }
     }
 
+#if SILVERLIGHT
     [Tag("Nullable")]
     [Tag("Database")]
+#endif
     [TestClass]
     public class TestNullable
     {                

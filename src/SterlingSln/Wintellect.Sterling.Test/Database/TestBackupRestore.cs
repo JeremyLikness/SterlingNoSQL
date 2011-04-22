@@ -1,12 +1,16 @@
 using System.IO;
+#if SILVERLIGHT
 using Microsoft.Silverlight.Testing;
+#endif
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Test.Helpers;
 
 namespace Wintellect.Sterling.Test.Database
 {
+#if SILVERLIGHT
     [Tag("Backup")]
     [Tag("Database")]
+#endif
     [TestClass]
     public class TestBackupRestore
     {

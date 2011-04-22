@@ -1,10 +1,14 @@
-﻿using Microsoft.Silverlight.Testing;
+﻿#if SILVERLIGHT
+using Microsoft.Silverlight.Testing;
+#endif
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Test.Helpers;
 
 namespace Wintellect.Sterling.Test.Database
 {
+#if SILVERLIGHT
     [Tag("Array")]
+#endif
     [TestClass]
     public class TestArrays
     {

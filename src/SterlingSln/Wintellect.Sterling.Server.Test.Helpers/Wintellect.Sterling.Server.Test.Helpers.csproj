@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E618E839-BCE8-4B54-8A20-1BBB37040AFD}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Wintellect.Sterling.Server.Test.Helpers</RootNamespace>
+    <AssemblyName>Wintellect.Sterling.Server.Test.Helpers</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\BadDatabaseInstance.cs">
+      <Link>BadDatabaseInstance.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\DupDatabaseInstance.cs">
+      <Link>DupDatabaseInstance.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\ExceptionHelper.cs">
+      <Link>ExceptionHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestAggregateListModel.cs">
+      <Link>TestAggregateListModel.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestAggregateModel.cs">
+      <Link>TestAggregateModel.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestBaseClassModel.cs">
+      <Link>TestBaseClassModel.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestClassWithArray.cs">
+      <Link>TestClassWithArray.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestClassWithDictionary.cs">
+      <Link>TestClassWithDictionary.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestClassWithStruct.cs">
+      <Link>TestClassWithStruct.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestCompositeClass.cs">
+      <Link>TestCompositeClass.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestCompositeKeyClass.cs">
+      <Link>TestCompositeKeyClass.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestCompositeSerializer.cs">
+      <Link>TestCompositeSerializer.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestDatabaseInstance.cs">
+      <Link>TestDatabaseInstance.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestDatabaseInstanceComposite.cs">
+      <Link>TestDatabaseInstanceComposite.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestDatabaseInterfaceInstance.cs">
+      <Link>TestDatabaseInterfaceInstance.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestDerivedClassAModel.cs">
+      <Link>TestDerivedClassAModel.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestDerivedClassBModel.cs">
+      <Link>TestDerivedClassBModel.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestForeignModel.cs">
+      <Link>TestForeignModel.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestListModel.cs">
+      <Link>TestListModel.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestModel.cs">
+      <Link>TestModel.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestModelAsList.cs">
+      <Link>TestModelAsList.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestSerializer.cs">
+      <Link>TestSerializer.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Wintellect.Sterling.Server\Wintellect.Sterling.Server.csproj">
+      <Project>{0119E739-C888-41C6-81CA-8D86C014BA85}</Project>
+      <Name>Wintellect.Sterling.Server</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

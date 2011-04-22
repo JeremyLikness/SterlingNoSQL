@@ -1,4 +1,6 @@
-﻿using Microsoft.Silverlight.Testing;
+﻿#if SILVERLIGHT
+using Microsoft.Silverlight.Testing;
+#endif
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Database;
 
@@ -74,8 +76,10 @@ namespace Wintellect.Sterling.Test.Database
         }
     }
 
+#if SILVERLIGHT 
     [Tag("Byte")]
     [Tag("Database")]
+#endif
     [TestClass]
     public class TestByteStreamInterceptor
     {
@@ -94,9 +98,9 @@ namespace Wintellect.Sterling.Test.Database
         [TestMethod]
         public void TestData()
         {
-            const string data = "Data to be intercepted";
+            const string DATA = "Data to be intercepted";
 
-            var byteStreamData = new ByteStreamData {Id = "data", Data = data};
+            var byteStreamData = new ByteStreamData {Id = "data", Data = DATA};
 
             _databaseInstance.RegisterInterceptor<ByteInterceptor>();
             _databaseInstance.RegisterInterceptor<ByteInterceptor2>();
@@ -105,7 +109,7 @@ namespace Wintellect.Sterling.Test.Database
 
             var loadedByteStreamData = _databaseInstance.Load<ByteStreamData>("data");
 
-            Assert.AreEqual(data, loadedByteStreamData.Data, "Byte interceptor test failed: data does not match");
+            Assert.AreEqual(DATA, loadedByteStreamData.Data, "Byte interceptor test failed: data does not match");
 
             _databaseInstance.UnRegisterInterceptor<ByteInterceptor2>();
 
@@ -118,14 +122,14 @@ namespace Wintellect.Sterling.Test.Database
                 loadedByteStreamData = null;
             }
 
-            Assert.IsTrue(loadedByteStreamData == null || !(data.Equals(loadedByteStreamData.Data)), 
+            Assert.IsTrue(loadedByteStreamData == null || !(DATA.Equals(loadedByteStreamData.Data)), 
                 "Byte interceptor test failed: Sterling deserialized intercepted data without interceptor.");
 
             _databaseInstance.RegisterInterceptor<ByteInterceptor2>();
 
             loadedByteStreamData = _databaseInstance.Load<ByteStreamData>("data");
 
-            Assert.AreEqual(data, loadedByteStreamData.Data, "Byte interceptor test failed: data does not match");
+            Assert.AreEqual(DATA, loadedByteStreamData.Data, "Byte interceptor test failed: data does not match");
         }
 
         [TestCleanup]

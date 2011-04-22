@@ -1,0 +1,236 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{0119E739-C888-41C6-81CA-8D86C014BA85}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Wintellect.Sterling.Server</RootNamespace>
+    <AssemblyName>Wintellect.Sterling.Server</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Wintellect.Sterling\Database\BaseDatabaseInstance.cs">
+      <Link>Database\BaseDatabaseInstance.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Database\BaseDriver.cs">
+      <Link>Database\BaseDriver.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Database\BaseSterlingByteInterceptor.cs">
+      <Link>Database\BaseSterlingByteInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Database\BaseSterlingTrigger.cs">
+      <Link>Database\BaseSterlingTrigger.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Database\CycleCache.cs">
+      <Link>Database\CycleCache.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Database\CycleItem.cs">
+      <Link>Database\CycleItem.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Database\Extensions.cs">
+      <Link>Database\Extensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Database\ITableDefinition.cs">
+      <Link>Database\ITableDefinition.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Database\LogManager.cs">
+      <Link>Database\LogManager.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Database\SterlingDatabase.cs">
+      <Link>Database\SterlingDatabase.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Database\TableDefinition.cs">
+      <Link>Database\TableDefinition.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Events\SterlingOperation.cs">
+      <Link>Events\SterlingOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Events\SterlingOperationArgs.cs">
+      <Link>Events\SterlingOperationArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\Exceptions3.Designer.cs">
+      <Link>Exceptions\Exceptions3.Designer.cs</Link>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Exceptions.resx</DependentUpon>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingActivationException.cs">
+      <Link>Exceptions\SterlingActivationException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingDatabaseNotFoundException.cs">
+      <Link>Exceptions\SterlingDatabaseNotFoundException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingDuplicateDatabaseException.cs">
+      <Link>Exceptions\SterlingDuplicateDatabaseException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingDuplicateIndexException.cs">
+      <Link>Exceptions\SterlingDuplicateIndexException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingDuplicateTypeException.cs">
+      <Link>Exceptions\SterlingDuplicateTypeException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingException.cs">
+      <Link>Exceptions\SterlingException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingIndexNotFoundException.cs">
+      <Link>Exceptions\SterlingIndexNotFoundException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingIsolatedStorageException.cs">
+      <Link>Exceptions\SterlingIsolatedStorageException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingLoggerNotFoundException.cs">
+      <Link>Exceptions\SterlingLoggerNotFoundException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingNoTableDefinitionsException.cs">
+      <Link>Exceptions\SterlingNoTableDefinitionsException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingNotReadyException.cs">
+      <Link>Exceptions\SterlingNotReadyException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingNullException.cs">
+      <Link>Exceptions\SterlingNullException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingSerializerException.cs">
+      <Link>Exceptions\SterlingSerializerException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingTableNotFoundException.cs">
+      <Link>Exceptions\SterlingTableNotFoundException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Exceptions\SterlingTriggerException.cs">
+      <Link>Exceptions\SterlingTriggerException.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Indexes\IIndexCollection.cs">
+      <Link>Indexes\IIndexCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Indexes\IndexCollection.cs">
+      <Link>Indexes\IndexCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Indexes\IndexCollection2.cs">
+      <Link>Indexes\IndexCollection2.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Indexes\TableIndex.cs">
+      <Link>Indexes\TableIndex.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Indexes\TableIndex2.cs">
+      <Link>Indexes\TableIndex2.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\ISterlingByteInterceptor.cs">
+      <Link>ISterlingByteInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\ISterlingDatabase.cs">
+      <Link>ISterlingDatabase.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\ISterlingDatabaseInstance.cs">
+      <Link>ISterlingDatabaseInstance.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\ISterlingDriver.cs">
+      <Link>ISterlingDriver.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\ISterlingLock.cs">
+      <Link>ISterlingLock.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\ISterlingTrigger.cs">
+      <Link>ISterlingTrigger.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Keys\IKeyCollection.cs">
+      <Link>Keys\IKeyCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Keys\KeyCollection.cs">
+      <Link>Keys\KeyCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Keys\TableKey.cs">
+      <Link>Keys\TableKey.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\MemoryDriver.cs">
+      <Link>MemoryDriver.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Serialization\AggregateSerializer.cs">
+      <Link>Serialization\AggregateSerializer.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Serialization\BaseSerializer.cs">
+      <Link>Serialization\BaseSerializer.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Serialization\DefaultSerializer.cs">
+      <Link>Serialization\DefaultSerializer.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Serialization\ISterlingSerializer.cs">
+      <Link>Serialization\ISterlingSerializer.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Serialization\PropertyOrField.cs">
+      <Link>Serialization\PropertyOrField.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Serialization\SerializationCache.cs">
+      <Link>Serialization\SerializationCache.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Serialization\SerializationHelper.cs">
+      <Link>Serialization\SerializationHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\Serialization\SterlingIgnoreAttribute.cs">
+      <Link>Serialization\SterlingIgnoreAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\SterlingDefaultLogger.cs">
+      <Link>SterlingDefaultLogger.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\SterlingEngine.cs">
+      <Link>SterlingEngine.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\SterlingFactory.cs">
+      <Link>SterlingFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\SterlingLogLevel.cs">
+      <Link>SterlingLogLevel.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serialization\ExtendedSerializer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\Wintellect.Sterling\Exceptions\Exceptions.resx">
+      <Link>Exceptions\Exceptions.resx</Link>
+      <LastGenOutput>Exceptions3.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
