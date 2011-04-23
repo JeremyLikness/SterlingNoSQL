@@ -7,7 +7,7 @@ using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Test.Helpers;
 
-namespace Wintellect.Sterling.IsolatedStorage.Test.Database
+namespace Wintellect.Sterling.Server.Test.Database
 {
     [TestClass]
     public class TestAsync

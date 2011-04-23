@@ -59,6 +59,9 @@
     <Reference Include="System.Windows.Browser" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SterlingBuildSln\VersionInfo.cs">
+      <Link>VersionInfo.cs</Link>
+    </Compile>
     <Compile Include="..\Wintellect.Sterling.IsolatedStorage\PathLock.cs">
       <Link>PathLock.cs</Link>
     </Compile>

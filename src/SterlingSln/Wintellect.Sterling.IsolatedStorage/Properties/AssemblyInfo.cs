@@ -8,8 +8,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Wintellect.Sterling.IsolatedStorage")]
 [assembly: AssemblyDescription("Sterling Isolated Storage Driver")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Jeremy Likness")]
-[assembly: AssemblyProduct("Wintellect.Sterling.IsolatedStorage")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("Sterling Isolated Storage Driver for Silverlight")]
 [assembly: AssemblyCopyright("Copyright © Jeremy Likness 2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -29,8 +29,5 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-// You can specify all the values or you can default the Revision and Build Numbers 
-// by using the '*' as shown below:
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+
 [assembly: InternalsVisibleTo("Wintellect.Sterling.IsolatedStorage.Test")]

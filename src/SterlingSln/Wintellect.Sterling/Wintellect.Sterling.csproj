@@ -59,6 +59,12 @@
     <Reference Include="System.Windows.Browser" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SterlingBuildSln\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\SterlingBuildSln\VersionInfo.cs">
+      <Link>VersionInfo.cs</Link>
+    </Compile>
     <Compile Include="Database\BaseDatabaseInstance.cs" />
     <Compile Include="Database\BaseDriver.cs" />
     <Compile Include="Database\BaseSterlingByteInterceptor.cs" />

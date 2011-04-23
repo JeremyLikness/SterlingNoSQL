@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{BAE29C2E-65C6-4842-BD9A-1D93A0D489B5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Wintellect.Sterling.Server.FileSystem.Test</RootNamespace>
+    <AssemblyName>Wintellect.Sterling.Server.FileSystem.Test</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <CodeAnalysisDependentAssemblyPaths Condition=" '$(VS100COMNTOOLS)' != '' " Include="$(VS100COMNTOOLS)..\IDE\PrivateAssemblies">
+      <Visible>False</Visible>
+    </CodeAnalysisDependentAssemblyPaths>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Database\TestActivation.cs" />
+    <Compile Include="Database\TestAggregateList.cs" />
+    <Compile Include="Database\TestArrays.cs" />
+    <Compile Include="Database\TestAsync.cs" />
+    <Compile Include="Database\TestBackupRestore.cs" />
+    <Compile Include="Database\TestByteStreamInterceptor.cs" />
+    <Compile Include="Database\TestCycle.cs" />
+    <Compile Include="Database\TestDelete.cs" />
+    <Compile Include="Database\TestDictionary.cs" />
+    <Compile Include="Database\TestDirtyFlag.cs" />
+    <Compile Include="Database\TestEnum.cs" />
+    <Compile Include="Database\TestField.cs" />
+    <Compile Include="Database\TestIndexQuery.cs" />
+    <Compile Include="Database\TestInterfaceProperty.cs" />
+    <Compile Include="Database\TestLists.cs" />
+    <Compile Include="Database\TestNullable.cs" />
+    <Compile Include="Database\TestPersonBill.cs" />
+    <Compile Include="Database\TestPurge.cs" />
+    <Compile Include="Database\TestQuery.cs" />
+    <Compile Include="Database\TestRegistration.cs" />
+    <Compile Include="Database\TestSaveAndLoad.cs" />
+    <Compile Include="Database\TestSerializers.cs" />
+    <Compile Include="Database\TestTriggers.cs" />
+    <Compile Include="Database\TestTruncate.cs" />
+    <Compile Include="Indexes\TestSingleIndex.cs" />
+    <Compile Include="Keys\TestCompositeKey.cs" />
+    <Compile Include="Keys\TestCompositeKeyWithKeyClass.cs" />
+    <Compile Include="Keys\TestKeyCollection.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Wintellect.Sterling.Server.FileSystem\Wintellect.Sterling.Server.FileSystem.csproj">
+      <Project>{D978BFD3-EC1D-462D-AE46-B7FF80812864}</Project>
+      <Name>Wintellect.Sterling.Server.FileSystem</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Wintellect.Sterling.Server.Test.Helpers\Wintellect.Sterling.Server.Test.Helpers.csproj">
+      <Project>{E618E839-BCE8-4B54-8A20-1BBB37040AFD}</Project>
+      <Name>Wintellect.Sterling.Server.Test.Helpers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Wintellect.Sterling.Server\Wintellect.Sterling.Server.csproj">
+      <Project>{0119E739-C888-41C6-81CA-8D86C014BA85}</Project>
+      <Name>Wintellect.Sterling.Server</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
