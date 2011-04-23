@@ -162,9 +162,6 @@
     <Compile Include="..\Wintellect.Sterling.Test\Serializer\TestExtendedSerializer.cs">
       <Link>Serializer\TestExtendedSerializer.cs</Link>
     </Compile>
-    <Compile Include="..\Wintellect.Sterling.Test\Serializer\TestListSerializer.cs">
-      <Link>Serializer\TestListSerializer.cs</Link>
-    </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>

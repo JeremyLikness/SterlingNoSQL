@@ -118,6 +118,30 @@
     <Compile Include="..\Wintellect.Sterling.Test\Database\TestTruncate.cs">
       <Link>Database\TestTruncate.cs</Link>
     </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test\Indexes\TestSingleIndex.cs">
+      <Link>Indexes\TestSingleIndex.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test\Keys\TestCompositeKey.cs">
+      <Link>Keys\TestCompositeKey.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test\Keys\TestCompositeKeyWithKeyClass.cs">
+      <Link>Keys\TestCompositeKeyWithKeyClass.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test\Keys\TestKeyCollection.cs">
+      <Link>Keys\TestKeyCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test\Keys\TestTableKey.cs">
+      <Link>Keys\TestTableKey.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test\Serializer\TestAggregateSerializer.cs">
+      <Link>Serializer\TestAggregateSerializer.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test\Serializer\TestDefaultSerializer.cs">
+      <Link>Serializer\TestDefaultSerializer.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test\Serializer\TestExtendedSerializer.cs">
+      <Link>Serializer\TestExtendedSerializer.cs</Link>
+    </Compile>
     <Compile Include="Database\TestAsync.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

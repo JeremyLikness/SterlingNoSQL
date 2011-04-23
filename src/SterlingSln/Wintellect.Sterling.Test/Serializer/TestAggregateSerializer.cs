@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+#if SILVERLIGHT
 using Microsoft.Silverlight.Testing;
+#endif
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Exceptions;
 using Wintellect.Sterling.Serialization;
@@ -9,7 +11,9 @@ using Wintellect.Sterling.Test.Helpers;
 
 namespace Wintellect.Sterling.Test.Serializer
 {
+#if SILVERLIGHT
     [Tag("Serializer")]
+#endif
     [TestClass]
     public class TestAggregateSerializer
     {

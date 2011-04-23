@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Linq;
+#if SILVERLIGHT
 using Microsoft.Silverlight.Testing;
+#endif
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Keys;
 using Wintellect.Sterling.Test.Helpers;
 
 namespace Wintellect.Sterling.Test.Keys
 {
+#if SILVERLIGHT
     [Tag("TableKey")]
+#endif
     [TestClass]
     public class TestTableKey
     {

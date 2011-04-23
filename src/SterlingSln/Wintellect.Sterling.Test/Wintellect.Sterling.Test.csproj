@@ -112,7 +112,6 @@
     <Compile Include="Serializer\TestAggregateSerializer.cs" />
     <Compile Include="Serializer\TestDefaultSerializer.cs" />
     <Compile Include="Serializer\TestExtendedSerializer.cs" />
-    <Compile Include="Serializer\TestListSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">

@@ -1,11 +1,15 @@
 using System;
+#if SILVERLIGHT
 using Microsoft.Silverlight.Testing;
+#endif
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Test.Helpers;
 
 namespace Wintellect.Sterling.Test.Keys
 {
+#if SILVERLIGHT
     [Tag("CompositeKey")]
+#endif
     [TestClass]
     public class TestCompositeKey
     {

@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using System.Text;
+#if SILVERLIGHT
 using Microsoft.Silverlight.Testing;
+#endif
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Serialization;
 
@@ -9,7 +11,9 @@ namespace Wintellect.Sterling.Test.Serializer
     /// <summary>
     ///     Default serializer test
     /// </summary>
+#if SILVERLIGHT
     [Tag("Serializer")]
+#endif
     [TestClass]
     public class TestDefaultSerializer
     {
