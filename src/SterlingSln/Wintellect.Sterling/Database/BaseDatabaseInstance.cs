@@ -196,7 +196,7 @@ namespace Wintellect.Sterling.Database
         /// <summary>
         ///     The name of the database instance
         /// </summary>
-        public abstract string Name { get; }
+        public virtual string Name { get { return GetType().FullName; } }
 
         /// <summary>
         ///     Method called from the constructor to register tables
