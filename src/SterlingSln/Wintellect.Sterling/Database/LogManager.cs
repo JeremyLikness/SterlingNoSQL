@@ -7,7 +7,7 @@ namespace Wintellect.Sterling.Database
     /// <summary>
     ///     Manages the loggers
     /// </summary>
-    internal class LogManager : ISterlingLock 
+    public class LogManager : ISterlingLock 
     {
         /// <summary>
         ///     The dictionary of loggers

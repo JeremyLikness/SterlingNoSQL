@@ -30,6 +30,19 @@ namespace Wintellect.Sterling.Database
         /// </summary>
         private readonly List<BackgroundWorker> _workers = new List<BackgroundWorker>();
 
+        private SerializationHelper _serializationHelper; 
+
+        public SerializationHelper Helper
+        {
+            get
+            {
+                return _serializationHelper ?? (_serializationHelper = new SerializationHelper(this, Serializer, SterlingFactory.GetLogger(),
+                                                                    s => Driver.GetTypeIndex(s),
+                                                                    i => Driver.GetTypeAtIndex(i)));
+            }
+
+        }
+
         /// <summary>
         ///     List of triggers
         /// </summary>
@@ -471,10 +484,7 @@ namespace Wintellect.Sterling.Database
             {
                 using (var bw = new BinaryWriter(memStream))
                 {
-                    var serializationHelper = new SerializationHelper(this, Serializer, SterlingFactory.GetLogger(),
-                                                                      s => Driver.GetTypeIndex(s),
-                                                                      i => Driver.GetTypeAtIndex(i));
-                    serializationHelper.Save(type, instance, bw, cache);
+                    Helper.Save(type, instance, bw, cache);
 
                     bw.Flush();
 

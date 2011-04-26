@@ -2,11 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using Wintellect.Sterling.Database;
 using Wintellect.Sterling.Events;
 using Wintellect.Sterling.Indexes;
 using Wintellect.Sterling.Keys;
+using Wintellect.Sterling.Serialization;
 
 namespace Wintellect.Sterling
 {
@@ -19,6 +19,8 @@ namespace Wintellect.Sterling
         ///     The driver
         /// </summary>
         ISterlingDriver Driver { get; }
+
+        SerializationHelper Helper { get; }
 
         /// <summary>
         ///     Register a trigger

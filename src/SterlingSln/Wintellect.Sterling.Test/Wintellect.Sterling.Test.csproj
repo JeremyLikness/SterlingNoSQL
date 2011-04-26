@@ -110,6 +110,7 @@
     <Compile Include="Keys\TestTableKey.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serializer\TestAggregateSerializer.cs" />
+    <Compile Include="Serializer\TestCustomSerializer.cs" />
     <Compile Include="Serializer\TestDefaultSerializer.cs" />
     <Compile Include="Serializer\TestExtendedSerializer.cs" />
   </ItemGroup>

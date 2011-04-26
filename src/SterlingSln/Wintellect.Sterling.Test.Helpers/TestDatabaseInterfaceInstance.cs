@@ -7,6 +7,7 @@ using Wintellect.Sterling.Database;
 using Wintellect.Sterling.Events;
 using Wintellect.Sterling.Indexes;
 using Wintellect.Sterling.Keys;
+using Wintellect.Sterling.Serialization;
 
 namespace Wintellect.Sterling.Test.Helpers
 {
@@ -22,6 +23,11 @@ namespace Wintellect.Sterling.Test.Helpers
         ///     The driver
         /// </summary>
         public ISterlingDriver Driver
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public SerializationHelper Helper
         {
             get { throw new NotImplementedException(); }
         }

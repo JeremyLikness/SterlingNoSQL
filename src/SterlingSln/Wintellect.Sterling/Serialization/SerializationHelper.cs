@@ -9,12 +9,30 @@ using System.Collections.Generic;
 namespace Wintellect.Sterling.Serialization
 {
     /// <summary>
+    ///     Wraps nodes for passing directly into the Save pass of the Serialization Helper
+    /// </summary>
+    public class SerializationNode
+    {
+        public object Value { get; set; }
+
+        public static SerializationNode WrapForSerialization(object obj)
+        {
+            return new SerializationNode {Value = obj};
+        }
+
+        public T UnwrapForDeserialization<T>()
+        {
+            return (T) Value;
+        }
+    }
+
+    /// <summary>
     ///     This class assists with the serialization and de-serialization of objects
     /// </summary>
     /// <remarks>
     ///     This is where the heavy lifting is done, and likely where most of the tweaks make sense
     /// </remarks>
-    internal class SerializationHelper
+    public class SerializationHelper
     {
         // a few constants to serialize null values to the stream
         private const ushort NULL = 0;
@@ -25,13 +43,13 @@ namespace Wintellect.Sterling.Serialization
         /// <summary>
         ///     The import cache, stores what properties are available and how to access them
         /// </summary>
-        private static readonly
+        private readonly
             Dictionary<Type, List<SerializationCache>>
             _propertyCache =
                 new Dictionary
                     <Type, List<SerializationCache>>();
 
-        private static readonly Dictionary<string,Type> _typeRef = new Dictionary<string, Type>();
+        private readonly Dictionary<string,Type> _typeRef = new Dictionary<string, Type>();
 
         private readonly ISterlingDatabaseInstance _database;
         private readonly ISterlingSerializer _serializer;
@@ -378,7 +396,7 @@ namespace Wintellect.Sterling.Serialization
                 return null;
             }
 
-            Type typeResolved = null;
+            Type typeResolved;
 
             if (!_typeRef.TryGetValue(typeName, out typeResolved))
             {
