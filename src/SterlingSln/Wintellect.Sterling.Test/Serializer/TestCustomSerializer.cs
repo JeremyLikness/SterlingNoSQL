@@ -2,21 +2,23 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.Silverlight.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Wintellect.Sterling.Database;
 using Wintellect.Sterling.Serialization;
+using Wintellect.Sterling.Test.Helpers;
 
 namespace Wintellect.Sterling.Test.Serializer
 {
     /// <summary>
     ///     Example list normally not supported (IEnumerable)
     /// </summary>
-    public class NotSupportedList : IEnumerable<string>
+    public class NotSupportedList : IEnumerable<TestModel>
     {
-        private readonly List<string> _list = new List<string>();
+        private readonly List<TestModel> _list = new List<TestModel>();
 
-        public void Add(IEnumerable<string> newItems)
+        public void Add(IEnumerable<TestModel> newItems)
         {
             _list.AddRange(newItems);
         }
@@ -27,7 +29,7 @@ namespace Wintellect.Sterling.Test.Serializer
         /// <returns>
         /// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
         /// </returns>
-        public IEnumerator<string> GetEnumerator()
+        public IEnumerator<TestModel> GetEnumerator()
         {
             return _list.GetEnumerator();
         }
@@ -71,9 +73,10 @@ namespace Wintellect.Sterling.Test.Serializer
         protected override List<ITableDefinition> RegisterTables()
         {
             return new List<ITableDefinition>
-                           {
-                               CreateTableDefinition<NotSupportedClass, int>(t=>t.Id)
-                           };
+                            {
+                                CreateTableDefinition<NotSupportedClass, int>(t=>t.Id),
+                                CreateTableDefinition<TestModel,int>(t=>t.Key)
+                            };
         }
     }
 
@@ -101,7 +104,7 @@ namespace Wintellect.Sterling.Test.Serializer
         public override void Serialize(object target, BinaryWriter writer)
         {
             // turn it into a list and save it 
-            var list = new List<string>((NotSupportedList) target);
+            var list = new List<TestModel>((NotSupportedList) target);
 
             // this takes advantage of the special save wrapper for injecting into the stream
             TestCustomSerializer.DatabaseInstance.Helper.Save(list, writer);
@@ -116,7 +119,7 @@ namespace Wintellect.Sterling.Test.Serializer
         public override object Deserialize(Type type, BinaryReader reader)
         {
             // grab it as a list - again, unwrapped from a node and returned
-            var list = TestCustomSerializer.DatabaseInstance.Helper.Load<List<string>>(reader);
+            var list = TestCustomSerializer.DatabaseInstance.Helper.Load<List<TestModel>>(reader);
             return new NotSupportedList {list};
         }
     }
@@ -165,21 +168,31 @@ namespace Wintellect.Sterling.Test.Serializer
         [TestMethod]
         public void TestCustomSaveAndLoad()
         {
-            var expectedList = new[] {"one", "two", "three"};
+            var expectedList = new[] {TestModel.MakeTestModel(), TestModel.MakeTestModel(), TestModel.MakeTestModel()};
             var expected = new NotSupportedClass {Id = 1};
             expected.InnerList.Add(expectedList);
 
             var key = DatabaseInstance.Save(expected);
+
+            // confirm the test models were saved as "foreign keys" 
+            var count = DatabaseInstance.Query<TestModel, int>().Count();
+
+            Assert.AreEqual(expectedList.Length, count, "Load failed: test models were not saved independently.");
 
             var actual = DatabaseInstance.Load<NotSupportedClass>(key);
             Assert.IsNotNull(actual, "Load failed: instance is null.");
             Assert.AreEqual(expected.Id, actual.Id, "Load failed: key mismatch.");
 
             // cast to list
-            var actualList = new List<string>(actual.InnerList);
+            var actualList = new List<TestModel>(actual.InnerList);
 
-            CollectionAssert.AreEquivalent(expectedList, actualList, "Load failed: lists do not match.");
+            Assert.AreEqual(expectedList.Length, actualList.Count, "Load failed: mismatch in list.");
 
+            foreach (var matchingItem in
+                expectedList.Select(item => (from i in actualList where i.Key.Equals(item.Key) select i.Key).FirstOrDefault()).Where(matchingItem => matchingItem < 1))
+            {
+                Assert.Fail("Test failed: matching models not loaded.");
+            }
         }        
     }
 }
