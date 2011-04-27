@@ -10,6 +10,8 @@ namespace Wintellect.Sterling.Serialization
 {
     /// <summary>
     ///     Wraps nodes for passing directly into the Save pass of the Serialization Helper
+    ///     Basically just hosts another object so that the helper can recursively navigate properties
+    ///     Useful in external serializers that want to re-enter the stream using the helper methods
     /// </summary>
     public class SerializationNode
     {
@@ -123,6 +125,23 @@ namespace Wintellect.Sterling.Serialization
             _logManager = logManager;
             _typeResolver = typeResolver;
             _typeIndexer = typeIndexer;
+        }
+
+        /// <summary>
+        ///     External entry point for save, used by serializers
+        ///     or other methods that simply want to intercept the
+        ///     serialization stream. Wraps the object in a node and
+        ///     then parses recursively
+        /// </summary>
+        /// <remarks>
+        ///     See the custom serializer test for an example
+        /// </remarks>
+        /// <param name="obj">The instance to save</param>
+        /// <param name="bw">The writer to inject to</param>
+        public void Save(object obj, BinaryWriter bw)
+        {
+            var node = SerializationNode.WrapForSerialization(obj);
+            Save(typeof(SerializationNode), node, bw, new CycleCache());
         }
 
         /// <summary>
@@ -315,6 +334,24 @@ namespace Wintellect.Sterling.Serialization
                                 foreignKey.GetType().FullName, foreignKey, type.FullName), null);
 
             _serializer.Serialize(foreignKey, bw);            
+        }
+
+        /// <summary>
+        ///     Helper load for serializers - this is not part of the internal recursion
+        ///     Basically allows a node to be saved in a wrapper, and this is the entry
+        ///     to unwrap it
+        /// </summary>
+        /// <typeparam name="T">Type of the object to laod</typeparam>
+        /// <param name="br">The reader stream being accessed</param>
+        /// <returns>The unwrapped object instance</returns>
+        public T Load<T>(BinaryReader br)
+        {
+            var node = Load(typeof (SerializationNode), null, br, new CycleCache()) as SerializationNode;
+            if (node != null)
+            {
+                return node.UnwrapForDeserialization<T>();
+            }
+            return default(T);
         }
 
         /// <summary>

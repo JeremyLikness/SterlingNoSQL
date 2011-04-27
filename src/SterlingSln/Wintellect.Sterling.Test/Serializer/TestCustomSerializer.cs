@@ -9,6 +9,9 @@ using Wintellect.Sterling.Serialization;
 
 namespace Wintellect.Sterling.Test.Serializer
 {
+    /// <summary>
+    ///     Example list normally not supported (IEnumerable)
+    /// </summary>
     public class NotSupportedList : IEnumerable<string>
     {
         private readonly List<string> _list = new List<string>();
@@ -41,6 +44,9 @@ namespace Wintellect.Sterling.Test.Serializer
         }
     }
 
+    /// <summary>
+    ///     Class typically not supported because the property is IEnumerable
+    /// </summary>
     public class NotSupportedClass
     {
         public NotSupportedClass()
@@ -53,6 +59,9 @@ namespace Wintellect.Sterling.Test.Serializer
         public NotSupportedList InnerList { get; set; }
     }
 
+    /// <summary>
+    ///     Custom database to host the test
+    /// </summary>
     public class CustomSerializerDatabase : BaseDatabaseInstance
     {        
         /// <summary>
@@ -68,6 +77,9 @@ namespace Wintellect.Sterling.Test.Serializer
         }
     }
 
+    /// <summary>
+    ///     Serializer to create support for the non-supported property
+    /// </summary>
     public class SupportSerializer : BaseSerializer
     {
         /// <summary>
@@ -77,6 +89,7 @@ namespace Wintellect.Sterling.Test.Serializer
         /// <returns>True if it can be serialized</returns>
         public override bool CanSerialize(Type targetType)
         {
+            // only support the "non-supported" list
             return targetType.Equals(typeof (NotSupportedList));
         }
 
@@ -89,7 +102,9 @@ namespace Wintellect.Sterling.Test.Serializer
         {
             // turn it into a list and save it 
             var list = new List<string>((NotSupportedList) target);
-            TestCustomSerializer.DatabaseInstance.Helper.Save(typeof(SerializationNode), SerializationNode.WrapForSerialization(list), writer, new CycleCache());
+
+            // this takes advantage of the special save wrapper for injecting into the stream
+            TestCustomSerializer.DatabaseInstance.Helper.Save(list, writer);
         }
 
         /// <summary>
@@ -100,17 +115,16 @@ namespace Wintellect.Sterling.Test.Serializer
         /// <returns>The deserialized object</returns>
         public override object Deserialize(Type type, BinaryReader reader)
         {
-            // grab it as a list 
-            var list =
-                ((SerializationNode)
-                 TestCustomSerializer.DatabaseInstance.Helper.Load(typeof (SerializationNode), null, reader,
-                                                                   new CycleCache())).UnwrapForDeserialization
-                    <List<string>>();
+            // grab it as a list - again, unwrapped from a node and returned
+            var list = TestCustomSerializer.DatabaseInstance.Helper.Load<List<string>>(reader);
             return new NotSupportedList {list};
         }
     }
 
 #if SILVERLIGHT
+    /// <summary>
+    ///     Test for custom serialization
+    /// </summary>
     [Tag("Custom")]
     [Tag("Serializer")]
 #endif
@@ -118,8 +132,11 @@ namespace Wintellect.Sterling.Test.Serializer
     public class TestCustomSerializer
     {
         private SterlingEngine _engine;
-        public static ISterlingDatabaseInstance DatabaseInstance;        
+        public static ISterlingDatabaseInstance DatabaseInstance;
 
+        /// <summary>
+        ///    Initialize the test
+        /// </summary>
         [TestInitialize]
         public void TestInit()
         {
@@ -130,6 +147,9 @@ namespace Wintellect.Sterling.Test.Serializer
             DatabaseInstance.Purge();
         }
 
+        /// <summary>
+        ///     Clean up when done
+        /// </summary>
         [TestCleanup]
         public void TestCleanup()
         {
@@ -138,6 +158,10 @@ namespace Wintellect.Sterling.Test.Serializer
             DatabaseInstance = null;
         }
 
+        /// <summary>
+        ///     Test the serializer by creating a typically non-supported class and processing with
+        ///     the custom serializer
+        /// </summary>
         [TestMethod]
         public void TestCustomSaveAndLoad()
         {
