@@ -452,7 +452,16 @@ namespace Wintellect.Sterling.Serialization
             {
                 var keyType = _database.GetKeyType(typeResolved);
                 var key = _serializer.Deserialize(keyType, br);
-                return _database.Load(typeResolved, key, cache);
+
+                var cached = cache.CheckKey(keyType, key);
+                if (cached != null)
+                {
+                    return cached;
+                }
+
+                cached = _database.Load(typeResolved, key, cache);
+                cache.Add(typeResolved, cached, key);
+                return cached;
             }
 
             if (_serializer.CanSerialize(typeResolved))

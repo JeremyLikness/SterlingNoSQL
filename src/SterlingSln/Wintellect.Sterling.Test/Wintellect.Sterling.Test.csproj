@@ -93,6 +93,7 @@
     <Compile Include="Database\TestIndexQuery.cs" />
     <Compile Include="Database\TestInterfaceProperty.cs" />
     <Compile Include="Database\TestLists.cs" />
+    <Compile Include="Database\TestNestedInstance.cs" />
     <Compile Include="Database\TestNullable.cs" />
     <Compile Include="Database\TestPurge.cs" />
     <Compile Include="Database\TestQuery.cs" />
