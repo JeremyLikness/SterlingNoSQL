@@ -57,6 +57,11 @@ namespace Wintellect.Sterling
         string Name { get; }
 
         /// <summary>
+        ///     The type dictating which objects should be ignored
+        /// </summary>
+        Type IgnoreAttribute { get; }
+
+        /// <summary>
         ///     True if it is registered with the sterling engine
         /// </summary>
         /// <param name="instance">The instance</param>

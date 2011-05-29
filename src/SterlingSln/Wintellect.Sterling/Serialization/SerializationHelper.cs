@@ -83,8 +83,8 @@ namespace Wintellect.Sterling.Serialization
                 var fields = from f in type.GetFields()
                              where                              
                              !f.IsStatic &&
-                             !f.IsLiteral &&                             
-                             !f.IsIgnored() && !f.FieldType.IsIgnored()
+                             !f.IsLiteral &&
+                             !f.IsIgnored(_database.IgnoreAttribute) && !f.FieldType.IsIgnored(_database.IgnoreAttribute)
                              select new PropertyOrField(f);               
                 
                 var properties = from p in type.GetProperties()
@@ -92,7 +92,7 @@ namespace Wintellect.Sterling.Serialization
                                  ((noDerived && p.DeclaringType.Equals(type) || !noDerived)) &&
                                  p.CanRead && p.CanWrite &&
                                  p.GetGetMethod() != null && p.GetSetMethod() != null
-                                       && !p.IsIgnored() && !p.PropertyType.IsIgnored()
+                                       && !p.IsIgnored(_database.IgnoreAttribute) && !p.PropertyType.IsIgnored(_database.IgnoreAttribute)
                                  select new PropertyOrField(p);                                 
 
                 foreach (var p in properties.Concat(fields))

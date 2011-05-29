@@ -82,6 +82,11 @@ namespace Wintellect.Sterling.Test.Helpers
         }
 
         /// <summary>
+        ///     The type dictating which objects should be ignored
+        /// </summary>
+        public Type IgnoreAttribute { get { return typeof(SterlingIgnoreAttribute); } }
+
+        /// <summary>
         ///     True if it is registered with the sterling engine
         /// </summary>
         /// <param name="instance">The instance</param>

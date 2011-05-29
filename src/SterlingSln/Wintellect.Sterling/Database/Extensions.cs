@@ -63,9 +63,9 @@ namespace Wintellect.Sterling.Database
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        public static bool IsIgnored(this PropertyInfo p)
+        public static bool IsIgnored(this PropertyInfo p, Type ignoreAttribute)
         {
-            return (from c in p.GetCustomAttributes(false) where c is SterlingIgnoreAttribute select c).Any();
+            return p.GetCustomAttributes(ignoreAttribute,false).Any();
         }
 
         /// <summary>
@@ -73,9 +73,9 @@ namespace Wintellect.Sterling.Database
         /// </summary>
         /// <param name="f"></param>
         /// <returns></returns>
-        public static bool IsIgnored(this FieldInfo f)
+        public static bool IsIgnored(this FieldInfo f, Type ignoreAttribute)
         {
-            return (from c in f.GetCustomAttributes(false) where c is SterlingIgnoreAttribute select c).Any();
+            return f.GetCustomAttributes(ignoreAttribute,false).Any();
         }
 
         /// <summary>
@@ -83,9 +83,9 @@ namespace Wintellect.Sterling.Database
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static bool IsIgnored(this Type type)
+        public static bool IsIgnored(this Type type, Type ignoreAttribute)
         {
-            return (from c in type.GetCustomAttributes(false) where c is SterlingIgnoreAttribute select c).Any();
+            return type.GetCustomAttributes(ignoreAttribute,false).Any();
         }
 
     }

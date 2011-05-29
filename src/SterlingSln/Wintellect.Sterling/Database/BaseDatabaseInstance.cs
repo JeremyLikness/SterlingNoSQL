@@ -211,6 +211,12 @@ namespace Wintellect.Sterling.Database
         /// </summary>
         public virtual string Name { get { return GetType().FullName; } }
 
+
+        /// <summary>
+        ///     The type dictating which objects should be ignored
+        /// </summary>
+        public virtual Type IgnoreAttribute { get { return typeof(SterlingIgnoreAttribute); } }
+
         /// <summary>
         ///     Method called from the constructor to register tables
         /// </summary>
