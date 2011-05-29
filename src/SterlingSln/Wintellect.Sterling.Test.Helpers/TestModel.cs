@@ -119,4 +119,21 @@ namespace Wintellect.Sterling.Test.Helpers
         public IDictionary Dict { get; set; }
         public ObservableCollection<TestModel> Models { get; set; }
     }
+
+    public class TestIndexedSubclassBase
+    {
+        public int Id {get;set;}
+        public string BaseProperty { get; set; }
+    }
+
+    public class TestIndexedSubclassModel:TestIndexedSubclassBase
+    {
+        public string SubclassProperty { get; set; }
+    }
+
+    public class TestIndexedSubclassFake {
+        public int Id;
+        public string BaseProperty { get; set; }
+        public string SubclassProperty { get; set; }
+    }
 }

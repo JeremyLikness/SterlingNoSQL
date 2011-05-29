@@ -176,6 +176,29 @@ namespace Wintellect.Sterling.Test.Helpers
         }
 
         /// <summary>
+        ///     Save a sub-class under a base class table definition
+        /// </summary>
+        /// <typeparam name="T">The table type</typeparam>
+        /// <typeparam name="TKey">Save it</typeparam>
+        /// <param name="instance">An instance or sub-class of the table type</param>
+        /// <returns></returns>
+        public TKey SaveAs<T, TKey>(T instance) where T : class,new()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        ///     Save a sub-class under a base class table definition
+        /// </summary>
+        /// <typeparam name="T">The table type</typeparam>
+        /// <param name="instance">The instance or sub-class of the table type</param>
+        /// <returns></returns>
+        public object SaveAs<T>(T instance) where T : class,new()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         ///     Save it (no knowledge of key)
         /// </summary>
         /// <typeparam name="T">The type</typeparam>
@@ -189,11 +212,12 @@ namespace Wintellect.Sterling.Test.Helpers
         /// <summary>
         ///     Save when key is not known
         /// </summary>
-        /// <param name="type">The type to save</param>
+        /// <param name="actualType">The type of instance to save</param>
+        /// <param name="tableType">The type used to find the table to save to</param>
         /// <param name="instance">The instance</param>
         /// <param name="cache">The cycle cache</param>
         /// <returns>The key</returns>
-        public object Save(Type type, object instance, CycleCache cache)
+        public object Save(Type actualType, Type tableType, object instance, CycleCache cache)
         {
             throw new NotImplementedException();
         }
@@ -205,6 +229,17 @@ namespace Wintellect.Sterling.Test.Helpers
         /// <param name="instance">The instance</param>
         /// <returns>The key</returns>
         public object Save(Type type, object instance)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        ///     Save against a base class when key is not known
+        /// </summary>
+        /// <param name="type">The table type to save against</param>
+        /// <param name="instance">The instance</param>
+        /// <returns>The key</returns>
+        public object SaveAs(Type type, object instance)
         {
             throw new NotImplementedException();
         }

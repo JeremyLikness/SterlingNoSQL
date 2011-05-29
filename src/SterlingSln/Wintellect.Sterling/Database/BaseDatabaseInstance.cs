@@ -437,6 +437,46 @@ namespace Wintellect.Sterling.Database
         }
 
         /// <summary>
+        ///     Save an instance against a base class table definition
+        /// </summary>
+        /// <typeparam name="T">The table type</typeparam>
+        /// <typeparam name="TKey">Save it</typeparam>
+        /// <param name="instance">An instance or sub-class of the table type</param>
+        /// <returns></returns>
+        public TKey SaveAs<T, TKey>(T instance) where T : class, new()
+        {
+            return (TKey)SaveAs(instance);
+        }
+
+        /// <summary>
+        ///     Save an instance against a base class table definition
+        /// </summary>
+        /// <typeparam name="T">The table type</typeparam>
+        /// <param name="instance">An instance or sub-class of the table type</param>
+        /// <returns></returns>
+        public object SaveAs<T>(T instance) where T : class, new()
+        {
+            var tableType = typeof(T);
+            return Save(instance.GetType(), tableType, instance, new CycleCache());
+        }
+
+        /// <summary>
+        ///     Save against a base class when key is not known
+        /// </summary>
+        /// <param name="type">The table type to save against</param>
+        /// <param name="instance">The instance</param>
+        /// <returns>The key</returns>
+        public object SaveAs(Type tableType, object instance)
+        {
+            if (!instance.GetType().IsSubclassOf(tableType) || !(instance.GetType() == tableType))
+            {
+                throw new SterlingException(string.Format("{0} is not of type {1}", instance.GetType().Name, tableType.Name));
+            }
+
+            return Save(tableType, instance);
+        }
+
+        /// <summary>
         ///     Entry point for save
         /// </summary>
         /// <param name="type">Type to save</param>
@@ -444,45 +484,46 @@ namespace Wintellect.Sterling.Database
         /// <returns>The key saved</returns>
         public object Save(Type type, object instance)
         {
-            return Save(type, instance, new CycleCache());
+            return Save(type, type, instance, new CycleCache());
         }
 
         /// <summary>
         ///     Save when key is not known
         /// </summary>
-        /// <param name="type">The type of the instance</param>
+        /// <param name="actualType">The type of instance to save</param>
+        /// <param name="tableType">The table type to save to</param>
         /// <param name="instance">The instance</param>
         /// <param name="cache">Cycle cache</param>
         /// <returns>The key</returns>
-        public object Save(Type type, object instance, CycleCache cache)
+        public object Save(Type actualType, Type tableType, object instance, CycleCache cache)
         {
-            if (!TableDefinitions.ContainsKey(type))
+            if (!TableDefinitions.ContainsKey(tableType))
             {
                 throw new SterlingTableNotFoundException(instance.GetType(), Name);
             }
 
-            if (!TableDefinitions[type].IsDirty(instance))
+            if (!TableDefinitions[tableType].IsDirty(instance))
             {
-                return TableDefinitions[type].FetchKeyFromInstance(instance);
+                return TableDefinitions[tableType].FetchKeyFromInstance(instance);
             }
 
             // call any before save triggers 
-            foreach (var trigger in _TriggerList(type).Where(trigger => !trigger.BeforeSave(type, instance)))
+            foreach (var trigger in _TriggerList(tableType).Where(trigger => !trigger.BeforeSave(actualType, instance)))
             {
                 throw new SterlingTriggerException(
                     Exceptions.Exceptions.BaseDatabaseInstance_Save_Save_suppressed_by_trigger, trigger.GetType());
             }
 
-            var key = TableDefinitions[type].FetchKeyFromInstance(instance);
+            var key = TableDefinitions[tableType].FetchKeyFromInstance(instance);
 
             if (cache.Check(instance))
             {
                 return key;
             }
 
-            cache.Add(type, instance, key);
+            cache.Add(tableType, instance, key);
 
-            var keyIndex = TableDefinitions[type].Keys.AddKey(key);
+            var keyIndex = TableDefinitions[tableType].Keys.AddKey(key);
 
             var memStream = new MemoryStream();
 
@@ -490,7 +531,7 @@ namespace Wintellect.Sterling.Database
             {
                 using (var bw = new BinaryWriter(memStream))
                 {
-                    Helper.Save(type, instance, bw, cache);
+                    Helper.Save(actualType, instance, bw, cache,true);
 
                     bw.Flush();
 
@@ -506,7 +547,7 @@ namespace Wintellect.Sterling.Database
                     }
 
                     memStream.Seek(0, SeekOrigin.Begin);
-                    Driver.Save(type, keyIndex, memStream.ToArray());
+                    Driver.Save(tableType, keyIndex, memStream.ToArray());
                 }
             }
             finally
@@ -517,18 +558,18 @@ namespace Wintellect.Sterling.Database
 
 
             // update the indexes
-            foreach (var index in TableDefinitions[type].Indexes.Values)
+            foreach (var index in TableDefinitions[tableType].Indexes.Values)
             {
                 index.AddIndex(instance, key);
             }
 
             // call post-save triggers
-            foreach (var trigger in _TriggerList(type))
+            foreach (var trigger in _TriggerList(tableType))
             {
-                trigger.AfterSave(type, instance);
+                trigger.AfterSave(actualType, instance);
             }
 
-            _RaiseOperation(SterlingOperation.Save, type, key);
+            _RaiseOperation(SterlingOperation.Save, tableType, key);
 
             return key;
         }

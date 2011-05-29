@@ -53,7 +53,9 @@ namespace Wintellect.Sterling.Test.Helpers
                            CreateTableDefinition<TestClassWithStruct, int>(t => t.ID),
                            CreateTableDefinition<TestClassWithDictionary, int>(t => t.ID),
                            CreateTableDefinition<TestCompositeClass, string>(GetCompositeKey),
-                           CreateTableDefinition<TestModelAsListModel, int>(t=>t.Id)
+                           CreateTableDefinition<TestModelAsListModel, int>(t=>t.Id),
+                           CreateTableDefinition<TestIndexedSubclassBase,int>(t => t.Id),
+                           CreateTableDefinition<TestIndexedSubclassFake,int>(t => t.Id)
                            
                        };
         }

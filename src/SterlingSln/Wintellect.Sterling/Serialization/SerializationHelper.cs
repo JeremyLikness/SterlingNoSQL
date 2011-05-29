@@ -141,7 +141,7 @@ namespace Wintellect.Sterling.Serialization
         public void Save(object obj, BinaryWriter bw)
         {
             var node = SerializationNode.WrapForSerialization(obj);
-            Save(typeof(SerializationNode), node, bw, new CycleCache());
+            Save(typeof(SerializationNode), node, bw, new CycleCache(),true);
         }
 
         /// <summary>
@@ -151,7 +151,8 @@ namespace Wintellect.Sterling.Serialization
         /// <param name="instance">The instance to type</param>
         /// <param name="bw">The writer to save it to</param>
         /// <param name="cache">Cycle cache</param>
-        public void Save(Type type, object instance, BinaryWriter bw, CycleCache cache)
+        /// <param name="saveTypeExplicit">False if the calling method has already stored the object type, otherwise true</param>
+        public void Save(Type type, object instance, BinaryWriter bw, CycleCache cache, bool saveTypeExplicit)
         {
             _logManager.Log(SterlingLogLevel.Verbose, string.Format("Sterling is serializing type {0}", type.FullName),
                             null);
@@ -181,7 +182,11 @@ namespace Wintellect.Sterling.Serialization
             else if (typeof(IDictionary).IsAssignableFrom(type))
             {
                 _SaveDictionary(instance as IDictionary, bw, cache);              
-            }           
+            }
+            else if (saveTypeExplicit)
+            {
+                bw.Write(_typeResolver(type.AssemblyQualifiedName));
+            }
 
             // now iterate the serializable properties - create a copy to avoid multi-threaded conflicts
             foreach (var p in new List<SerializationCache>(_propertyCache[type]))
@@ -278,7 +283,7 @@ namespace Wintellect.Sterling.Serialization
             }           
                        
             bw.Write(_typeResolver(type.AssemblyQualifiedName));
-            Save(type, instance, bw, cache);
+            Save(type, instance, bw, cache,false);
         }
 
         /// <summary>
@@ -318,7 +323,7 @@ namespace Wintellect.Sterling.Serialization
 
             if (foreignTable == null) return;
 
-            var foreignKey = _database.Save(foreignTable.GetType(), foreignTable, cache);
+            var foreignKey = _database.Save(foreignTable.GetType(), foreignTable.GetType(),foreignTable, cache);
             
             // need to be able to serialize the key 
             if (!_serializer.CanSerialize(foreignKey.GetType()))
@@ -374,9 +379,6 @@ namespace Wintellect.Sterling.Serialization
             // make a template
             var instance = Activator.CreateInstance(type);
 
-            // push to the stack
-            cache.Add(type, instance, key);
-
             // build the reflection cache);
             if (!_propertyCache.ContainsKey(type))
             {
@@ -386,6 +388,8 @@ namespace Wintellect.Sterling.Serialization
 
             if (instance is Array)
             {
+                // push to the stack
+                cache.Add(type, instance, key);
                 var isNull = _DeserializeNull(br);
 
                 if (!isNull)
@@ -399,6 +403,8 @@ namespace Wintellect.Sterling.Serialization
             }
             else if (instance is IList)
             {
+                // push to the stack
+                cache.Add(type, instance, key);
                 var isNull = _DeserializeNull(br);
                 if (!isNull)
                 {
@@ -408,12 +414,32 @@ namespace Wintellect.Sterling.Serialization
 
             else if (instance is IDictionary)
             {
+                // push to the stack
+                cache.Add(type, instance, key);
                 var isNull = _DeserializeNull(br);
                 if (!isNull)
                 {
                     _LoadDictionary(br, cache, instance as IDictionary);
                 }
-            }           
+            }
+            else
+            {
+                type = Type.GetType(_typeIndexer(br.ReadInt32()));
+                if (instance.GetType() != type)
+                {
+                    instance = Activator.CreateInstance(type);
+                }
+
+                // push to the stack
+                cache.Add(type, instance, key);
+
+                // build the reflection cache);
+                if (!_propertyCache.ContainsKey(type))
+                {
+                    //_CacheProperties(type);
+                    _CacheProperties(type);
+                }
+            }
 
             // now iterate
             foreach (var p in new List<SerializationCache>(_propertyCache[type]))
@@ -433,7 +459,7 @@ namespace Wintellect.Sterling.Serialization
                 return null;
             }
 
-            Type typeResolved;
+            Type typeResolved = null;
 
             if (!_typeRef.TryGetValue(typeName, out typeResolved))
             {

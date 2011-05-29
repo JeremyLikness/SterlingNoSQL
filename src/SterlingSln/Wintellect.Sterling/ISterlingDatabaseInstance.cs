@@ -89,6 +89,7 @@ namespace Wintellect.Sterling
         /// <returns>The key type</returns>
         Type GetKeyType(Type table);
 
+        
         /// <summary>
         ///     Save it
         /// </summary>
@@ -96,6 +97,15 @@ namespace Wintellect.Sterling
         /// <typeparam name="TKey">Save it</typeparam>
         /// <param name="instance">The instance</param>
         TKey Save<T, TKey>(T instance) where T : class, new();
+
+        /// <summary>
+        ///     Save a sub-class under a base class table definition
+        /// </summary>
+        /// <typeparam name="T">The table type</typeparam>
+        /// <typeparam name="TKey">Save it</typeparam>
+        /// <param name="instance">An instance or sub-class of the table type</param>
+        /// <returns></returns>
+        TKey SaveAs<T, TKey>(T instance) where T : class,new();
 
         /// <summary>
         ///     Query (keys only)
@@ -136,13 +146,22 @@ namespace Wintellect.Sterling
         object Save<T>(T instance) where T : class, new();
 
         /// <summary>
+        ///     Save a sub-class under a base class table definition
+        /// </summary>
+        /// <typeparam name="T">The table type</typeparam>
+        /// <param name="instance">The instance or sub-class of the table type</param>
+        /// <returns></returns>
+        object SaveAs<T>(T instance) where T : class,new();
+
+        /// <summary>
         ///     Save when key is not known
         /// </summary>
-        /// <param name="type">The type to save</param>
+        /// <param name="actualType">The type of instance to save</param>
+        /// <param name="tableType">The type used to find the table to save to</param>
         /// <param name="instance">The instance</param>
         /// <param name="cache">The cycle cache</param>
         /// <returns>The key</returns>
-        object Save(Type type, object instance, CycleCache cache);
+        object Save(Type actualType, Type tableType, object instance, CycleCache cache);
 
         /// <summary>
         ///     Save when key is not known
@@ -152,6 +171,13 @@ namespace Wintellect.Sterling
         /// <returns>The key</returns>
         object Save(Type type, object instance);
 
+        /// <summary>
+        ///     Save when key is not known
+        /// </summary>
+        /// <param name="type">The table type to save against</param>
+        /// <param name="instance">The instance</param>
+        /// <returns>The key</returns>
+        object SaveAs(Type type, object instance);
 
         /// <summary>
         ///     Save asynchronously

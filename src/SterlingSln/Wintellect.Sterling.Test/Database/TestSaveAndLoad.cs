@@ -285,5 +285,63 @@ namespace Wintellect.Sterling.Test.Database
             Assert.AreEqual(expected.TestModelInstance.Key, actualTestModel.Key, "Load failed: test model key mismatch on direct load.");
             Assert.AreEqual(expected.TestModelInstance.Data, actualTestModel.Data, "Load failed: test model data mismatch on direct load.");
         }
+
+        [TestMethod]
+        public void TestSaveAsWithBase()
+        {
+            var expected = new TestIndexedSubclassBase();
+            expected.BaseProperty = "This is base";
+            expected.Id = 1;
+            _databaseInstance.SaveAs<TestIndexedSubclassBase>(expected);
+
+            var actual = _databaseInstance.Load<TestIndexedSubclassBase>(expected.Id);
+
+            Assert.AreEqual(expected.Id, actual.Id, "Save As failed: key mismatch. ");
+            Assert.AreEqual(expected.BaseProperty, actual.BaseProperty, "Save As failed: base property mismatch. ");
+        }
+
+        [TestMethod]
+        public void TestSaveAsWithSubclass()
+        {
+            var expected = new TestIndexedSubclassModel();
+            expected.BaseProperty = "This is base";
+            expected.SubclassProperty = "This is subclass";
+            expected.Id = 2;
+            _databaseInstance.SaveAs<TestIndexedSubclassBase>(expected);
+
+            var actual = _databaseInstance.Load<TestIndexedSubclassBase>(expected.Id);
+            var actualSubclass = actual as TestIndexedSubclassModel;
+
+            Assert.AreEqual(expected.Id, actual.Id, "Save As failed: key mismatch. ");
+            Assert.AreEqual(expected.BaseProperty, actual.BaseProperty, "Save As failed: base property mismatch. ");
+            Assert.IsNotNull(actualSubclass, "Save As failed: Subclass not honoured on deserialization. ");
+            Assert.AreEqual(expected.SubclassProperty, actualSubclass.SubclassProperty, "Save As failed: Subclass property mismatch. ");
+        }
+
+        [TestMethod]
+        public void TestSaveAsWithInvalidSubclass()
+        {
+            SterlingException expectedException = null;
+            var expected = new TestIndexedSubclassFake();
+
+            var expectedErrorMessage = string.Format("{0} is not of type {1}", expected.GetType().Name, typeof(TestIndexedSubclassBase).Name);
+            
+            expected.BaseProperty = "This is base";
+            expected.SubclassProperty = "This is subclass";
+            expected.Id = 2;
+
+            try
+            {
+                _databaseInstance.SaveAs(typeof(TestIndexedSubclassBase),expected);
+            }
+            catch (SterlingException ex)
+            {
+                expectedException = ex;
+            }
+
+            Assert.IsNotNull(expectedException, "Save As failed: succeeded with inaccurate subclass");
+            Assert.IsInstanceOfType(expectedException, typeof(SterlingException));
+            Assert.AreEqual(expectedErrorMessage,expectedException.Message);
+        }
     }
 }
