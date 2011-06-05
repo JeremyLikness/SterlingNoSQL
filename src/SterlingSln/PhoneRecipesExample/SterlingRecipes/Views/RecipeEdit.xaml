@@ -1,0 +1,89 @@
+﻿<phone:PhoneApplicationPage
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:design="clr-namespace:SterlingRecipes.SampleData" xmlns:MVVM="clr-namespace:UltraLight.MVVM;assembly=UltraLight.MVVM" xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit" 
+    xmlns:Custom="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" xmlns:ic="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions" 
+    x:Class="SterlingRecipes.Views.RecipeEdit"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"    
+    SupportedOrientations="Portrait" Orientation="Portrait"
+    mc:Ignorable="d" d:DesignHeight="696" d:DesignWidth="480"
+    shell:SystemTray.IsVisible="True">
+	<phone:PhoneApplicationPage.ApplicationBar>
+		<shell:ApplicationBar>
+			<shell:ApplicationBarIconButton IconUri="/icons/appbar.add.rest.png" IsEnabled="True" Text="ingredient"/>
+            <shell:ApplicationBarIconButton IconUri="/icons/appbar.save.rest.png" IsEnabled="True" Text="save"/>
+			<shell:ApplicationBarIconButton IconUri="/icons/appbar.cancel.rest.png" IsEnabled="True" Text="cancel"/>
+		</shell:ApplicationBar>
+	</phone:PhoneApplicationPage.ApplicationBar>
+
+    <!--LayoutRoot is the root grid where all page content is placed-->
+    <Grid x:Name="LayoutRoot" Background="Transparent"
+          d:DataContext="{d:DesignInstance design:DesignRecipeViewModel, IsDesignTimeCreatable=True}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!--TitlePanel contains the name of the application and page title-->
+        <StackPanel x:Name="TitlePanel" Grid.Row="0" Margin="12,17,0,28">
+            <TextBlock x:Name="ApplicationTitle" Text="Sterling Recipes" Style="{StaticResource PhoneTextNormalStyle}"/>
+            <TextBlock x:Name="PageTitle" Text="{Binding Title}" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
+        </StackPanel>
+
+        <!--ContentPanel - place additional content here-->
+        <Grid x:Name="ContentPanel" Grid.Row="1" HorizontalAlignment="Stretch" Margin="12,0,12,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="3*"/>
+                <RowDefinition Height="Auto"/>                
+            </Grid.RowDefinitions>
+            <TextBlock Text="Recipe Name:" Style="{StaticResource PhoneTextLargeStyle}"/>
+            <TextBox Text="{Binding RecipeName, Mode=TwoWay}"
+                     Grid.Row="1">
+                <TextBox.InputScope>
+                    <InputScope>
+                        <InputScopeName NameValue="Text"/>
+                    </InputScope>
+                </TextBox.InputScope>
+            </TextBox>
+            <TextBlock Text="Recipe Category:" Grid.Row="2" Style="{StaticResource PhoneTextLargeStyle}"/>
+            <toolkit:ListPicker Grid.Row="3" 
+                                ItemsSource="{Binding Categories}"
+                                SelectedItem="{Binding RecipeCategory,Mode=TwoWay}">
+                <toolkit:ListPicker.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock FontSize="30" Text="{Binding CategoryName}"/>
+                    </DataTemplate>
+                </toolkit:ListPicker.ItemTemplate>
+            </toolkit:ListPicker>
+            <TextBlock Text="Instructions (Click to view/edit):"
+                       Style="{StaticResource PhoneTextLargeStyle}"
+                       Grid.Row="4"/>
+            <Button Grid.Row="5" MVVM:ButtonCommand.Command="{Binding TextCommand}">
+                    <TextBlock 
+                        TextWrapping="Wrap"
+                        Style="{StaticResource PhoneTextSmallStyle}"
+                        Margin="3"
+                               Text="{Binding Instructions}"/>
+            </Button>
+            <Button Content="Ingredients" Grid.Row="6">
+            	<Custom:Interaction.Triggers>
+            		<Custom:EventTrigger EventName="Click">
+            			<ic:NavigateToPageAction TargetPage="/Views/IngredientsList.xaml"/>
+            		</Custom:EventTrigger>
+            	</Custom:Interaction.Triggers>
+            </Button>
+        </Grid>
+    </Grid>
+
+</phone:PhoneApplicationPage>

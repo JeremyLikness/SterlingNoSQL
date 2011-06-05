@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="SterlingRecipes.Views.RecipeList"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:design="clr-namespace:SterlingRecipes.SampleData"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    d:DesignHeight="480" d:DesignWidth="480">
+    
+    <Grid x:Name="LayoutRoot" 
+         d:DataContext="{d:DesignInstance design:DesignMainViewModel, IsDesignTimeCreatable=True}"
+          Background="{StaticResource PhoneBackgroundBrush}">
+        <ListBox ItemsSource="{Binding Recipes}"
+                 SelectedItem="{Binding CurrentRecipe,Mode=TwoWay}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock  FontSize="30" Text="{Binding Name}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>

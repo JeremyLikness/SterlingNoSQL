@@ -1,0 +1,16 @@
+﻿g,gram
+c,cup
+dash,dash
+drop,drop
+gal,gallon
+kl,kiloliter
+l,liter
+ml,mililiter
+oz,ounce
+pinch,pinch
+qt,quart
+tbsp,tablespoon
+tsp,teaspoon
+pkg,package
+serv,serving
+slice,slice

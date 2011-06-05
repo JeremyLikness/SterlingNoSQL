@@ -1,0 +1,6 @@
+﻿Breakfast
+Lunch
+Dinner
+Snack
+Dessert
+Miscellaneous
