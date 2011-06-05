@@ -18,3 +18,5 @@ using System.Runtime.InteropServices;
 [assembly: Guid("6226a809-781a-4b7f-a5ae-0035bf12d0fb")]
 
 [assembly: InternalsVisibleTo("Wintellect.Sterling.ElevatedTrust.Test")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
