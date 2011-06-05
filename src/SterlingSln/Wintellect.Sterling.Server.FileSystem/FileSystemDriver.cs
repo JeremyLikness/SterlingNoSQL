@@ -15,7 +15,6 @@ namespace Wintellect.Sterling.Server.FileSystem
         private const string BASE = "Databases/";
         private readonly List<Type> _tables = new List<Type>();
         private bool _dirtyType;
-        private readonly Dictionary<string,byte[]> _saveCache = new Dictionary<string, byte[]>();
         
         public FileSystemDriver() : this(BASE)
         {            
@@ -312,30 +311,19 @@ namespace Wintellect.Sterling.Server.FileSystem
             var instanceFolder = _pathProvider.GetInstanceFolder(_basePath, DatabaseName, type, this, keyIndex);
             _fileHelper.EnsureDirectory(instanceFolder);
             var instancePath = _pathProvider.GetInstancePath(_basePath, DatabaseName, type, this, keyIndex);
-
-            lock(((ICollection)_saveCache).SyncRoot)
-            {
-                _saveCache[instancePath] = bytes;
-            }
-
+            
             // lock on this while saving, but remember that anyone else loading can now grab the
             // copy 
             lock (PathLock.GetLock(instancePath))
-            {
+            {             
                 using (
                     var instanceFile =
                         _fileHelper.GetWriter(instancePath))
                 {
                     instanceFile.Write(bytes);
-                }
-
-                lock (((ICollection)_saveCache).SyncRoot)
-                {
-                    if (_saveCache.ContainsKey(instancePath))
-                    {
-                        _saveCache.Remove(instancePath);
-                    }
-                }
+                    instanceFile.Flush();
+                    instanceFile.Close();
+                }                
             }
 
             if (!_dirtyType) return;
@@ -353,16 +341,7 @@ namespace Wintellect.Sterling.Server.FileSystem
         public override BinaryReader Load(Type type, int keyIndex)
         {
             var instancePath = _pathProvider.GetInstancePath(_basePath, DatabaseName, type, this, keyIndex);
-
-            // if a copy is available, return that - it's our best bet
-            lock(((ICollection)_saveCache).SyncRoot)
-            {
-                if (_saveCache.ContainsKey(instancePath))
-                {
-                    return new BinaryReader(new MemoryStream(_saveCache[instancePath]));
-                }
-            }
-
+            
             // otherwise let's wait for it to be released and grab it from disk
             lock (PathLock.GetLock(instancePath))
             {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Wintellect.Sterling.IsolatedStorage;
 
 namespace Wintellect.Sterling.ElevatedTrust
@@ -32,6 +33,8 @@ namespace Wintellect.Sterling.ElevatedTrust
             }
         }
 
+        private static readonly object _writerMutex = new object();
+
         /// <summary>
         ///     Get an isolated storage writer
         /// </summary>
@@ -40,12 +43,17 @@ namespace Wintellect.Sterling.ElevatedTrust
         public BinaryWriter GetWriter(string path)
         {
             try
-            {                
+            {
+                Monitor.Enter(_writerMutex);
                 return new BinaryWriter(File.Open(path, FileMode.Create, FileAccess.Write));
             }
             catch(Exception ex)
             {
                 throw new SterlingElevatedTrustException(ex);
+            }
+            finally
+            {
+                Monitor.Exit(_writerMutex);
             }
         }
 

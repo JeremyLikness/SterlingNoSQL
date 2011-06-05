@@ -44,6 +44,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SterlingBuildSln\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\SterlingBuildSln\VersionInfo.cs">
+      <Link>VersionInfo.cs</Link>
+    </Compile>
     <Compile Include="..\Wintellect.Sterling\Database\BaseDatabaseInstance.cs">
       <Link>Database\BaseDatabaseInstance.cs</Link>
     </Compile>

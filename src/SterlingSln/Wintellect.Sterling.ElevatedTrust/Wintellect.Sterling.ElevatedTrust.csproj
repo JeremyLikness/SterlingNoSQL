@@ -59,8 +59,8 @@
     <Reference Include="System.Windows.Browser" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SterlingBuildSln\VersionInfo.cs">
-      <Link>VersionInfo.cs</Link>
+    <Compile Include="..\SterlingBuildSln\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="..\Wintellect.Sterling.IsolatedStorage\PathLock.cs">
       <Link>PathLock.cs</Link>
@@ -76,6 +76,11 @@
       <Project>{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}</Project>
       <Name>Wintellect.Sterling</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\SterlingBuildSln\TraceAndTestImpact.testsettings">
+      <Link>TraceAndTestImpact.testsettings</Link>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <ProjectExtensions>

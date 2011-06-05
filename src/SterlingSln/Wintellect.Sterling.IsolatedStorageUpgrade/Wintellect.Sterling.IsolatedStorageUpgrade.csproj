@@ -59,6 +59,9 @@
     <Reference Include="System.Windows.Browser" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SterlingBuildSln\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="PurgeEntry.cs" />
     <Compile Include="Upgrade.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Wintellect.Sterling.WidowsPhone")]
-[assembly: AssemblyDescription("Sterling OODB for Windows Phone 7 Silverlight")]
+[assembly: AssemblyDescription("Sterling NoSQL Database Windows Phone 7 Edition")]
 [assembly: AssemblyConfiguration("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

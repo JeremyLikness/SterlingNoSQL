@@ -52,8 +52,8 @@
     <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SterlingBuildSln\VersionInfo.cs">
-      <Link>VersionInfo.cs</Link>
+    <Compile Include="..\SterlingBuildSln\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="..\Wintellect.Sterling.IsolatedStorage\IsolatedStorageDriver.cs">
       <Link>IsolatedStorageDriver.cs</Link>

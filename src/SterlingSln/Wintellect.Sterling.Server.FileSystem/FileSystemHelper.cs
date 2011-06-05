@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace Wintellect.Sterling.Server.FileSystem
 {
@@ -31,6 +32,8 @@ namespace Wintellect.Sterling.Server.FileSystem
             }
         }
 
+        private static readonly object _writerMutex = new object();
+
         /// <summary>
         ///     Get an isolated storage writer
         /// </summary>
@@ -39,12 +42,18 @@ namespace Wintellect.Sterling.Server.FileSystem
         public BinaryWriter GetWriter(string path)
         {
             try
-            {                
-                return new BinaryWriter(File.Open(path, FileMode.Create, FileAccess.Write));
+            {
+                Monitor.Enter(_writerMutex);
+                var stream = File.Open(path, FileMode.Create, FileAccess.Write);
+                return new BinaryWriter(stream);
             }
             catch(Exception ex)
             {
                 throw new SterlingFileSystemException(ex);
+            }
+            finally
+            {
+                Monitor.Exit(_writerMutex);
             }
         }
 

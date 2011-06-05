@@ -6,13 +6,8 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Wintellect.Sterling.ElevatedTrust")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Sterling NoSQL Database Silverlight Elevated Trust Driver")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Sterling Elevated Trust Driver for Silverlight")]
-[assembly: AssemblyCopyright("Copyright © Jeremy Likness 2011")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 

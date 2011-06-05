@@ -463,12 +463,12 @@ namespace Wintellect.Sterling.Database
         /// <summary>
         ///     Save against a base class when key is not known
         /// </summary>
-        /// <param name="type">The table type to save against</param>
+        /// <param name="tableType"></param>
         /// <param name="instance">The instance</param>
         /// <returns>The key</returns>
         public object SaveAs(Type tableType, object instance)
         {
-            if (!instance.GetType().IsSubclassOf(tableType) || !(instance.GetType() == tableType))
+            if (!instance.GetType().IsSubclassOf(tableType) || instance.GetType() != tableType)
             {
                 throw new SterlingException(string.Format("{0} is not of type {1}", instance.GetType().Name, tableType.Name));
             }
@@ -514,21 +514,31 @@ namespace Wintellect.Sterling.Database
                     Exceptions.Exceptions.BaseDatabaseInstance_Save_Save_suppressed_by_trigger, trigger.GetType());
             }
 
-            var key = TableDefinitions[tableType].FetchKeyFromInstance(instance);
+            var key = TableDefinitions[tableType].FetchKeyFromInstance(instance);            
+
+            int keyIndex;
 
             if (cache.Check(instance))
             {
                 return key;
             }
+            
+            lock(TableDefinitions[tableType])
+            {
+                if (cache.Check(instance))
+                {
+                    return key;
+                }
 
-            cache.Add(tableType, instance, key);
-
-            var keyIndex = TableDefinitions[tableType].Keys.AddKey(key);
+                cache.Add(tableType, instance, key);
+            
+                keyIndex = TableDefinitions[tableType].Keys.AddKey(key);
+            }
 
             var memStream = new MemoryStream();
 
             try
-            {
+            {                
                 using (var bw = new BinaryWriter(memStream))
                 {
                     Helper.Save(actualType, instance, bw, cache,true);
@@ -735,7 +745,11 @@ namespace Wintellect.Sterling.Database
                 foreach (var t in TableDefinitions.Keys.Where(type.IsAssignableFrom))
                 {
                     assignable = true;
-                    keyIndex = TableDefinitions[t].Keys.GetIndexForKey(key);
+
+                    lock (TableDefinitions[t])
+                    {
+                        keyIndex = TableDefinitions[t].Keys.GetIndexForKey(key);
+                    }
 
                     if (keyIndex < 0) continue;
 
@@ -745,7 +759,10 @@ namespace Wintellect.Sterling.Database
             }
             else
             {
-                keyIndex = TableDefinitions[newType].Keys.GetIndexForKey(key);
+                lock (TableDefinitions[newType])
+                {
+                    keyIndex = TableDefinitions[newType].Keys.GetIndexForKey(key);
+                }
             }
 
             if (!assignable)

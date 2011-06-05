@@ -59,8 +59,8 @@
     <Reference Include="System.Windows.Browser" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SterlingBuildSln\VersionInfo.cs">
-      <Link>VersionInfo.cs</Link>
+    <Compile Include="..\SterlingBuildSln\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="IsolatedStorageDriver.cs" />
     <Compile Include="IsoStorageHelper.cs" />

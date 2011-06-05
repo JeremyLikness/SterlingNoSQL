@@ -6,13 +6,8 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Wintellect.Sterling.WindowsPhone.IsolatedStorageUpgrade")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Sterling NoSQL Database Windows Phone 7 Isolated Storage Upgrade from 1.0 to 1.5")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("Wintellect.Sterling.WindowsPhone.IsolatedStorageUpgrade")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2011")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
