@@ -259,7 +259,7 @@ namespace Wintellect.Sterling.Database
                 throw new SterlingDuplicateDatabaseException(typeof(T));
             }
             
-            var database = (ISterlingDatabaseInstance)Activator.CreateInstance(typeof (T));
+             var database = (ISterlingDatabaseInstance)Activator.CreateInstance(typeof (T));
 
             if (driver == null)
             {
@@ -272,7 +272,9 @@ namespace Wintellect.Sterling.Database
                 driver.Log = _logManager.Log;
             }
             
-            ((BaseDatabaseInstance) database).Serializer = _serializer;          
+            ((BaseDatabaseInstance) database).Serializer = _serializer;
+
+            ((BaseDatabaseInstance)database).RegisterTypeResolvers();
             
             ((BaseDatabaseInstance)database).PublishTables(driver);
             _databases.Add(database.Name, new Tuple<Type, ISterlingDatabaseInstance>(typeof(T),database));
@@ -325,6 +327,15 @@ namespace Wintellect.Sterling.Database
             }
 
             ((AggregateSerializer)_serializer).AddSerializer((ISterlingSerializer)Activator.CreateInstance(typeof(T)));
+        }
+
+        /// <summary>
+        /// Register a class responsible for type resolution.
+        /// </summary>
+        /// <param name="typeResolver">The typeResolver</param>
+        public void RegisterTypeResolver(ISterlingTypeResolver typeResolver)
+        {
+            TableTypeResolver.RegisterTypeResolver(typeResolver);
         }
 
         /// <summary>

@@ -60,12 +60,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BadDatabaseInstance.cs" />
+    <Compile Include="TestChangingTypeSecondVersionClass.cs" />
     <Compile Include="DupDatabaseInstance.cs" />
     <Compile Include="ExceptionHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestAggregateListModel.cs" />
     <Compile Include="TestAggregateModel.cs" />
     <Compile Include="TestBaseClassModel.cs" />
+    <Compile Include="TestChangingTypeFirstVersionClass.cs" />
     <Compile Include="TestClassWithArray.cs" />
     <Compile Include="TestClassWithDictionary.cs" />
     <Compile Include="TestClassWithStruct.cs" />

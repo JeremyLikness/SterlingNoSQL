@@ -8,5 +8,10 @@ namespace Wintellect.Sterling.Exceptions
             : base(string.Format(Exceptions.SterlingTableNotFoundException, tableType.FullName, databaseName))
         {
         }
+
+        public SterlingTableNotFoundException(string typeName, string databaseName)
+            : base(string.Format(Exceptions.SterlingTableNotFoundException, typeName, databaseName))
+        {
+        }
     }
 }

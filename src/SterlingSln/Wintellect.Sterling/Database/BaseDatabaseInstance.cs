@@ -224,6 +224,22 @@ namespace Wintellect.Sterling.Database
         protected abstract List<ITableDefinition> RegisterTables();
 
         /// <summary>
+        /// Register any type resolvers.
+        /// </summary>
+        internal virtual void RegisterTypeResolvers()
+        {
+        }
+
+        /// <summary>
+        /// Register a class responsible for type resolution.
+        /// </summary>
+        /// <param name="typeInterceptor"></param>
+        public void RegisterTypeResolver(ISterlingTypeResolver typeInterceptor)
+        {
+            TableTypeResolver.RegisterTypeResolver(typeInterceptor);
+        }
+
+        /// <summary>
         ///     Returns a table definition 
         /// </summary>
         /// <typeparam name="T">The type of the table</typeparam>

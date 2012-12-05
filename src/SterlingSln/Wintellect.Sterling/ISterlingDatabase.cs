@@ -79,6 +79,12 @@ namespace Wintellect.Sterling
         ///     Register a serializer with the system
         /// </summary>
         /// <typeparam name="T">The type of the serliaizer</typeparam>
-        void RegisterSerializer<T>() where T : BaseSerializer;        
+        void RegisterSerializer<T>() where T : BaseSerializer;
+
+        /// <summary>
+        /// Register a class responsible for type resolution.
+        /// </summary>
+        /// <param name="typeResolver">The typeResolver</param>
+        void RegisterTypeResolver(ISterlingTypeResolver typeResolver);
     }
 }
