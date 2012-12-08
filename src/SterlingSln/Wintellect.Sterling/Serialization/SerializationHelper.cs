@@ -41,6 +41,7 @@ namespace Wintellect.Sterling.Serialization
         private const ushort NOTNULL = 1;
         private const string NULL_DISPLAY = "[NULL]";
         private const string NOTNULL_DISPLAY = "[NOT NULL]";
+        private const string PROPERTY_VALUE_SEPARATOR = ":";
         
         /// <summary>
         ///     The import cache, stores what properties are available and how to access them
@@ -104,7 +105,7 @@ namespace Wintellect.Sterling.Serialization
 
                     var p1 = p;
 
-                    _propertyCache[type].Add(new SerializationCache(propType, (parent, property) => p1.Setter(parent,property), p1.GetValue));                    
+                    _propertyCache[type].Add(new SerializationCache(propType, p1.Name, (parent, property) => p1.Setter(parent,property), p1.GetValue));                    
                 }                
             }
         }
@@ -192,7 +193,7 @@ namespace Wintellect.Sterling.Serialization
             foreach (var p in new List<SerializationCache>(_propertyCache[type]))
             {
                 var value = p.GetMethod(instance);
-                _InnerSave(value == null ? p.PropType : value.GetType(), value, bw, cache);
+                _InnerSave(value == null ? p.PropType : value.GetType(), p.PropertyName, value, bw, cache);
             }
         }
 
@@ -208,7 +209,8 @@ namespace Wintellect.Sterling.Serialization
             bw.Write(list.Count);
             foreach(var item in list)
             {
-                _InnerSave(item == null ? typeof(string) : item.GetType(), item, bw, cache);
+                //TODO: propertyName
+                _InnerSave(item == null ? typeof(string) : item.GetType(), "ListItem", item, bw, cache);
             }
         }
 
@@ -224,8 +226,9 @@ namespace Wintellect.Sterling.Serialization
             bw.Write(dictionary.Count);
             foreach (var item in dictionary.Keys)
             {
-                _InnerSave(item.GetType(), item, bw, cache);
-                _InnerSave(dictionary[item] == null ? typeof(string) : dictionary[item].GetType(), dictionary[item], bw, cache);
+                //TODO: propertyName
+                _InnerSave(item.GetType(), "DictionaryItemKey", item, bw, cache);
+                _InnerSave(dictionary[item] == null ? typeof(string) : dictionary[item].GetType(), "DictionaryItemValue", dictionary[item], bw, cache);
             }
         }
 
@@ -241,28 +244,30 @@ namespace Wintellect.Sterling.Serialization
             bw.Write(array.Length);
             foreach (var item in array)
             {
-                _InnerSave(item == null ? typeof(string) : item.GetType(), item, bw, cache);
+                //TODO: propertyname
+                _InnerSave(item == null ? typeof(string) : item.GetType(), "ArrayItem", item, bw, cache);
             }
         }
 
-        private void _InnerSave(Type type, object instance, BinaryWriter bw,  CycleCache cache)
+        private void _InnerSave(Type type, string propertyName, object instance, BinaryWriter bw,  CycleCache cache)
         {                                    
             if (_database.IsRegistered(type))
             {
                 // foreign table - write if it is null or not, and if not null, write the key
                 // then serialize it separately
-                _SerializeClass(type, instance, bw, cache);
+                _SerializeClass(type, propertyName, instance, bw, cache);
                 return;
             }
             
             if (_serializer.CanSerialize(type))
             {
-                _SerializeProperty(type, instance, bw);
+                _SerializeProperty(type, propertyName, instance, bw);
                 return;
             }
 
             if (instance is Array)
             {
+                bw.Write(propertyName + PROPERTY_VALUE_SEPARATOR);
                 bw.Write(_typeResolver(type.AssemblyQualifiedName));
                 _SaveArray(bw, cache, instance as Array);
                 return;
@@ -270,6 +275,7 @@ namespace Wintellect.Sterling.Serialization
 
             if (typeof(IList).IsAssignableFrom(type))
             {
+                bw.Write(propertyName + PROPERTY_VALUE_SEPARATOR);
                 bw.Write(_typeResolver(type.AssemblyQualifiedName));
                 _SaveList(instance as IList, bw, cache);                                
                 return;
@@ -277,11 +283,13 @@ namespace Wintellect.Sterling.Serialization
 
             if (typeof(IDictionary).IsAssignableFrom(type))
             {
+                bw.Write(propertyName + PROPERTY_VALUE_SEPARATOR);
                 bw.Write(_typeResolver(type.AssemblyQualifiedName));
                 _SaveDictionary(instance as IDictionary, bw, cache);
                 return;
             }           
                        
+            bw.Write(propertyName + PROPERTY_VALUE_SEPARATOR);
             bw.Write(_typeResolver(type.AssemblyQualifiedName));
             Save(type, instance, bw, cache,false);
         }
@@ -290,10 +298,12 @@ namespace Wintellect.Sterling.Serialization
         ///     Serializes a property
         /// </summary>
         /// <param name="type">The parent type</param>
+        /// <param name="propertyName">The property name</param>
         /// <param name="propertyValue">The property value</param>
         /// <param name="bw">The writer</param>
-        private void _SerializeProperty(Type type, object propertyValue, BinaryWriter bw)
+        private void _SerializeProperty(Type type, string propertyName, object propertyValue, BinaryWriter bw)
         {
+            bw.Write(propertyName + PROPERTY_VALUE_SEPARATOR);
             bw.Write(_typeResolver(type.AssemblyQualifiedName));
 
             var isNull = propertyValue == null;
@@ -311,11 +321,13 @@ namespace Wintellect.Sterling.Serialization
         ///     Serialize a class
         /// </summary>
         /// <param name="type">The type</param>
+        /// <param name="propertyName">The name of the property.</param>
         /// <param name="foreignTable">The referenced type</param>
         /// <param name="bw">The writer</param>
         /// <param name="cache">Cycle cache</param>
-        private void _SerializeClass(Type type, object foreignTable, BinaryWriter bw, CycleCache cache)
+        private void _SerializeClass(Type type, string propertyName, object foreignTable, BinaryWriter bw, CycleCache cache)
         {
+            bw.Write(propertyName + PROPERTY_VALUE_SEPARATOR);
             bw.Write(_typeResolver(type.AssemblyQualifiedName));
 
             // serialize to the stream if the foreign key is nulled
@@ -452,6 +464,7 @@ namespace Wintellect.Sterling.Serialization
 
         private object _Deserialize(BinaryReader br, CycleCache cache)
         {
+            var propertyName = br.ReadString().Replace(PROPERTY_VALUE_SEPARATOR, string.Empty);
             var typeName = _typeIndexer(br.ReadInt32());
 
             if (_DeserializeNull(br))
