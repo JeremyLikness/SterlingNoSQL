@@ -115,6 +115,10 @@ namespace Wintellect.Sterling.IsolatedStorage.Test.Database
 
             var firstVersionFromUpdatedDatabase = _secondDatabaseInstance.Load<TestChangingTypeSecondVersionClass>(firstVersion.Key);
             Assert.IsNotNull(firstVersionFromUpdatedDatabase);
+            Assert.AreEqual(firstVersion.Key, firstVersionFromUpdatedDatabase.Key);
+            Assert.AreEqual(firstVersion.Name, firstVersionFromUpdatedDatabase.Name);
+            Assert.AreEqual(firstVersion.PropertyOne, firstVersionFromUpdatedDatabase.PropertyOne);
+            Assert.AreEqual(firstVersion.PropertyTwo, firstVersionFromUpdatedDatabase.PropertyTwo);
         }
     }
 }

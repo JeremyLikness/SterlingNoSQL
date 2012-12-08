@@ -42,15 +42,17 @@ namespace Wintellect.Sterling.Serialization
         private const string NULL_DISPLAY = "[NULL]";
         private const string NOTNULL_DISPLAY = "[NOT NULL]";
         private const string PROPERTY_VALUE_SEPARATOR = ":";
+        private const string END_OF_INSTANCE = "[END_OF_INSTANCE]";
         
         /// <summary>
-        ///     The import cache, stores what properties are available and how to access them
+        ///     The import cache, stores what properties are available and how to access them. Each type has a matching dictionary with the property names as keys
+        ///     and the SerializationCache objects as values (provides access to the properties).
         /// </summary>
         private readonly
-            Dictionary<Type, List<SerializationCache>>
+            Dictionary<Type, Dictionary<string, SerializationCache>>
             _propertyCache =
                 new Dictionary
-                    <Type, List<SerializationCache>>();
+                    <Type, Dictionary<string, SerializationCache>>();
 
         private readonly Dictionary<string,Type> _typeRef = new Dictionary<string, Type>();
 
@@ -71,8 +73,7 @@ namespace Wintellect.Sterling.Serialization
                 // fast "out" if already exists
                 if (_propertyCache.ContainsKey(type)) return;
 
-                _propertyCache.Add(type,
-                                   new List<SerializationCache>());
+                _propertyCache.Add(type, new Dictionary<string, SerializationCache>());
 
                 var isList = typeof (IList).IsAssignableFrom(type);
                 var isDictionary = typeof (IDictionary).IsAssignableFrom(type);
@@ -105,7 +106,7 @@ namespace Wintellect.Sterling.Serialization
 
                     var p1 = p;
 
-                    _propertyCache[type].Add(new SerializationCache(propType, p1.Name, (parent, property) => p1.Setter(parent,property), p1.GetValue));                    
+                    _propertyCache[type].Add(p1.Name, new SerializationCache(propType, p1.Name, (parent, property) => p1.Setter(parent, property), p1.GetValue));
                 }                
             }
         }
@@ -190,11 +191,15 @@ namespace Wintellect.Sterling.Serialization
             }
 
             // now iterate the serializable properties - create a copy to avoid multi-threaded conflicts
-            foreach (var p in new List<SerializationCache>(_propertyCache[type]))
+            foreach (var p in new Dictionary<string, SerializationCache>(_propertyCache[type]))
             {
-                var value = p.GetMethod(instance);
-                _InnerSave(value == null ? p.PropType : value.GetType(), p.PropertyName, value, bw, cache);
+                var serializationCache = p.Value;
+                var value = serializationCache.GetMethod(instance);
+                _InnerSave(value == null ? serializationCache.PropType : value.GetType(), serializationCache.PropertyName, value, bw, cache);
             }
+
+            // indicate the end of the instance was reached.
+            bw.Write(END_OF_INSTANCE);
         }
 
         private void _SaveList(IList list, BinaryWriter bw, CycleCache cache)
@@ -209,7 +214,6 @@ namespace Wintellect.Sterling.Serialization
             bw.Write(list.Count);
             foreach(var item in list)
             {
-                //TODO: propertyName
                 _InnerSave(item == null ? typeof(string) : item.GetType(), "ListItem", item, bw, cache);
             }
         }
@@ -226,7 +230,6 @@ namespace Wintellect.Sterling.Serialization
             bw.Write(dictionary.Count);
             foreach (var item in dictionary.Keys)
             {
-                //TODO: propertyName
                 _InnerSave(item.GetType(), "DictionaryItemKey", item, bw, cache);
                 _InnerSave(dictionary[item] == null ? typeof(string) : dictionary[item].GetType(), "DictionaryItemValue", dictionary[item], bw, cache);
             }
@@ -244,7 +247,6 @@ namespace Wintellect.Sterling.Serialization
             bw.Write(array.Length);
             foreach (var item in array)
             {
-                //TODO: propertyname
                 _InnerSave(item == null ? typeof(string) : item.GetType(), "ArrayItem", item, bw, cache);
             }
         }
@@ -409,7 +411,7 @@ namespace Wintellect.Sterling.Serialization
                     var count = br.ReadInt32();
                     for (var x = 0; x < count; x++)
                     {
-                        ((Array) instance).SetValue(_Deserialize(br, cache), x);
+                        ((Array)instance).SetValue(_Deserialize(br, cache).Value, x);
                     }
                 }
             }
@@ -453,23 +455,37 @@ namespace Wintellect.Sterling.Serialization
                 }
             }
 
-            // now iterate
-            foreach (var p in new List<SerializationCache>(_propertyCache[type]))
+            // now iterate until the end of the file was reached
+            KeyValuePair<string, object> propertyPair = _Deserialize(br, cache);
+            while(propertyPair.Key != END_OF_INSTANCE)
             {
-                p.SetMethod(instance, _Deserialize(br, cache));
+                var serializationCache = _propertyCache[type][propertyPair.Key];
+                serializationCache.SetMethod(instance, propertyPair.Value);
+                propertyPair = _Deserialize(br, cache);
             }
 
             return instance;
         }
 
-        private object _Deserialize(BinaryReader br, CycleCache cache)
+        /// <summary>
+        /// Deserializes the next part in the BinaryReader and returns a KeyValuePair containing the property name as key van the deserialized object as value.
+        /// </summary>
+        /// <param name="br">The binary reader</param>
+        /// <param name="cache">The cycle cache</param>
+        /// <returns>A KeyValuePair containing the property name and the property value.</returns>
+        private KeyValuePair<string, object> _Deserialize(BinaryReader br, CycleCache cache)
         {
             var propertyName = br.ReadString().Replace(PROPERTY_VALUE_SEPARATOR, string.Empty);
+            if (propertyName == END_OF_INSTANCE)
+            {
+                return new KeyValuePair<string, object>(END_OF_INSTANCE, END_OF_INSTANCE);
+            }
+
             var typeName = _typeIndexer(br.ReadInt32());
 
             if (_DeserializeNull(br))
             {
-                return null;
+                return new KeyValuePair<string, object>(propertyName, null);
             }
 
             Type typeResolved = null;
@@ -495,17 +511,17 @@ namespace Wintellect.Sterling.Serialization
                 var cached = cache.CheckKey(keyType, key);
                 if (cached != null)
                 {
-                    return cached;
+                    return new KeyValuePair<string, object>(propertyName, cached);
                 }
 
                 cached = _database.Load(typeResolved, key, cache);
                 cache.Add(typeResolved, cached, key);
-                return cached;
+                return new KeyValuePair<string, object>(propertyName, cached);
             }
 
             if (_serializer.CanSerialize(typeResolved))
             {
-                return _serializer.Deserialize(typeResolved, br);
+                return new KeyValuePair<string, object>(propertyName, _serializer.Deserialize(typeResolved, br));
             }
 
             
@@ -515,22 +531,22 @@ namespace Wintellect.Sterling.Serialization
                 var array = Array.CreateInstance(typeResolved.GetElementType(), count);
                 for (var x = 0; x < count; x++)
                 {
-                    array.SetValue(_Deserialize(br, cache), x);
+                    array.SetValue(_Deserialize(br, cache).Value, x);
                 }
 
-                return array;
+                return new KeyValuePair<string, object>(propertyName, array);
             }
 
             if (typeof (IList).IsAssignableFrom(typeResolved))
             {
                 var list = Activator.CreateInstance(typeResolved) as IList;
-                return _LoadList(br, cache, list);               
+                return new KeyValuePair<string, object>(propertyName, _LoadList(br, cache, list));              
             }
 
             if (typeof (IDictionary).IsAssignableFrom(typeResolved))
             {
                 var dictionary = Activator.CreateInstance(typeResolved) as IDictionary;
-                return _LoadDictionary(br, cache, dictionary);
+                return new KeyValuePair<string, object>(propertyName, _LoadDictionary(br, cache, dictionary));
             }            
 
             var instance = Activator.CreateInstance(typeResolved);
@@ -542,13 +558,16 @@ namespace Wintellect.Sterling.Serialization
                 _CacheProperties(typeResolved);
             }
 
-            // now iterate
-            foreach (var p in _propertyCache[typeResolved])
+            // now iterate until the end of the file was reached
+            KeyValuePair<string, object> propertyPair = _Deserialize(br, cache);
+            while (propertyPair.Key != END_OF_INSTANCE)
             {
-                p.SetMethod(instance, _Deserialize(br, cache));
+                var serializationCache = _propertyCache[typeResolved][propertyPair.Key];
+                serializationCache.SetMethod(instance, propertyPair.Value);
+                propertyPair = _Deserialize(br, cache);
             }
 
-            return instance;
+            return new KeyValuePair<string, object>(propertyName, instance);
         }
         
         private IDictionary _LoadDictionary(BinaryReader br, CycleCache cache, IDictionary dictionary)
@@ -556,7 +575,7 @@ namespace Wintellect.Sterling.Serialization
             var count = br.ReadInt32();
             for (var x = 0; x < count; x++)
             {
-                dictionary.Add(_Deserialize(br, cache), _Deserialize(br, cache));
+                dictionary.Add(_Deserialize(br, cache).Value, _Deserialize(br, cache).Value);
             }
             return dictionary;
         }
@@ -566,7 +585,7 @@ namespace Wintellect.Sterling.Serialization
             var count = br.ReadInt32();
             for (var x = 0; x < count; x++)
             {
-                list.Add(_Deserialize(br, cache));
+                list.Add(_Deserialize(br, cache).Value);
             }
             return list;
         }
