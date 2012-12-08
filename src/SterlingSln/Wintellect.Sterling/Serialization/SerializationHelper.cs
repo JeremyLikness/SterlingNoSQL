@@ -459,8 +459,11 @@ namespace Wintellect.Sterling.Serialization
             KeyValuePair<string, object> propertyPair = _Deserialize(br, cache);
             while(propertyPair.Key != END_OF_INSTANCE)
             {
-                var serializationCache = _propertyCache[type][propertyPair.Key];
-                serializationCache.SetMethod(instance, propertyPair.Value);
+                SerializationCache serializationCache;
+                if (_propertyCache[type].TryGetValue(propertyPair.Key, out serializationCache))
+                {
+                    serializationCache.SetMethod(instance, propertyPair.Value);
+                }
                 propertyPair = _Deserialize(br, cache);
             }
 
@@ -562,8 +565,11 @@ namespace Wintellect.Sterling.Serialization
             KeyValuePair<string, object> propertyPair = _Deserialize(br, cache);
             while (propertyPair.Key != END_OF_INSTANCE)
             {
-                var serializationCache = _propertyCache[typeResolved][propertyPair.Key];
-                serializationCache.SetMethod(instance, propertyPair.Value);
+                SerializationCache serializationCache;
+                if (_propertyCache[typeResolved].TryGetValue(propertyPair.Key, out serializationCache))
+                {
+                    serializationCache.SetMethod(instance, propertyPair.Value);
+                }
                 propertyPair = _Deserialize(br, cache);
             }
 

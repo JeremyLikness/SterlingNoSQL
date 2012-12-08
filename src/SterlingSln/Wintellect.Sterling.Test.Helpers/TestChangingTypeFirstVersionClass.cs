@@ -12,6 +12,8 @@ namespace Wintellect.Sterling.Test.Helpers
 
         public string PropertyTwo { get; set; }
 
+        public string PropertyRemovedInSecondVersion { get; set; }
+
         public static TestChangingTypeFirstVersionClass MakeChangingTypeFirstVersionClass()
         {
             return new TestChangingTypeFirstVersionClass
@@ -19,7 +21,8 @@ namespace Wintellect.Sterling.Test.Helpers
                            Key = Guid.NewGuid().ToString(),
                            Name = "Name",
                            PropertyOne = "One",
-                           PropertyTwo = "Two"
+                           PropertyTwo = "Two",
+                           PropertyRemovedInSecondVersion = "ToBeRemoved"
                        };
         }
     }
