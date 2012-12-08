@@ -3,7 +3,8 @@
 namespace Wintellect.Sterling
 {
     /// <summary>
-    /// A class responsible for converting objects serialized in a previous schema to the current schema.
+    /// Implement this interface when you're application will be updated. Typenames might have changed and with this interface, you can return the correct
+    /// type for a given type name. Register your resolver by calling RegisterTypeResolver on your database.
     /// </summary>
     public interface ISterlingTypeResolver
     {
