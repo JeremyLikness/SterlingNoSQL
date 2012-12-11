@@ -456,27 +456,7 @@ namespace Wintellect.Sterling.Serialization
             }
 
             // now iterate until the end of the file was reached
-            KeyValuePair<string, object> propertyPair = _Deserialize(br, cache);
-            while(propertyPair.Key != END_OF_INSTANCE)
-            {
-                SerializationCache serializationCache;
-                if (_propertyCache[type].TryGetValue(propertyPair.Key, out serializationCache))
-                {
-                    serializationCache.SetMethod(instance, propertyPair.Value);
-                }
-                else
-                {
-                    // unknown property, see if it should be converted or ignored
-                    var propertyConverter = _database.TryGetPropertyConverter(type);
-                    if (propertyConverter != null)
-                    {
-                        propertyConverter.SetValue(instance, propertyPair.Key, propertyPair.Value);
-                    }
-                }
-
-                propertyPair = _Deserialize(br, cache);
-            }
-
+            _IteratePropertiesUntilEndOfFileIsReached(br, cache, type, instance);
             return instance;
         }
 
@@ -572,6 +552,12 @@ namespace Wintellect.Sterling.Serialization
             }
 
             // now iterate until the end of the file was reached
+            _IteratePropertiesUntilEndOfFileIsReached(br, cache, typeResolved, instance);
+            return new KeyValuePair<string, object>(propertyName, instance);
+        }
+
+        private void _IteratePropertiesUntilEndOfFileIsReached(BinaryReader br, CycleCache cache, Type typeResolved, object instance)
+        {
             KeyValuePair<string, object> propertyPair = _Deserialize(br, cache);
             while (propertyPair.Key != END_OF_INSTANCE)
             {
@@ -580,10 +566,18 @@ namespace Wintellect.Sterling.Serialization
                 {
                     serializationCache.SetMethod(instance, propertyPair.Value);
                 }
+                else
+                {
+                    // unknown property, see if it should be converted or ignored
+                    ISterlingPropertyConverter propertyConverter;
+                    if (_database.TryGetPropertyConverter(typeResolved, out propertyConverter))
+                    {
+                        propertyConverter.SetValue(instance, propertyPair.Key, propertyPair.Value);
+                    }
+                }
+
                 propertyPair = _Deserialize(br, cache);
             }
-
-            return new KeyValuePair<string, object>(propertyName, instance);
         }
         
         private IDictionary _LoadDictionary(BinaryReader br, CycleCache cache, IDictionary dictionary)

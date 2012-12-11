@@ -261,10 +261,11 @@ namespace Wintellect.Sterling.Database
         ///     Gets the property converter for the given type, or returns null if none is found.
         /// </summary>
         /// <param name="type">The type</param>
-        /// <returns>An ISterlingPropertyConverter</returns>
-        public ISterlingPropertyConverter TryGetPropertyConverter(Type type)
+        /// <param name="propertyConverter">The property converter</param>
+        /// <returns>True if there is a registered property converter.</returns>
+        public bool TryGetPropertyConverter(Type type, out ISterlingPropertyConverter propertyConverter)
         {
-            return !_propertyConverters.ContainsKey(type) ? null : _propertyConverters[type];
+            return _propertyConverters.TryGetValue(type, out propertyConverter);
         }
 
         /// <summary>

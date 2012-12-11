@@ -293,7 +293,8 @@ namespace Wintellect.Sterling
         ///     Gets the property converter for the given type, or returns null if none is found.
         /// </summary>
         /// <param name="type">The type</param>
-        /// <returns>An ISterlingPropertyConverter</returns>
-        ISterlingPropertyConverter TryGetPropertyConverter(Type type);
+        /// <param name="propertyConverter">The property converter</param>
+        /// <returns>True if there is a registered property converter.</returns>
+        bool TryGetPropertyConverter(Type type, out ISterlingPropertyConverter propertyConverter);
     }
 }
