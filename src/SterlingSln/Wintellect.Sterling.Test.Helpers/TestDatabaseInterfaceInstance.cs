@@ -396,5 +396,24 @@ namespace Wintellect.Sterling.Test.Helpers
         {
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        ///     Registers a property converter.
+        /// </summary>
+        /// <param name="propertyConverter">The property converter</param>
+        public void RegisterPropertyConverter(ISterlingPropertyConverter propertyConverter)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        ///     Gets the property converter for the given type, or returns null if none is found.
+        /// </summary>
+        /// <param name="type">The type</param>
+        /// <returns>An ISterlingPropertyConverter</returns>
+        public ISterlingPropertyConverter TryGetPropertyConverter(Type type)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

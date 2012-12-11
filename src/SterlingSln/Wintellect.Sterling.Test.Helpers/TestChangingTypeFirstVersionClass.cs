@@ -14,6 +14,8 @@ namespace Wintellect.Sterling.Test.Helpers
 
         public string PropertyRemovedInSecondVersion { get; set; }
 
+        public string PropertyRenamedInSecondVersion { get; set; }
+
         public static TestChangingTypeFirstVersionClass MakeChangingTypeFirstVersionClass()
         {
             return new TestChangingTypeFirstVersionClass
@@ -22,7 +24,8 @@ namespace Wintellect.Sterling.Test.Helpers
                            Name = "Name",
                            PropertyOne = "One",
                            PropertyTwo = "Two",
-                           PropertyRemovedInSecondVersion = "ToBeRemoved"
+                           PropertyRemovedInSecondVersion = "ToBeRemoved",
+                           PropertyRenamedInSecondVersion = "ToBeRenamed"
                        };
         }
     }

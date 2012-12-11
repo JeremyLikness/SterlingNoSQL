@@ -464,6 +464,16 @@ namespace Wintellect.Sterling.Serialization
                 {
                     serializationCache.SetMethod(instance, propertyPair.Value);
                 }
+                else
+                {
+                    // unknown property, see if it should be converted or ignored
+                    var propertyConverter = _database.TryGetPropertyConverter(type);
+                    if (propertyConverter != null)
+                    {
+                        propertyConverter.SetValue(instance, propertyPair.Key, propertyPair.Value);
+                    }
+                }
+
                 propertyPair = _Deserialize(br, cache);
             }
 

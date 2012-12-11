@@ -108,6 +108,7 @@
     <Compile Include="ISterlingDatabaseInstance.cs" />
     <Compile Include="ISterlingDriver.cs" />
     <Compile Include="ISterlingLock.cs" />
+    <Compile Include="ISterlingPropertyConverter.cs" />
     <Compile Include="ISterlingTrigger.cs" />
     <Compile Include="ISterlingTypeResolver.cs" />
     <Compile Include="Keys\IKeyCollection.cs" />

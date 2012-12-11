@@ -15,7 +15,7 @@ namespace Wintellect.Sterling.Database
         private static Dictionary<string, Type> _resolvedTypes = new Dictionary<string, Type>();
         #endregion
 
-        #region Internal Methods
+        #region Public Methods
         public static void RegisterTypeResolver(ISterlingTypeResolver interceptor)
         {
             if (interceptor == null)

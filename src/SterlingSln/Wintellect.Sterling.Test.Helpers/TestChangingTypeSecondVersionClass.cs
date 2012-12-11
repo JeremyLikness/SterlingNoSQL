@@ -12,15 +12,6 @@ namespace Wintellect.Sterling.Test.Helpers
 
         public string PropertyOne { get; set; }
 
-        public static TestChangingTypeSecondVersionClass MakeChangingTypeSecondVersionClass()
-        {
-            return new TestChangingTypeSecondVersionClass
-                       {
-                           Key = Guid.NewGuid().ToString(),
-                           Name = "Name",
-                           PropertyOne = "One",
-                           PropertyTwo = "Two"
-                       };
-        }
+        public string RenamedProperty { get; set; }
     }
 }

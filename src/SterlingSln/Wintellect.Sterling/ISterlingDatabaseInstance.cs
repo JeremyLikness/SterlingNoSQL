@@ -288,5 +288,12 @@ namespace Wintellect.Sterling
         /// </summary>
         /// <param name="tableDefinition">The new table definition</param>
         void RegisterTableDefinition(ITableDefinition tableDefinition);
+
+        /// <summary>
+        ///     Gets the property converter for the given type, or returns null if none is found.
+        /// </summary>
+        /// <param name="type">The type</param>
+        /// <returns>An ISterlingPropertyConverter</returns>
+        ISterlingPropertyConverter TryGetPropertyConverter(Type type);
     }
 }

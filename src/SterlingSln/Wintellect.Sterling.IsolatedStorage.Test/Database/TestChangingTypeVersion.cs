@@ -48,6 +48,12 @@ namespace Wintellect.Sterling.IsolatedStorage.Test.Database
             RegisterTypeResolver(new ChangingTypeFirstToSecondVersionResolver());
         }
 
+        internal override void RegisterPropertyConverters()
+        {
+            base.RegisterPropertyConverters();
+            RegisterPropertyConverter(new ChangingTypePropertyConverter());
+        }
+
         protected override List<ITableDefinition> RegisterTables()
         {
             return new List<ITableDefinition>
@@ -67,6 +73,22 @@ namespace Wintellect.Sterling.IsolatedStorage.Test.Database
             }
 
             return null;
+        }
+    }
+
+    public class ChangingTypePropertyConverter : ISterlingPropertyConverter
+    {
+        public Type IsConverterFor()
+        {
+            return typeof (TestChangingTypeSecondVersionClass);
+        }
+
+        public void SetValue(object instance, string oldPropertyName, object value)
+        {
+            if (oldPropertyName == "PropertyRenamedInSecondVersion")
+            {
+                ((TestChangingTypeSecondVersionClass)instance).RenamedProperty = value.ToString();   
+            }
         }
     }
 
@@ -119,6 +141,7 @@ namespace Wintellect.Sterling.IsolatedStorage.Test.Database
             Assert.AreEqual(firstVersion.Name, firstVersionFromUpdatedDatabase.Name);
             Assert.AreEqual(firstVersion.PropertyOne, firstVersionFromUpdatedDatabase.PropertyOne);
             Assert.AreEqual(firstVersion.PropertyTwo, firstVersionFromUpdatedDatabase.PropertyTwo);
+            Assert.AreEqual(firstVersion.PropertyRenamedInSecondVersion, firstVersionFromUpdatedDatabase.RenamedProperty);
         }
     }
 }

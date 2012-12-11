@@ -275,6 +275,7 @@ namespace Wintellect.Sterling.Database
             ((BaseDatabaseInstance) database).Serializer = _serializer;
 
             ((BaseDatabaseInstance)database).RegisterTypeResolvers();
+            ((BaseDatabaseInstance)database).RegisterPropertyConverters();
             
             ((BaseDatabaseInstance)database).PublishTables(driver);
             _databases.Add(database.Name, new Tuple<Type, ISterlingDatabaseInstance>(typeof(T),database));

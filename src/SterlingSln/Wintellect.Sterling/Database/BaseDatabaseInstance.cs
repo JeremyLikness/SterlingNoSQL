@@ -224,9 +224,16 @@ namespace Wintellect.Sterling.Database
         protected abstract List<ITableDefinition> RegisterTables();
 
         /// <summary>
-        /// Register any type resolvers.
+        ///     Register any type resolvers.
         /// </summary>
         internal virtual void RegisterTypeResolvers()
+        {
+        }
+
+        /// <summary>
+        ///     Registers any property converters.
+        /// </summary>
+        internal virtual void RegisterPropertyConverters()
         {
         }
 
@@ -234,9 +241,30 @@ namespace Wintellect.Sterling.Database
         /// Register a class responsible for type resolution.
         /// </summary>
         /// <param name="typeInterceptor"></param>
-        public void RegisterTypeResolver(ISterlingTypeResolver typeInterceptor)
+        protected void RegisterTypeResolver(ISterlingTypeResolver typeInterceptor)
         {
             TableTypeResolver.RegisterTypeResolver(typeInterceptor);
+        }
+
+        private readonly Dictionary<Type, ISterlingPropertyConverter> _propertyConverters = new Dictionary<Type, ISterlingPropertyConverter>();
+
+        /// <summary>
+        ///     Registers a property converter.
+        /// </summary>
+        /// <param name="propertyConverter">The property converter</param>
+        protected void RegisterPropertyConverter(ISterlingPropertyConverter propertyConverter)
+        {
+            _propertyConverters.Add(propertyConverter.IsConverterFor(), propertyConverter);
+        }
+
+        /// <summary>
+        ///     Gets the property converter for the given type, or returns null if none is found.
+        /// </summary>
+        /// <param name="type">The type</param>
+        /// <returns>An ISterlingPropertyConverter</returns>
+        public ISterlingPropertyConverter TryGetPropertyConverter(Type type)
+        {
+            return !_propertyConverters.ContainsKey(type) ? null : _propertyConverters[type];
         }
 
         /// <summary>
