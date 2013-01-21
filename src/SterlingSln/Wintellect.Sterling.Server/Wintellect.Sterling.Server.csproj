@@ -83,6 +83,9 @@
     <Compile Include="..\Wintellect.Sterling\Database\TableDefinition.cs">
       <Link>Database\TableDefinition.cs</Link>
     </Compile>
+    <Compile Include="..\Wintellect.Sterling\Database\TableTypeResolver.cs">
+      <Link>Database\TableTypeResolver.cs</Link>
+    </Compile>
     <Compile Include="..\Wintellect.Sterling\Events\SterlingOperation.cs">
       <Link>Events\SterlingOperation.cs</Link>
     </Compile>
@@ -170,8 +173,14 @@
     <Compile Include="..\Wintellect.Sterling\ISterlingLock.cs">
       <Link>ISterlingLock.cs</Link>
     </Compile>
+    <Compile Include="..\Wintellect.Sterling\ISterlingPropertyConverter.cs">
+      <Link>ISterlingPropertyConverter.cs</Link>
+    </Compile>
     <Compile Include="..\Wintellect.Sterling\ISterlingTrigger.cs">
       <Link>ISterlingTrigger.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling\ISterlingTypeResolver.cs">
+      <Link>ISterlingTypeResolver.cs</Link>
     </Compile>
     <Compile Include="..\Wintellect.Sterling\Keys\IKeyCollection.cs">
       <Link>Keys\IKeyCollection.cs</Link>
