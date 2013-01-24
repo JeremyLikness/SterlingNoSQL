@@ -108,6 +108,7 @@ namespace Wintellect.Sterling.Serialization
             if (type.IsEnum)
             {
                 type = Enum.GetUnderlyingType(type);
+                target = Convert.ChangeType(target, type, null);
             }
 
             if (CanSerialize(type))

@@ -129,6 +129,7 @@
     <Compile Include="RequestStorage.xaml.cs">
       <DependentUpon>RequestStorage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Database\TestEnumKey.cs" />
     <Compile Include="TestIsoHelper.cs" />
   </ItemGroup>
   <ItemGroup>

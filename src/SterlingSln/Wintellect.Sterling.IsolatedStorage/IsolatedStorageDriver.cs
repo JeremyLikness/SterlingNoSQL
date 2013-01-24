@@ -102,8 +102,7 @@ namespace Wintellect.Sterling.IsolatedStorage
                         var count = keyFile.ReadInt32();
                         for (var x = 0; x < count; x++)
                         {
-                            dictionary.Add(DatabaseSerializer.Deserialize(keyType, keyFile),
-                                           keyFile.ReadInt32());
+                            dictionary.Add(DatabaseSerializer.Deserialize(keyType, keyFile), keyFile.ReadInt32());
                         }
                     }
                 }

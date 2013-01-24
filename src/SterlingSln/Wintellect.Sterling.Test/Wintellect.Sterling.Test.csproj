@@ -89,6 +89,7 @@
     <Compile Include="Database\TestDictionary.cs" />
     <Compile Include="Database\TestDirtyFlag.cs" />
     <Compile Include="Database\TestEnum.cs" />
+    <Compile Include="Database\TestEnumKey.cs" />
     <Compile Include="Database\TestField.cs" />
     <Compile Include="Database\TestIndexQuery.cs" />
     <Compile Include="Database\TestInterfaceProperty.cs" />
