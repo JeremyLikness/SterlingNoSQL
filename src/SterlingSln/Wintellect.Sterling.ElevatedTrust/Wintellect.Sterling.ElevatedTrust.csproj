@@ -49,6 +49,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\SterlingBuildSln\Wintellect.Sterling.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
     <Reference Include="System.Windows" />
@@ -80,6 +86,9 @@
   <ItemGroup>
     <None Include="..\SterlingBuildSln\TraceAndTestImpact.testsettings">
       <Link>TraceAndTestImpact.testsettings</Link>
+    </None>
+    <None Include="..\SterlingBuildSln\Wintellect.Sterling.snk">
+      <Link>Wintellect.Sterling.snk</Link>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
