@@ -68,6 +68,12 @@
     <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestBaseClassModel.cs">
       <Link>TestBaseClassModel.cs</Link>
     </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestChangingTypeFirstVersionClass.cs">
+      <Link>TestChangingTypeFirstVersionClass.cs</Link>
+    </Compile>
+    <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestChangingTypeSecondVersionClass.cs">
+      <Link>TestChangingTypeSecondVersionClass.cs</Link>
+    </Compile>
     <Compile Include="..\Wintellect.Sterling.Test.Helpers\TestClassWithArray.cs">
       <Link>TestClassWithArray.cs</Link>
     </Compile>

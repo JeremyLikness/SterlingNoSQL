@@ -61,6 +61,7 @@
     <Compile Include="Database\TestAsync.cs" />
     <Compile Include="Database\TestBackupRestore.cs" />
     <Compile Include="Database\TestByteStreamInterceptor.cs" />
+    <Compile Include="Database\TestChangingTypeVersion.cs" />
     <Compile Include="Database\TestCycle.cs" />
     <Compile Include="Database\TestDelete.cs" />
     <Compile Include="Database\TestDictionary.cs" />

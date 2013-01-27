@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Wintellect.Sterling.Database;
+using Wintellect.Sterling.Exceptions;
 using Wintellect.Sterling.Serialization;
 
 namespace Wintellect.Sterling.Server.FileSystem
@@ -236,7 +237,14 @@ namespace Wintellect.Sterling.Server.FileSystem
                 var count = typeFile.ReadInt32();
                 for (var x = 0; x < count; x++)
                 {
-                    GetTypeIndex(typeFile.ReadString());
+                    var fullTypeName = typeFile.ReadString();
+                    var tableType = TableTypeResolver.ResolveTableType(fullTypeName);
+                    if (tableType == null)
+                    {
+                        throw new SterlingTableNotFoundException(fullTypeName, DatabaseName);
+                    }
+
+                    GetTypeIndex(tableType.AssemblyQualifiedName);
                 }
             }
 
