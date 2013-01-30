@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SterlingExample.Web", "SterlingExample.Web\SterlingExample.Web.csproj", "{5082D1A4-7D81-4D1C-9EC0-22B99C50E117}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wintellect.Sterling", "Wintellect.Sterling\Wintellect.Sterling.csproj", "{8E5B5989-AD61-49D8-BCB9-40C0902D4D7B}"
