@@ -42,10 +42,12 @@ namespace Wintellect.Sterling.ElevatedTrust
         /// <returns>The writer</returns>
         public BinaryWriter GetWriter(string path)
         {
+            BinaryWriter binaryWriter = null;
             try
             {
                 Monitor.Enter(_writerMutex);
-                return new BinaryWriter(File.Open(path, FileMode.Create, FileAccess.Write));
+                binaryWriter = new BinaryWriter(File.Open(path, FileMode.Create, FileAccess.Write));
+                return binaryWriter;
             }
             catch(Exception ex)
             {
@@ -53,6 +55,8 @@ namespace Wintellect.Sterling.ElevatedTrust
             }
             finally
             {
+                if (binaryWriter != null)
+                    binaryWriter.Close();
                 Monitor.Exit(_writerMutex);
             }
         }

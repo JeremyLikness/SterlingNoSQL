@@ -226,14 +226,14 @@ namespace Wintellect.Sterling.Database
         /// <summary>
         ///     Register any type resolvers.
         /// </summary>
-        internal virtual void RegisterTypeResolvers()
+        protected internal virtual void RegisterTypeResolvers()
         {
         }
 
         /// <summary>
         ///     Registers any property converters.
         /// </summary>
-        internal virtual void RegisterPropertyConverters()
+        protected internal virtual void RegisterPropertyConverters()
         {
         }
 

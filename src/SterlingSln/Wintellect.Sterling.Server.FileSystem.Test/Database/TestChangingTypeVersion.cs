@@ -16,7 +16,7 @@ namespace Wintellect.Sterling.Server.FileSystem.Test.Database
             }
         }
 
-        internal override void RegisterTypeResolvers()
+        protected internal override void RegisterTypeResolvers()
         {
             base.RegisterTypeResolvers();
             RegisterTypeResolver(new ChangingTypeFirstToSecondVersionResolver());
@@ -41,13 +41,13 @@ namespace Wintellect.Sterling.Server.FileSystem.Test.Database
             }
         }
 
-        internal override void RegisterTypeResolvers()
+        protected internal override void RegisterTypeResolvers()
         {
             base.RegisterTypeResolvers();
             RegisterTypeResolver(new ChangingTypeFirstToSecondVersionResolver());
         }
 
-        internal override void RegisterPropertyConverters()
+        protected internal override void RegisterPropertyConverters()
         {
             base.RegisterPropertyConverters();
             RegisterPropertyConverter(new ChangingTypePropertyConverter());
