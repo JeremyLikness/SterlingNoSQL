@@ -19,12 +19,12 @@ namespace Wintellect.Sterling.Serialization
 
         public static SerializationNode WrapForSerialization(object obj)
         {
-            return new SerializationNode {Value = obj};
+            return new SerializationNode { Value = obj };
         }
 
         public T UnwrapForDeserialization<T>()
         {
-            return (T) Value;
+            return (T)Value;
         }
     }
 
@@ -43,7 +43,7 @@ namespace Wintellect.Sterling.Serialization
         private const string NOTNULL_DISPLAY = "[NOT NULL]";
         private const string PROPERTY_VALUE_SEPARATOR = ":";
         private const string END_OF_INSTANCE = "[END_OF_INSTANCE]";
-        
+
         /// <summary>
         ///     The import cache, stores what properties are available and how to access them. Each type has a matching dictionary with the property names as keys
         ///     and the SerializationCache objects as values (provides access to the properties).
@@ -54,7 +54,7 @@ namespace Wintellect.Sterling.Serialization
                 new Dictionary
                     <Type, Dictionary<string, SerializationCache>>();
 
-        private readonly Dictionary<string,Type> _typeRef = new Dictionary<string, Type>();
+        private readonly Dictionary<string, Type> _typeRef = new Dictionary<string, Type>();
 
         private readonly ISterlingDatabaseInstance _database;
         private readonly ISterlingSerializer _serializer;
@@ -75,39 +75,39 @@ namespace Wintellect.Sterling.Serialization
 
                 _propertyCache.Add(type, new Dictionary<string, SerializationCache>());
 
-                var isList = typeof (IList).IsAssignableFrom(type);
-                var isDictionary = typeof (IDictionary).IsAssignableFrom(type);
-                var isArray = typeof (Array).IsAssignableFrom(type);
+                var isList = typeof(IList).IsAssignableFrom(type);
+                var isDictionary = typeof(IDictionary).IsAssignableFrom(type);
+                var isArray = typeof(Array).IsAssignableFrom(type);
 
-                var noDerived = isList || isDictionary || isArray; 
+                var noDerived = isList || isDictionary || isArray;
 
                 // first fields
                 var fields = from f in type.GetFields()
-                             where                              
+                             where
                              !f.IsStatic &&
                              !f.IsLiteral &&
                              !f.IsIgnored(_database.IgnoreAttribute) && !f.FieldType.IsIgnored(_database.IgnoreAttribute)
-                             select new PropertyOrField(f);               
-                
+                             select new PropertyOrField(f);
+
                 var properties = from p in type.GetProperties()
-                                 where          
+                                 where
                                  ((noDerived && p.DeclaringType.Equals(type) || !noDerived)) &&
                                  p.CanRead && p.CanWrite &&
                                  p.GetGetMethod() != null && p.GetSetMethod() != null
                                        && !p.IsIgnored(_database.IgnoreAttribute) && !p.PropertyType.IsIgnored(_database.IgnoreAttribute)
-                                 select new PropertyOrField(p);                                 
+                                 select new PropertyOrField(p);
 
                 foreach (var p in properties.Concat(fields))
-                {                    
-                    var propType = p.PfType;   
-                 
+                {
+                    var propType = p.PfType;
+
                     // eagerly add to the type master
                     _typeResolver(propType.AssemblyQualifiedName);
 
                     var p1 = p;
 
                     _propertyCache[type].Add(p1.Name, new SerializationCache(propType, p1.Name, (parent, property) => p1.Setter(parent, property), p1.GetValue));
-                }                
+                }
             }
         }
 
@@ -120,7 +120,7 @@ namespace Wintellect.Sterling.Serialization
         /// <param name="typeResolver"></param>
         /// <param name="typeIndexer"></param>
         public SerializationHelper(ISterlingDatabaseInstance database, ISterlingSerializer serializer,
-                                   LogManager logManager, Func<string,int> typeResolver, Func<int,string> typeIndexer)
+                                   LogManager logManager, Func<string, int> typeResolver, Func<int, string> typeIndexer)
         {
             _database = database;
             _serializer = serializer;
@@ -143,7 +143,7 @@ namespace Wintellect.Sterling.Serialization
         public void Save(object obj, BinaryWriter bw)
         {
             var node = SerializationNode.WrapForSerialization(obj);
-            Save(typeof(SerializationNode), node, bw, new CycleCache(),true);
+            Save(typeof(SerializationNode), node, bw, new CycleCache(), true);
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace Wintellect.Sterling.Serialization
         {
             _logManager.Log(SterlingLogLevel.Verbose, string.Format("Sterling is serializing type {0}", type.FullName),
                             null);
-            
+
             // need to indicate to the stream whether or not this is null
             var nullFlag = instance == null;
 
@@ -183,7 +183,7 @@ namespace Wintellect.Sterling.Serialization
             }
             else if (typeof(IDictionary).IsAssignableFrom(type))
             {
-                _SaveDictionary(instance as IDictionary, bw, cache);              
+                _SaveDictionary(instance as IDictionary, bw, cache);
             }
             else if (saveTypeExplicit)
             {
@@ -211,8 +211,17 @@ namespace Wintellect.Sterling.Serialization
                 return;
             }
 
-            bw.Write(list.Count);
-            foreach(var item in list)
+            var itemsWithoutNulls = new List<object>();
+            foreach (var item in list)
+            {
+                if (item != null)
+                {
+                    itemsWithoutNulls.Add(item);
+                }
+            }
+
+            bw.Write(itemsWithoutNulls.Count);
+            foreach (var item in itemsWithoutNulls)
             {
                 _InnerSave(item == null ? typeof(string) : item.GetType(), "ListItem", item, bw, cache);
             }
@@ -244,15 +253,24 @@ namespace Wintellect.Sterling.Serialization
                 return;
             }
 
-            bw.Write(array.Length);
+            var itemsWithoutNulls = new List<object>();
             foreach (var item in array)
+            {
+                if (item != null)
+                {
+                    itemsWithoutNulls.Add(item);
+                }
+            }
+
+            bw.Write(itemsWithoutNulls.Count);
+            foreach (var item in itemsWithoutNulls)
             {
                 _InnerSave(item == null ? typeof(string) : item.GetType(), "ArrayItem", item, bw, cache);
             }
         }
 
-        private void _InnerSave(Type type, string propertyName, object instance, BinaryWriter bw,  CycleCache cache)
-        {                                    
+        private void _InnerSave(Type type, string propertyName, object instance, BinaryWriter bw, CycleCache cache)
+        {
             if (_database.IsRegistered(type))
             {
                 // foreign table - write if it is null or not, and if not null, write the key
@@ -260,7 +278,7 @@ namespace Wintellect.Sterling.Serialization
                 _SerializeClass(type, propertyName, instance, bw, cache);
                 return;
             }
-            
+
             if (_serializer.CanSerialize(type))
             {
                 _SerializeProperty(type, propertyName, instance, bw);
@@ -279,7 +297,7 @@ namespace Wintellect.Sterling.Serialization
             {
                 bw.Write(propertyName + PROPERTY_VALUE_SEPARATOR);
                 bw.Write(_typeResolver(type.AssemblyQualifiedName));
-                _SaveList(instance as IList, bw, cache);                                
+                _SaveList(instance as IList, bw, cache);
                 return;
             }
 
@@ -289,11 +307,11 @@ namespace Wintellect.Sterling.Serialization
                 bw.Write(_typeResolver(type.AssemblyQualifiedName));
                 _SaveDictionary(instance as IDictionary, bw, cache);
                 return;
-            }           
-                       
+            }
+
             bw.Write(propertyName + PROPERTY_VALUE_SEPARATOR);
             bw.Write(_typeResolver(type.AssemblyQualifiedName));
-            Save(type, instance, bw, cache,false);
+            Save(type, instance, bw, cache, false);
         }
 
         /// <summary>
@@ -337,8 +355,8 @@ namespace Wintellect.Sterling.Serialization
 
             if (foreignTable == null) return;
 
-            var foreignKey = _database.Save(foreignTable.GetType(), foreignTable.GetType(),foreignTable, cache);
-            
+            var foreignKey = _database.Save(foreignTable.GetType(), foreignTable.GetType(), foreignTable, cache);
+
             // need to be able to serialize the key 
             if (!_serializer.CanSerialize(foreignKey.GetType()))
             {
@@ -352,7 +370,7 @@ namespace Wintellect.Sterling.Serialization
                                 "Sterling is saving foreign key of type {0} with value {1} for parent {2}",
                                 foreignKey.GetType().FullName, foreignKey, type.FullName), null);
 
-            _serializer.Serialize(foreignKey, bw);            
+            _serializer.Serialize(foreignKey, bw);
         }
 
         /// <summary>
@@ -365,7 +383,7 @@ namespace Wintellect.Sterling.Serialization
         /// <returns>The unwrapped object instance</returns>
         public T Load<T>(BinaryReader br)
         {
-            var node = Load(typeof (SerializationNode), null, br, new CycleCache()) as SerializationNode;
+            var node = Load(typeof(SerializationNode), null, br, new CycleCache()) as SerializationNode;
             if (node != null)
             {
                 return node.UnwrapForDeserialization<T>();
@@ -389,7 +407,7 @@ namespace Wintellect.Sterling.Serialization
             {
                 return null;
             }
-            
+
             // make a template
             var instance = Activator.CreateInstance(type);
 
@@ -487,14 +505,14 @@ namespace Wintellect.Sterling.Serialization
             {
                 typeResolved = Type.GetType(typeName);
 
-                lock(((ICollection)_typeRef).SyncRoot)
+                lock (((ICollection)_typeRef).SyncRoot)
                 {
                     if (!_typeRef.ContainsKey(typeName))
                     {
                         _typeRef.Add(typeName, typeResolved);
                     }
                 }
-            }            
+            }
 
             if (_database.IsRegistered(typeResolved))
             {
@@ -517,30 +535,41 @@ namespace Wintellect.Sterling.Serialization
                 return new KeyValuePair<string, object>(propertyName, _serializer.Deserialize(typeResolved, br));
             }
 
-            
+
             if (typeof(Array).IsAssignableFrom(typeResolved))
-            {                
+            {
                 var count = br.ReadInt32();
-                var array = Array.CreateInstance(typeResolved.GetElementType(), count);
+                var listWithoutNulls = new List<object>();
                 for (var x = 0; x < count; x++)
                 {
-                    array.SetValue(_Deserialize(br, cache).Value, x);
+                    var item = _Deserialize(br, cache).Value;
+                    if (item != null)
+                    {
+                        listWithoutNulls.Add(item);
+                    }
+                }
+
+                var array = Array.CreateInstance(typeResolved.GetElementType(), listWithoutNulls.Count);
+                for (var x = 0; x < listWithoutNulls.Count; x++)
+                {
+                    var item = listWithoutNulls[x];
+                    array.SetValue(item, x);
                 }
 
                 return new KeyValuePair<string, object>(propertyName, array);
             }
 
-            if (typeof (IList).IsAssignableFrom(typeResolved))
+            if (typeof(IList).IsAssignableFrom(typeResolved))
             {
                 var list = Activator.CreateInstance(typeResolved) as IList;
-                return new KeyValuePair<string, object>(propertyName, _LoadList(br, cache, list));              
+                return new KeyValuePair<string, object>(propertyName, _LoadList(br, cache, list));
             }
 
-            if (typeof (IDictionary).IsAssignableFrom(typeResolved))
+            if (typeof(IDictionary).IsAssignableFrom(typeResolved))
             {
                 var dictionary = Activator.CreateInstance(typeResolved) as IDictionary;
                 return new KeyValuePair<string, object>(propertyName, _LoadDictionary(br, cache, dictionary));
-            }            
+            }
 
             var instance = Activator.CreateInstance(typeResolved);
 
@@ -579,9 +608,9 @@ namespace Wintellect.Sterling.Serialization
                 propertyPair = _Deserialize(br, cache);
             }
         }
-        
+
         private IDictionary _LoadDictionary(BinaryReader br, CycleCache cache, IDictionary dictionary)
-        {            
+        {
             var count = br.ReadInt32();
             for (var x = 0; x < count; x++)
             {
@@ -595,7 +624,11 @@ namespace Wintellect.Sterling.Serialization
             var count = br.ReadInt32();
             for (var x = 0; x < count; x++)
             {
-                list.Add(_Deserialize(br, cache).Value);
+                var item = _Deserialize(br, cache).Value;
+                if (item != null)
+                {
+                    list.Add(item);
+                }
             }
             return list;
         }
@@ -604,13 +637,13 @@ namespace Wintellect.Sterling.Serialization
         {
             bw.Write(isNull ? NULL : NOTNULL);
             _logManager.Log(SterlingLogLevel.Verbose, string.Format("{0}", isNull ? NULL_DISPLAY : NOTNULL_DISPLAY), null);
-        }    
+        }
 
         private bool _DeserializeNull(BinaryReader br)
         {
             var nullFlag = br.ReadUInt16();
             var isNull = nullFlag == NULL;
-            _logManager.Log(SterlingLogLevel.Verbose, string.Format("{0}", isNull ? NULL_DISPLAY : NOTNULL_DISPLAY),null);
+            _logManager.Log(SterlingLogLevel.Verbose, string.Format("{0}", isNull ? NULL_DISPLAY : NOTNULL_DISPLAY), null);
             return isNull;
         }
     }

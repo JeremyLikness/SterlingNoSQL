@@ -10,14 +10,15 @@ namespace Wintellect.Sterling.Test.Helpers
         
         public List<TestModel> Children { get; set; }
 
-        public static TestListModel MakeTestListModel()
+        public static TestListModel MakeTestListModel(bool includeNullInList)
         {
             return new TestListModel
                        {
                            ID = _nextId++,
                            Children =
-                               new List<TestModel>
-                                   {TestModel.MakeTestModel(), TestModel.MakeTestModel(), TestModel.MakeTestModel()}
+                               includeNullInList ?
+                               new List<TestModel> {TestModel.MakeTestModel(), TestModel.MakeTestModel(), TestModel.MakeTestModel(), null} : 
+                               new List<TestModel> {TestModel.MakeTestModel(), TestModel.MakeTestModel(), TestModel.MakeTestModel()}
                        };
         }
     }

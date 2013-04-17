@@ -171,7 +171,7 @@ namespace Wintellect.Sterling.ElevatedTrust.Test.Database
         {
             var trigger = new TriggerListTestTrigger(100);
             _databaseInstance.RegisterTrigger(trigger);
-            var expected = TestListModel.MakeTestListModel();
+            var expected = TestListModel.MakeTestListModel(false);
 
             // set all the keys to something negative so the trigger can generate the key
             foreach(var subModel in expected.Children)

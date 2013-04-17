@@ -29,7 +29,7 @@ namespace Wintellect.Sterling.Server.FileSystem.Test.Database
         [TestMethod]
         public void TestNullList()
         {
-            var expected = TestListModel.MakeTestListModel();
+            var expected = TestListModel.MakeTestListModel(false);
             expected.Children = null;
             var key = _databaseInstance.Save(expected);
             var actual = _databaseInstance.Load<TestListModel>(key);
@@ -41,7 +41,7 @@ namespace Wintellect.Sterling.Server.FileSystem.Test.Database
         [TestMethod]
         public void TestEmptyList()
         {
-            var expected = TestListModel.MakeTestListModel();
+            var expected = TestListModel.MakeTestListModel(false);
             expected.Children.Clear();
             var key = _databaseInstance.Save(expected);
             var actual = _databaseInstance.Load<TestListModel>(key);
@@ -54,7 +54,7 @@ namespace Wintellect.Sterling.Server.FileSystem.Test.Database
         [TestMethod]
         public void TestList()
         {
-            var expected = TestListModel.MakeTestListModel();
+            var expected = TestListModel.MakeTestListModel(false);
             var key = _databaseInstance.Save(expected);
             var actual = _databaseInstance.Load<TestListModel>(key);
             Assert.IsNotNull(actual, "Save/load failed: model is null.");

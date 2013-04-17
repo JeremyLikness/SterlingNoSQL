@@ -29,7 +29,7 @@ namespace Wintellect.Sterling.Server.FileSystem.Test.Database
         [TestMethod]
         public void TestNullArray()
         {
-            var expected = TestClassWithArray.MakeTestClassWithArray();
+            var expected = TestClassWithArray.MakeTestClassWithArray(false);
             expected.BaseClassArray = null;
             expected.ClassArray = null;
             expected.ValueTypeArray = null;
@@ -46,7 +46,7 @@ namespace Wintellect.Sterling.Server.FileSystem.Test.Database
         [TestMethod]
         public void TestArray()
         {
-            var expected = TestClassWithArray.MakeTestClassWithArray();
+            var expected = TestClassWithArray.MakeTestClassWithArray(false);
             var key = _databaseInstance.Save(expected);
             var actual = _databaseInstance.Load<TestClassWithArray>(key);
             

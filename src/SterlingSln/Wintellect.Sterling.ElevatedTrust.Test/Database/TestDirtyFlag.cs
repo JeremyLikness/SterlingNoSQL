@@ -65,7 +65,7 @@ namespace Wintellect.Sterling.ElevatedTrust.Test.Database
         [TestMethod]
         public void TestDirtyFlagFalse()
         {
-            var expected = TestListModel.MakeTestListModel();
+            var expected = TestListModel.MakeTestListModel(false);
 
             // first save is to generate the keys
             var key = _databaseInstance.Save(expected);
@@ -91,7 +91,7 @@ namespace Wintellect.Sterling.ElevatedTrust.Test.Database
         [TestMethod]
         public void TestDirtyFlagTrue()
         {
-            var expected = TestListModel.MakeTestListModel();
+            var expected = TestListModel.MakeTestListModel(false);
 
             // first save is to generate the keys
             var key = _databaseInstance.Save(expected);
