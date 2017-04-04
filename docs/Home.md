@@ -7,7 +7,7 @@ The goal behind Sterling is to keep it:
 * Lightweight. As of this writing, the DLL for Sterling is under 85 Kb. No one needs to bloat their project for something as simple as persisting data.
 * Flexible. While the core is light, Sterling is designed to handle any serialization task and make it ultra-easy to query databases using LINQ-to-Objects.
 * Portable. Sterling runs equally well on the desktop/server .NET framework, Silverlight, and Windows Phone.
-View the full [Features](Features) list.
+View the full [Features](Features.md) list.
 
 **Important Note from Jeremy Likness** 
 
@@ -61,7 +61,7 @@ Sterling contributors who have joined the development team are:
 
 In short, here's all it takes to define a table with an integer key and a string index: 
 
-{code: c#}
+```C#
 protected override List<ITableDefinition> RegisterTables()
 {
    return new List<ITableDefinition>
@@ -69,13 +69,13 @@ protected override List<ITableDefinition> RegisterTables()
                                .WithIndex<MyContact, string, int>("Contact_Email", c => c.Email)
       };
 }
-{code: c#}
+```
 
 Note the indexes always contain the key. This is because Sterling will lazy-load the actual entity. You can query over indexes and keys using LINQ to Objects, and only de-serialize when you need the value.
 
 Here is an example of a complex query from the reference application:
 
-{code: c#}
+```C#
 return from n in CurrentFoodDescription.Nutrients
         join nd in
             SterlingService.Current.Database.Query<NutrientDefinition, string, string, int>(
@@ -92,6 +92,6 @@ return from n in CurrentFoodDescription.Nutrients
                         Description = nd.Index.Item2,
                         UnitOfMeasure = nd.Index.Item1
                     };
-{code: c#}
+```
 
 To learn more, read the full [Sterling User's Guide](https://sites.google.com/site/sterlingdatabase/).
