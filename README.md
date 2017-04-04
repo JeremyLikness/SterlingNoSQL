@@ -1,6 +1,6 @@
 # Sterling NoSQL Object-Oriented Database 
 
-This is the project for Sterling, and object-oriented database Jeremy authored to meet the growing demand for queryable, persistent storage in Silverlight and Windows Phone apps. 
+This is the project for Sterling, and object-oriented database Jeremy Likness created to meet the growing demand for queryable, persistent storage in Silverlight and Windows Phone apps in the early two-thousand tens.
 
 ![Sterling Database](./Sterling-Final-Small.png) 
 
